@@ -1,52 +1,70 @@
+# Naming Scheme
+Motor variable names: `[position or function]Motor`
+    eg Elevator.leftMotor
+       CoralArm.shoulderMotor
+       AlgaeArm.pivotMotor
+
+Sensor variable names: `[attribute/data]Sensor`
+
+Method names:
+    - getters: `get[motor position/function if necessary][attribute/data]`
+    - setters: `set[motor position/function if necessary][attribute/data]`
+    - sequences: `seq[function][motor position/function if necessary]`
+    - `configureMotors()`
+a getter should be private unless its supersystem requires that data
+
 # Subsystems
-## ElevatorMotors
+## Elevator
 ### Variables
-Kraken joinedMotor
-CANRange rangeFinder
+TalonFX leftMotor
+TalonFX rightMotor
+CANRange heightSensor
 MagnentSensor atBottomSensor
 
 ### Methods
 public ElevatorMotors()
 public void configureMotors()
-public double getCurrentHeight()
-public void setHeight()
+
+public bool getAtBottom()
+public double getHeight()
+
+public void setHeight(double height)
 
 ## CoralArm
-<!-- Does coral intake require spinning gripper motors? -->
-
 ### Variables
-Falcon shoulderMotor
-Neo gripperMotor
+TalonFX pivotMotor
+CANSparkMax gripperMotor
 
 ### Methods
+public CoralArm()
+private configureMotors()
 public double getShoulderAngle()
 public void setShoulderAngle()
 
 public void setGripperSpeed()
-public void stopGripper()
+public void seqStopGripper()
 
 <!-- public void intakeCoral() -->
 
 ## AlgaeArm
 ### Variables
-Neo intakeWheelsMotor
-Falcon intakePivot
+TalonFX pivotMotor
+CANSparkMax gripperMotor
 
 ### Methods
-public void deployIntake()
-public void retreatIntake()
+public double getPivotAngle()
+public void setPivotAngle(double angle)
 
-public void spinIntakeWheels()
-public void stopIntakeWheels()
+public void setGripperSpeed(double speed)
+public void seqStopGripper()
 
-public void intakeAlgae()
-public void scoreAlgae()
+public void seqIntake()
+public void seqScore()
+public void seqDeployIntake()
+public void seqRetreatIntake()
 
 ## Climber
 TODO!
 
 # Supersystems
 ## ElevatorSupersystem
-initializes: ElevatorMotors + CoralArm
-
-<!-- Maybe algae supersystem -->
