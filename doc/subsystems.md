@@ -8,9 +8,11 @@ Sensor variable names: `[attribute/data]Sensor`
 
 Method names:
     - getters: `get[motor position/function if necessary][attribute/data]`
+        - bool getters: `is[condition]`
     - setters: `set[motor position/function if necessary][attribute/data]`
-    - sequences: `seq[function][motor position/function if necessary]`
+    - small executors: `[function][motor position/function if necessary]`
     - `configureMotors()`
+    - full sequences: `seq[function][motor position/function if necessary]`
 a getter should be private unless its supersystem requires that data
 
 # Subsystems
@@ -25,7 +27,7 @@ MagnentSensor atBottomSensor
 public ElevatorMotors()
 public void configureMotors()
 
-public bool getAtBottom()
+public bool isAtBottom()
 public double getHeight()
 
 public void setHeight(double height)
@@ -42,7 +44,7 @@ public double getShoulderAngle()
 public void setShoulderAngle()
 
 public void setGripperSpeed()
-public void seqStopGripper()
+public void stopGripper()
 
 <!-- public void intakeCoral() -->
 
@@ -56,10 +58,10 @@ public double getPivotAngle()
 public void setPivotAngle(double angle)
 
 public void setGripperSpeed(double speed)
-public void seqStopGripper()
+public void stopGripper()
 
 public void seqIntake()
-public void seqScore()
+public void seqIcore()
 public void seqDeployIntake()
 public void seqRetreatIntake()
 
