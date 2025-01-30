@@ -21,6 +21,10 @@ public final class Constants {
         public static final int leftMotorID = 0;
         public static final int rightMotorID = 0;
 
+        public static final int motorAcceleration = 160;
+        public static final int motorCruiseVelocity = 80;
+
         public static final int heightSensorID = 0;
+        public static final int bottomSensorGPIO = 0;
     }
 }

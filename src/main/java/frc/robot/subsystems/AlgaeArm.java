@@ -7,6 +7,8 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,7 +32,8 @@ public class AlgaeArm extends SubsystemBase {
         pivotMotor.getConfigurator().apply(pivotMotorConfigs);
     }
 
-    public void setPivotAngle(double angle) {}
+    // Figure out setAngle for algae arm
+    public void setPivotAngle(Rotation2d angle) {}
 
     public Command setGripperVoltage(double voltage) {
         return run(() -> gripperMotor.setVoltage(voltage));

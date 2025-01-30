@@ -9,6 +9,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 
 import static frc.robot.Constants.ElevatorConstants.*;
 
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -25,31 +26,33 @@ public class Elevator extends SubsystemBase {
         rightMotor = new TalonFX(rightMotorID, "canivore");
         leftMotor = new TalonFX(leftMotorID, "canivore");
         heightSensor = new CANrange(heightSensorID, "canivore");
-        // bottomSensor = new DigitalInput(); // TODO initialize bottomSensor
+        bottomSensor = new DigitalInput(bottomSensorGPIO);
 
         configureMotors();
     }
 
     private void configureMotors() {
-        var motorConfigs = new MotorOutputConfigs();
+        var motor_cfg = new TalonFXConfiguration();
+        motor_cfg.MotionMagic.MotionMagicAcceleration = motorAcceleration;
+        motor_cfg.MotionMagic.MotionMagicAcceleration = motorCruiseVelocity;
 
-        var slot0 = new Slot0Configs();
-        // TODO tune pids
-
-        rightMotor.getConfigurator().apply(slot0);
-        rightMotor.getConfigurator().apply(motorConfigs.withInverted(InvertedValue.Clockwise_Positive));
+        var right_motor_cfg = motor_cfg;
+        right_motor_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+        rightMotor.getConfigurator().apply(right_motor_cfg);
         
-        leftMotor.getConfigurator().apply(slot0);
-        leftMotor.getConfigurator().apply(motorConfigs.withInverted(InvertedValue.CounterClockwise_Positive));
+        var left_motor_cfg = motor_cfg;
+        left_motor_cfg.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+        leftMotor.getConfigurator().apply(right_motor_cfg);
     }
     
     public boolean isAtBottom() {
         return bottomSensor.get();
     }
 
-    public double getHeight() {
-        return heightSensor.getAmbientSignal().getValue();
+    public Distance getHeight() {
+        return heightSensor.getDistance().getValue();
     }
 
-    public Command setHeight(double height) { return Commands.none(); }
+    // TODO write set height function
+    public Command setHeight(Distance height) { return Commands.none(); }
 }
