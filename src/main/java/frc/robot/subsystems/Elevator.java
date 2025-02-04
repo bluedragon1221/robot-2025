@@ -15,19 +15,29 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
+    private static Elevator instance;
+
     private static TalonFX leftMotor;
     private static TalonFX rightMotor;
     
     private static CANrange heightSensor;
     private static DigitalInput bottomSensor;
 
-    public Elevator() {
+    private Elevator() {
         rightMotor = new TalonFX(rightMotorID, "canivore");
         leftMotor = new TalonFX(leftMotorID, "canivore");
         heightSensor = new CANrange(heightSensorID, "canivore");
         bottomSensor = new DigitalInput(bottomSensorGPIO);
 
         configureMotors();
+    }
+
+    public static Elevator getInstance() {
+        if (instance == null) {
+            instance = new Elevator();
+        }
+
+        return instance;
     }
 
     private void configureMotors() {

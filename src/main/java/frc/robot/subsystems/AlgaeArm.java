@@ -13,14 +13,24 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class AlgaeArm extends SubsystemBase {
+    private static AlgaeArm instance;
+
     private static TalonFX pivotMotor;
     private static SparkMax gripperMotor;
 
-    public AlgaeArm() {
+    private AlgaeArm() {
         pivotMotor = new TalonFX(pivotMotorID, "canivore");
         gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
         configureMotors();
+    }
+
+    public static AlgaeArm getInstance() {
+        if (instance == null) {
+            instance = new AlgaeArm();
+        }
+
+        return instance;
     }
 
     private void configureMotors() {

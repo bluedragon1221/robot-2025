@@ -30,16 +30,26 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralArm extends SubsystemBase {
+    private static CoralArm instance;
+
     private static TalonFX pivotMotor;
     private static SparkMax gripperMotor;
     private static CANcoder pivotEncoder;
 
-    public CoralArm() {
+    private CoralArm() {
         pivotMotor = new TalonFX(pivotMotorID, "canbus");
         pivotEncoder = new CANcoder(pivotEncoderID, "canivore");
         gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
         configureMotors();
+    }
+
+    public static CoralArm getInstance() {
+        if (instance == null) {
+            instance = new CoralArm();
+        }
+
+        return instance;
     }
 
     private void configureMotors() {
