@@ -8,7 +8,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -26,8 +25,7 @@ public class AlgaeArm extends SubsystemBase {
 
     private void configureMotors() {
         var pivotMotorConfigs = new TalonFXConfiguration();
-        // TODO: tune pivot motor
-        // TODO: use motionmagic
+        // TODO: do these need tuning? mm?
 
         pivotMotor.getConfigurator().apply(pivotMotorConfigs);
     }
