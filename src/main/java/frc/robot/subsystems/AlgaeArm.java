@@ -26,8 +26,8 @@ public class AlgaeArm extends SubsystemBase {
 
     private void configureMotors() {
         var pivotMotorConfigs = new TalonFXConfiguration();
-        // TODO tune pivot motor
-        // TODO use motionmagic
+        // TODO: tune pivot motor
+        // TODO: use motionmagic
 
         pivotMotor.getConfigurator().apply(pivotMotorConfigs);
     }

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -33,16 +32,24 @@ public class Elevator extends SubsystemBase {
 
     private void configureMotors() {
         var motor_cfg = new TalonFXConfiguration();
-        motor_cfg.MotionMagic.MotionMagicAcceleration = motorAcceleration;
+        motor_cfg.MotionMagic.MotionMagicAcceleration = motorMaxAcceleration;
         motor_cfg.MotionMagic.MotionMagicAcceleration = motorCruiseVelocity;
 
-        var right_motor_cfg = motor_cfg;
-        right_motor_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        rightMotor.getConfigurator().apply(right_motor_cfg);
-        
-        var left_motor_cfg = motor_cfg;
-        left_motor_cfg.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-        leftMotor.getConfigurator().apply(right_motor_cfg);
+        // TODO: these are default values! make sure to change
+        var slot0 = motor_cfg.Slot0;
+        slot0.kS = 0.25;
+        slot0.kV = 0.12;
+        slot0.kA = 0.01;
+        slot0.kP = 60;
+        slot0.kI = 0;
+        slot0.kD = 0.5;
+
+        rightMotor.getConfigurator().apply(motor_cfg);
+        leftMotor.getConfigurator().apply(motor_cfg);
+
+        var mfg_overrides = new MotorOutputConfigs();
+        rightMotor.getConfigurator().apply(mfg_overrides.withInverted(InvertedValue.Clockwise_Positive));
+        leftMotor.getConfigurator().apply(mfg_overrides.withInverted(InvertedValue.CounterClockwise_Positive));
     }
     
     public boolean isAtBottom() {
@@ -53,6 +60,6 @@ public class Elevator extends SubsystemBase {
         return heightSensor.getDistance().getValue();
     }
 
-    // TODO write set height function
+    // TODO: write set height function
     public Command setHeight(Distance height) { return Commands.none(); }
 }

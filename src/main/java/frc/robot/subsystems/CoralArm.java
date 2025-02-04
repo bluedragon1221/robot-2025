@@ -1,8 +1,14 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.Constants.CoralArmConstants.*;
+import static frc.robot.Constants.CoralArmConstants.gripperMotorID;
+import static frc.robot.Constants.CoralArmConstants.pivotEncoderID;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorAcceleration;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorCruiseVelocity;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorID;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorTolerance;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -10,12 +16,12 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Time;
@@ -40,7 +46,7 @@ public class CoralArm extends SubsystemBase {
         // -- Configure pivot encoder --//
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        encoder_cfg.MagnetOffset = 0; // TODO pivot encoder magnet offset
+        encoder_cfg.MagnetOffset = 0; // TODO: pivot encoder magnet offset
         pivotEncoder.getConfigurator().apply(encoder_cfg);
 
         // -- Configure pivot motor --//
@@ -48,6 +54,15 @@ public class CoralArm extends SubsystemBase {
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
         pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         pivot_cfg.Feedback.RotorToSensorRatio = 1.0;
+
+        // TODO: these are default values! make sure to change
+        var slot0 = pivot_cfg.Slot0;
+        slot0.kS = 0.25;
+        slot0.kV = 0.12;
+        slot0.kA = 0.01;
+        slot0.kP = 60;
+        slot0.kI = 0;
+        slot0.kD = 0.5;
 
         pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
         pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
@@ -60,7 +75,7 @@ public class CoralArm extends SubsystemBase {
         // -- Configure gripper motor --//
         var gripper_cfg = new SparkMaxConfig();
         gripper_cfg.idleMode(IdleMode.kBrake);
-        // TODO more config for gripper
+        // TODO: more config for gripper
         gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
@@ -70,7 +85,7 @@ public class CoralArm extends SubsystemBase {
 
     private boolean isAtAngle(Rotation2d target_angle) {
         var diff = getPivotAngle().minus(target_angle).getDegrees();
-        return Math.abs(diff) < pivotMotorTolerance;
+        return Math.abs(diff) <= pivotMotorTolerance.in(Degrees);
     }
 
     // TODO figure out how the heck this thing is supposed to work
