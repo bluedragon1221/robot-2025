@@ -70,3 +70,4 @@ TODO!
 
 # Supersystems
 ## ElevatorSupersystem
+seqFullIntake()

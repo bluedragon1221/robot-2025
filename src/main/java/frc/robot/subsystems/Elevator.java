@@ -6,6 +6,7 @@ import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 
+import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.ElevatorConstants.*;
 
 import edu.wpi.first.units.measure.Distance;
@@ -32,7 +33,7 @@ public class Elevator extends SubsystemBase {
         configureMotors();
     }
 
-    public static Elevator getInstance() {
+    public static synchronized Elevator getInstance() {
         if (instance == null) {
             instance = new Elevator();
         }
@@ -70,6 +71,29 @@ public class Elevator extends SubsystemBase {
         return heightSensor.getDistance().getValue();
     }
 
+    public enum HeightPreset {
+        Down(Inches.of(0)),
+        Intake(),
+        L1(),
+        L2(),
+        L3(),
+        L4();
+
+        private final Distance distance;
+
+        HeightPreset(Distance d) {
+            distance = d;
+        }
+
+        public Distance getHeight() {
+            return distance;
+        }
+    }
+
     // TODO: write set height function
     public Command setHeight(Distance height) { return Commands.none(); }
+
+    public Command setHeightFromPreset(HeightPreset preset) {
+        return setHeight(preset.getHeight());
+    }
 }

@@ -25,7 +25,7 @@ public class AlgaeArm extends SubsystemBase {
         configureMotors();
     }
 
-    public static AlgaeArm getInstance() {
+    public static synchronized AlgaeArm getInstance() {
         if (instance == null) {
             instance = new AlgaeArm();
         }

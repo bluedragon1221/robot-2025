@@ -44,7 +44,7 @@ public class CoralArm extends SubsystemBase {
         configureMotors();
     }
 
-    public static CoralArm getInstance() {
+    public static synchronized CoralArm getInstance() {
         if (instance == null) {
             instance = new CoralArm();
         }
