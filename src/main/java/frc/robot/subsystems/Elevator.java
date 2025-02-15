@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.ElevatorConstants.*;
 
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -71,14 +72,30 @@ public class Elevator extends SubsystemBase {
         return heightSensor.getDistance().getValue();
     }
 
+
+    // Commands to nudge elevator (doesn't rely on setHeight)
+    public Command startNudgeElevator(Voltage volts) {
+        return run(() -> {
+            rightMotor.setVoltage(volts.magnitude());
+            leftMotor.setVoltage(volts.magnitude());
+        });
+    }
+
+    public Command stopNudgeElevator() {
+        return run(() -> {
+            rightMotor.setVoltage(0);
+            leftMotor.setVoltage(0);
+        });
+    }
+
     // TODO: measure elevator height presets
     public enum HeightPreset {
         Down(Inches.of(0)),
-        Intake(),
-        L1(),
-        L2(),
-        L3(),
-        L4();
+        Intake(Inches.of(0)),
+        L1(Inches.of(0)),
+        L2(Inches.of(0)),
+        L3(Inches.of(0)),
+        L4(Inches.of(0));
 
         private final Distance distance;
 
