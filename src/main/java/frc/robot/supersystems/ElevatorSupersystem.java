@@ -1,5 +1,8 @@
 package frc.robot.supersystems;
 
+import static edu.wpi.first.units.Units.Milliseconds;
+
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.CoralArm;
 import frc.robot.subsystems.Elevator;
@@ -18,5 +21,9 @@ public class ElevatorSupersystem extends SubsystemBase {
     public void seqFullIntake() {
         elevator.setHeightFromPreset(HeightPreset.Intake);
         coral_arm.setPivotAngleFromPreset(PivotPreset.Down);
+        
+        Time timeout = Milliseconds.of(100);
+        coral_arm.intake(timeout);
+
     }
 }

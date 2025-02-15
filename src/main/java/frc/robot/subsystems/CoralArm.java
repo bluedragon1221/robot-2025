@@ -3,12 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
-import static frc.robot.Constants.CoralArmConstants.gripperMotorID;
-import static frc.robot.Constants.CoralArmConstants.pivotEncoderID;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorAcceleration;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorCruiseVelocity;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorID;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorTolerance;
+import static frc.robot.Constants.CoralArmConstants.*;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -127,15 +122,13 @@ public class CoralArm extends SubsystemBase {
         return run(() -> gripperMotor.setVoltage(voltage));
     }
 
-    public Command seqStopGripper() {
+    public Command stopGripper() {
         return setGripperVoltage(0);
     }
 
-    public Command seqIntake() {
-        Time timeout = Milliseconds.of(100);
-
+    public Command intake(Time timeout) {
         return setGripperVoltage(70)
             .andThen(Commands.waitTime(timeout))
-            .andThen(this::seqStopGripper);
+            .andThen(this::stopGripper);
     }
 }

@@ -27,7 +27,7 @@ public class Elevator extends SubsystemBase {
     private Elevator() {
         rightMotor = new TalonFX(rightMotorID, "canivore");
         leftMotor = new TalonFX(leftMotorID, "canivore");
-        heightSensor = new CANrange(heightSensorID, "canivore");
+        heightSensor = new CANrange(heightSensorID, "canivore"); // TODO: use CANrange as feedback device into Elevator motors MM
         bottomSensor = new DigitalInput(bottomSensorGPIO);
 
         configureMotors();
@@ -71,6 +71,7 @@ public class Elevator extends SubsystemBase {
         return heightSensor.getDistance().getValue();
     }
 
+    // TODO: measure elevator height presets
     public enum HeightPreset {
         Down(Inches.of(0)),
         Intake(),
