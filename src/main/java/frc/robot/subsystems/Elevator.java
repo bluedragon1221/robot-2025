@@ -58,10 +58,6 @@ public class Elevator extends SubsystemBase {
 
         rightMotor.getConfigurator().apply(motor_cfg);
         leftMotor.getConfigurator().apply(motor_cfg);
-
-        var mfg_overrides = new MotorOutputConfigs();
-        rightMotor.getConfigurator().apply(mfg_overrides.withInverted(InvertedValue.Clockwise_Positive));
-        leftMotor.getConfigurator().apply(mfg_overrides.withInverted(InvertedValue.CounterClockwise_Positive));
     }
     
     public boolean isAtBottom() {
