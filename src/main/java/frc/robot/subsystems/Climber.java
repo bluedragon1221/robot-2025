@@ -120,6 +120,5 @@ public class Climber extends SubsystemBase {
         }
     }
 
-    // SmartDashboard: feedback to driver: what state is the robot in?
-    //                            camera feed
+    // TODO: SmartDashboard camera feed
 }
