@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
@@ -55,7 +56,9 @@ public class RobotContainer {
         // Add Autos
         auto_factory = drivetrain.createAutoFactory();
         auto_routines = new AutoRoutines(auto_factory);
-        auto_chooser.addRoutine("SimplePath", auto_routines::testAuto);
+        auto_chooser.addRoutine("Center Cage 2L4", auto_routines::CenterCage2l4);
+        
+        SmartDashboard.putData("Auto Chooser", auto_chooser);
 
         configureBindings();
     }
