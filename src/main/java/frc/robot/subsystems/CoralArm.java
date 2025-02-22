@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.Constants.CoralArmConstants.*;
 

@@ -24,6 +24,5 @@ public class ElevatorSupersystem extends SubsystemBase {
         
         Time timeout = Milliseconds.of(100);
         coral_arm.intake(timeout);
-
     }
 }

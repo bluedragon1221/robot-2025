@@ -44,6 +44,7 @@ public class Elevator extends SubsystemBase {
 
     private void configureMotors() {
         var motor_cfg = new TalonFXConfiguration();
+        // TODO: max acceleration, max velocity
         motor_cfg.MotionMagic.MotionMagicAcceleration = motorMaxAcceleration;
         motor_cfg.MotionMagic.MotionMagicAcceleration = motorCruiseVelocity;
 
