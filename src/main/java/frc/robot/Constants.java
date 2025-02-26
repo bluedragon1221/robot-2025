@@ -10,11 +10,11 @@ public final class Constants {
         public static final int leftMotorID = 20;
         public static final int rightMotorID = 21;
 
-        public static final int motorMaxAcceleration = 160;
-        public static final int motorCruiseVelocity = 80;
+        public static final int motorMaxAcceleration = 48;
+        public static final int motorCruiseVelocity = 70;
 
         public static final int heightSensorID = 22;
-        public static final int bottomSensorGPIO = 0;
+        public static final int bottomSensorDIO = 0;
     }
 
     public static final class CoralArmConstants {

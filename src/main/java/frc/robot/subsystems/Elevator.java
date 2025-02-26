@@ -1,10 +1,8 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
 
 import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.ElevatorConstants.*;
@@ -15,6 +13,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+// CTRE elevator mm class?
 
 public class Elevator extends SubsystemBase {
     private static Elevator instance;
@@ -29,9 +29,11 @@ public class Elevator extends SubsystemBase {
         rightMotor = new TalonFX(rightMotorID, "canivore");
         leftMotor = new TalonFX(leftMotorID, "canivore");
         heightSensor = new CANrange(heightSensorID, "canivore"); // TODO: use CANrange as feedback device into Elevator motors MM
-        bottomSensor = new DigitalInput(bottomSensorGPIO);
+        bottomSensor = new DigitalInput(bottomSensorDIO);
 
         configureMotors();
+
+        // MotionMagicVoltage
     }
 
     public static synchronized Elevator getInstance() {
@@ -49,19 +51,18 @@ public class Elevator extends SubsystemBase {
         motor_cfg.MotionMagic.MotionMagicAcceleration = motorCruiseVelocity;
 
         // TODO: these are default values! make sure to change
-        var slot0 = motor_cfg.Slot0;
-        slot0.kS = 0.25;
-        slot0.kV = 0.12;
-        slot0.kA = 0.01;
-        slot0.kP = 60;
-        slot0.kI = 0;
-        slot0.kD = 0.5;
+        motor_cfg.Slot0.kA = 0.01;
+        motor_cfg.Slot0.kG = 0.067;
+        motor_cfg.Slot0.kP = 60;
+        motor_cfg.Slot0.kI = 0;
+        motor_cfg.Slot0.kD = 0.5;
 
+        // TODO: make them inverted!!!
         rightMotor.getConfigurator().apply(motor_cfg);
         leftMotor.getConfigurator().apply(motor_cfg);
     }
     
-    public boolean isAtBottom() {
+    private boolean isAtBottom() {
         return bottomSensor.get();
     }
 
@@ -86,8 +87,8 @@ public class Elevator extends SubsystemBase {
     }
 
     // TODO: measure elevator height presets
-    public enum HeightPreset {
-        Down(Inches.of(0)),
+    public enum ElevatorHeightPreset {
+        Initial(Inches.of(0)), // not zero!!!
         Intake(Inches.of(0)),
         L1(Inches.of(0)),
         L2(Inches.of(0)),
@@ -96,7 +97,7 @@ public class Elevator extends SubsystemBase {
 
         private final Distance distance;
 
-        HeightPreset(Distance d) {
+        ElevatorHeightPreset(Distance d) {
             distance = d;
         }
 
@@ -108,7 +109,7 @@ public class Elevator extends SubsystemBase {
     // TODO: write set height function
     public Command setHeight(Distance height) { return Commands.none(); }
 
-    public Command setHeightFromPreset(HeightPreset preset) {
+    public Command setHeightFromPreset(ElevatorHeightPreset preset) {
         return setHeight(preset.getHeight());
     }
 }
