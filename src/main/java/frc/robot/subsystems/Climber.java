@@ -33,7 +33,7 @@ public class Climber extends SubsystemBase {
     };
 
     private Climber() {
-        setState(ClimbState.Initial);
+        climber_state = ClimbState.Initial;
     
         motor = new SparkMax(climberMotorID, MotorType.kBrushless);
         configureMotors();
@@ -48,6 +48,7 @@ public class Climber extends SubsystemBase {
     }
 
     private void configureMotors() {
+        // do I need to reset motor here?
         var cfg = new SparkMaxConfig();
         cfg.idleMode(IdleMode.kBrake);
         cfg.smartCurrentLimit((int)climberMotorCurrentLimit.baseUnitMagnitude());
@@ -66,11 +67,6 @@ public class Climber extends SubsystemBase {
         motor.getClosedLoopController().setReference(targetPosition, ControlType.kPosition);
     }
 
-    private void setState(ClimbState state) {
-        climber_state = state;
-        SmartDashboard.putString("Climber State", state.toString());
-    }
-
     /**
      * Moves the climber arm into position to catch the cage
      * Runs in 0.6 sec
@@ -78,9 +74,9 @@ public class Climber extends SubsystemBase {
     public Command deployIntake() {
         if (climber_state == ClimbState.Initial) {
             return run(() -> {
-                setState(ClimbState.Phase1Active);
+                climber_state = ClimbState.Phase1Active;
                 addRotations(50);
-                setState(ClimbState.Phase1Complete);
+                climber_state = ClimbState.Phase1Complete;
             });
         } else {
             return Commands.none();
@@ -94,9 +90,9 @@ public class Climber extends SubsystemBase {
     public Command retrieveCage() {
         if (climber_state == ClimbState.Phase1Complete) {
             return run(() -> {
-                setState(ClimbState.Phase2Active);
+                climber_state = ClimbState.Phase2Active;
                 addRotations(79);
-                setState(ClimbState.Phase2Complete);
+                climber_state = ClimbState.Phase2Complete;
             });
         } else {
             return Commands.none();
@@ -105,19 +101,23 @@ public class Climber extends SubsystemBase {
 
     /**
      * Complete the climb by pivoting off the cage and supporting the robot from the cage.
-     * TODO: Runs at 40% free speed since we're dealing with the full weight of the robot now
      * Runs in 3 sec
      */
     public Command finishClimb() {
         if (climber_state == ClimbState.Phase2Complete) {
             return run(() -> {
-                setState(ClimbState.Phase3Active);
+                climber_state = ClimbState.Phase3Active;
                 addRotations(81);
-                setState(ClimbState.ClimbComplete);
+                climber_state = ClimbState.ClimbComplete;
             });
         } else {
             return Commands.none();
         }
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putString("Climber State", climber_state.toString());
     }
 
     // TODO: SmartDashboard camera feed
