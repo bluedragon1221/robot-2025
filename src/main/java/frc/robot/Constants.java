@@ -1,9 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Current;
 
 public final class Constants {
     public static final class ElevatorConstants {
@@ -31,12 +29,21 @@ public final class Constants {
     public static final class AlgaeArmConstants {
         public static final int pivotMotorID = 35;
         public static final int gripperMotorID = 36;
+
+        public static final int pivotMotorAcceleration = 0;
+        public static final int pivotMotorCruiseVelocity = 0;
+
+        public static final double pivotMotorGearRatio = 1.0; // TODO: get actual gear ratio
     }
 
     public static final class ClimberConstants {
         public static final int climberMotorID = 40;
-        public static final Current climberMotorCurrentLimit = Amps.of(60);
+
+        public static final int climberMotorTolerance = 1;
+
+        public static final int climberMotorCurrentLimit = 60;
     }
 
-    public static final class ElevatorSupersystemConstants {}
+    public static final class ElevatorSupersystemConstants {
+    }
 }
