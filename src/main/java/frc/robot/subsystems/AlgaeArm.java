@@ -1,13 +1,17 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.AlgaeArmConstants.*;
+import static edu.wpi.first.units.Units.Volts;
+import static frc.robot.Constants.AlgaeArmConstants.gripperMotorID;
+import static frc.robot.Constants.AlgaeArmConstants.pivotMotorID;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +20,8 @@ public class AlgaeArm extends SubsystemBase {
     private static AlgaeArm instance;
 
     private static TalonFX pivotMotor;
+    final PositionVoltage position_voltage = new PositionVoltage(0);
+
     private static SparkMax gripperMotor;
 
     private AlgaeArm() {
@@ -34,21 +40,40 @@ public class AlgaeArm extends SubsystemBase {
     }
 
     private void configureMotors() {
-        var pivotMotorConfigs = new TalonFXConfiguration();
-        // TODO: do these need tuning? mm?
+        var cfg = new TalonFXConfiguration();
+        cfg.Slot0.kG = 0.067;
+        cfg.Slot0.kP = 30;
+        cfg.Slot0.kI = 0;
+        cfg.Slot0.kD = 0.3;
 
-        pivotMotor.getConfigurator().apply(pivotMotorConfigs);
+        pivotMotor.getConfigurator().apply(cfg);
     }
 
-    // Figure out setAngle for algae arm
-    public void setPivotAngle(Rotation2d angle) {}
-
-    public Command setGripperVoltage(double voltage) {
-        return run(() -> gripperMotor.setVoltage(voltage));
+    // Gripper
+    private Command setGripperVoltage(Voltage voltage) {
+        return run(() -> gripperMotor.setVoltage(voltage.magnitude()));
     }
 
-    public Command seqStopGripper() { return setGripperVoltage(0); }
+    // Pivot
+    private Command setPivotAngle(Rotation2d goalAngle) {
+        return run(() -> pivotMotor.setControl(
+                position_voltage.withPosition(goalAngle.getRotations())
+            )
+        );
+    }
 
-    public Command seqDeployIntake() { return Commands.none(); }
-    public Command seqRetreatIntake() { return Commands.none(); }
+    // sequences
+    public Command deployArm() {
+        return Commands.parallel(
+            setPivotAngle(Rotation2d.fromDegrees(35)),
+            setGripperVoltage(Volts.of(40))
+        );
+    }
+
+    public Command retreatArm() {
+        return Commands.parallel(
+            setPivotAngle(Rotation2d.fromDegrees(-10)),
+            setGripperVoltage(Volts.of(0))
+        );
+    }
 }
