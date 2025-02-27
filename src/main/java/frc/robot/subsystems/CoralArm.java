@@ -1,11 +1,10 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Rotations;
 import static frc.robot.Constants.CoralArmConstants.*;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -18,20 +17,22 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralArm extends SubsystemBase {
     private static CoralArm instance;
+    private final PositionVoltage position_voltage = new PositionVoltage(0);
 
     private static TalonFX pivotMotor;
     private static SparkMax gripperMotor;
     private static CANcoder pivotEncoder;
 
     private CoralArm() {
-        pivotMotor = new TalonFX(pivotMotorID, "canbus");
+        pivotMotor = new TalonFX(pivotMotorID, "canviore");
+
         pivotEncoder = new CANcoder(pivotEncoderID, "canivore");
         gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
@@ -76,35 +77,36 @@ public class CoralArm extends SubsystemBase {
 
         pivotMotor.getConfigurator().apply(pivot_cfg);
 
-        // -- Configure gripper motor --//
+        // Configure gripper motor
         var gripper_cfg = new SparkMaxConfig();
         gripper_cfg.idleMode(IdleMode.kBrake);
-        // TODO: more config for gripper
         gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
-    private Rotation2d getPivotAngle() {
-        return Rotation2d.fromRotations(pivotEncoder.getAbsolutePosition().getValue().in(Rotations));
+    // Gripper
+    public Command setGripperVoltage(Voltage voltage) {
+        return run(() -> gripperMotor.setVoltage(voltage.magnitude()));
     }
 
-    private boolean isAtAngle(Rotation2d target_angle) {
-        var diff = getPivotAngle().minus(target_angle).getDegrees();
-        return Math.abs(diff) <= pivotMotorTolerance.in(Degrees);
+    // Pivot
+    private boolean isAtAngle(Angle goalAngle) {
+        Angle current_angle = pivotEncoder.getAbsolutePosition().getValue();
+        return current_angle.isNear(goalAngle, pivotMotorTolerance);
     }
 
-    // TODO figure out how the heck this thing is supposed to work
-    public Command setPivotAngle(Rotation2d target_angle) {
-        return Commands.none();
+    public Command setPivotAngle(Rotation2d goalAngle) {
+        return run(() -> pivotMotor.setControl(
+            position_voltage.withPosition(goalAngle.getRotations())));
     }
 
-    public enum PivotPreset {
+    public enum CoralArmPreset {
         Down(Rotation2d.fromDegrees(0)),
         L4(Rotation2d.fromDegrees(90)),
         L3(Rotation2d.fromDegrees(125));
 
         private final Rotation2d angle;
 
-        PivotPreset(Rotation2d a) {
+        CoralArmPreset(Rotation2d a) {
             angle = a;
         }
 
@@ -113,21 +115,7 @@ public class CoralArm extends SubsystemBase {
         }
     }
 
-    public Command setPivotAngleFromPreset(PivotPreset preset) {
+    public Command setPivotAngleFromPreset(CoralArmPreset preset) {
         return setPivotAngle(preset.getAngle());
-    }
-
-    public Command setGripperVoltage(double voltage) {
-        return run(() -> gripperMotor.setVoltage(voltage));
-    }
-
-    public Command stopGripper() {
-        return setGripperVoltage(0);
-    }
-
-    public Command intake(Time timeout) {
-        return setGripperVoltage(70)
-            .andThen(Commands.waitTime(timeout))
-            .andThen(this::stopGripper);
     }
 }
