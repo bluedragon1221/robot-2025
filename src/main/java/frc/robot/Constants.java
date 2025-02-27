@@ -43,7 +43,7 @@ public final class Constants {
         public static final int pivotMotorAcceleration = 0;
         public static final int pivotMotorCruiseVelocity = 0;
 
-        public static final double pivotMotorGearRatio = 5.0; // TODO: get actual gear ratio
+        public static final double pivotMotorGearRatio = 10.0;
     }
 
     public static final class ClimberConstants {

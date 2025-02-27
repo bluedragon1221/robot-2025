@@ -12,7 +12,10 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
@@ -44,24 +47,29 @@ public class AlgaeArm extends SubsystemBase {
     }
 
     private void configureMotors() {
-        var cfg = new TalonFXConfiguration();
+        var pivot_cfg = new TalonFXConfiguration();
 
         // Use internal sensor as feedback source
-        cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-        cfg.Feedback.SensorToMechanismRatio = pivotMotorGearRatio;
+        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        pivot_cfg.Feedback.SensorToMechanismRatio = pivotMotorGearRatio;
 
         // MotionMagic
-        cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
-        cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
+        pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
+        pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
 
         // PID
-        cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        cfg.Slot0.kG = 0.067;
-        cfg.Slot0.kP = 30;
-        cfg.Slot0.kI = 0;
-        cfg.Slot0.kD = 0.3;
+        pivot_cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        pivot_cfg.Slot0.kG = 0.067;
+        pivot_cfg.Slot0.kP = 5;
+        pivot_cfg.Slot0.kI = 0;
+        pivot_cfg.Slot0.kD = 0.4;
 
-        pivotMotor.getConfigurator().apply(cfg);
+        pivotMotor.getConfigurator().apply(pivot_cfg);
+
+        var gripper_cfg = new SparkMaxConfig();
+        gripper_cfg.smartCurrentLimit(15); // 15 amp current limit
+        gripper_cfg.openLoopRampRate(0.5);      // 0.5 volts/sec ramp rate
+        gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     // Gripper
@@ -79,7 +87,7 @@ public class AlgaeArm extends SubsystemBase {
     public Command deployArm() {
         return Commands.parallel(
                 setPivotAngle(Degrees.of(35)),
-                setGripperVoltage(Volts.of(6)));
+                setGripperVoltage(Volts.of(3)));
     }
 
     public Command returnArm() {
@@ -90,8 +98,8 @@ public class AlgaeArm extends SubsystemBase {
     }
 
     public Command ejectAlgae() {
-        return setGripperVoltage(Volts.of(-6))
-            .withTimeout(Seconds.of(6))
+        return setGripperVoltage(Volts.of(-3))
+            .withTimeout(Seconds.of(3))
             .andThen(setGripperVoltage(Volts.of(0)));
     }
 }
