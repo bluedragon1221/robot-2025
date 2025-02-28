@@ -27,7 +27,7 @@ public class AlgaeArm extends SubsystemBase {
     private static AlgaeArm instance;
 
     private static TalonFX pivotMotor;
-    private final PositionVoltage position_voltage = new PositionVoltage(0);
+    private final PositionVoltage position_voltage = new PositionVoltage(0).withEnableFOC(true);
 
     private static SparkMax gripperMotor;
 
@@ -86,13 +86,13 @@ public class AlgaeArm extends SubsystemBase {
     // sequences
     public Command deployArm() {
         return Commands.parallel(
-                setPivotAngle(Degrees.of(35)),
+                setPivotAngle(Degrees.of(45)),
                 setGripperVoltage(Volts.of(3)));
     }
 
     public Command returnArm() {
         return Commands.parallel(
-            setPivotAngle(Degrees.of(-10)),
+            setPivotAngle(Degrees.of(-15)),
             setGripperVoltage(Volts.of(1)) // to keep the algae in the gripper
         );
     }
@@ -101,5 +101,9 @@ public class AlgaeArm extends SubsystemBase {
         return setGripperVoltage(Volts.of(-3))
             .withTimeout(Seconds.of(3))
             .andThen(setGripperVoltage(Volts.of(0)));
+    }
+
+    public Command armClimbingMode() {
+        return setPivotAngle(Degrees.of(90));
     }
 }

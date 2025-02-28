@@ -1,5 +1,8 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Rotations;
+import static frc.robot.Constants.AlgaeArmConstants.pivotMotorGearRatio;
 import static frc.robot.Constants.CoralArmConstants.*;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -8,6 +11,7 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -16,7 +20,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,16 +27,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class CoralArm extends SubsystemBase {
     private static CoralArm instance;
-    private final PositionVoltage position_voltage = new PositionVoltage(0);
+
+    private final PositionVoltage position_voltage = new PositionVoltage(0).withEnableFOC(true);
 
     private static TalonFX pivotMotor;
-    private static SparkMax gripperMotor;
     private static CANcoder pivotEncoder;
+
+    private static SparkMax gripperMotor;
 
     private CoralArm() {
         pivotMotor = new TalonFX(pivotMotorID, "canviore");
-
         pivotEncoder = new CANcoder(pivotEncoderID, "canivore");
+
         gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
         configureMotors();
@@ -51,23 +56,20 @@ public class CoralArm extends SubsystemBase {
         // -- Configure pivot encoder --//
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
-        encoder_cfg.MagnetOffset = 0; // TODO: pivot encoder magnet offset
+        encoder_cfg.MagnetOffset = 0;
         pivotEncoder.getConfigurator().apply(encoder_cfg);
 
         // -- Configure pivot motor --//
         var pivot_cfg = new TalonFXConfiguration();
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
-        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        pivot_cfg.Feedback.RotorToSensorRatio = 1.0;
+        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        pivot_cfg.Feedback.RotorToSensorRatio = pivotMotorGearRatio;
 
-        // TODO: these are default values! make sure to change
-        var slot0 = pivot_cfg.Slot0;
-        slot0.kS = 0.25;
-        slot0.kV = 0.12;
-        slot0.kA = 0.01;
-        slot0.kP = 60;
-        slot0.kI = 0;
-        slot0.kD = 0.5;
+        pivot_cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
+        pivot_cfg.Slot0.kG = 0.06;
+        pivot_cfg.Slot0.kP = 2;
+        pivot_cfg.Slot0.kI = 0;
+        pivot_cfg.Slot0.kD = 0.2;
 
         pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
         pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
@@ -94,23 +96,26 @@ public class CoralArm extends SubsystemBase {
         return current_angle.isNear(goalAngle, pivotMotorTolerance);
     }
 
-    public Command setPivotAngle(Rotation2d goalAngle) {
+    private Command setPivotAngle(Angle goalAngle) {
         return run(() -> pivotMotor.setControl(
-            position_voltage.withPosition(goalAngle.getRotations())));
+            position_voltage.withPosition(goalAngle.in(Rotations))));
     }
 
     public enum CoralArmPreset {
-        Down(Rotation2d.fromDegrees(0)),
-        L4(Rotation2d.fromDegrees(90)),
-        L3(Rotation2d.fromDegrees(125));
+        Initial(Degrees.of(0)), // straight up
+        Intake(Degrees.of(180)), // straight down
+        L4(Degrees.of(60)),
+        L3(Degrees.of(60)),
+        L2(Degrees.of(60)),
+        L1(Degrees.of(125));
 
-        private final Rotation2d angle;
+        private final Angle angle;
 
-        CoralArmPreset(Rotation2d a) {
+        CoralArmPreset(Angle a) {
             angle = a;
         }
 
-        public Rotation2d getAngle() {
+        public Angle getAngle() {
             return angle;
         }
     }

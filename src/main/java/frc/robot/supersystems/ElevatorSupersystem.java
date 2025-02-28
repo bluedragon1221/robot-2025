@@ -19,7 +19,7 @@ public class ElevatorSupersystem extends SubsystemBase {
 
     public void fullIntakeSequence() {
         elevator.setHeightFromPreset(ElevatorHeightPreset.Intake);
-        coral_arm.setPivotAngleFromPreset(CoralArmPreset.Down);
+        coral_arm.setPivotAngleFromPreset(CoralArmPreset.Intake);
         
         coral_arm.setGripperVoltage(Volts.of(40));
     }
