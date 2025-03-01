@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.AlgaeArmConstants.pivotMotorGearRatio;
 import static frc.robot.Constants.CoralArmConstants.*;
+import frc.robot.Constants.Preset;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -53,13 +55,13 @@ public class CoralArm extends SubsystemBase {
     }
 
     private void configureMotors() {
-        // -- Configure pivot encoder --//
+        // Pivot encoder
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         encoder_cfg.MagnetOffset = 0;
         pivotEncoder.getConfigurator().apply(encoder_cfg);
 
-        // -- Configure pivot motor --//
+        // Pivot motor
         var pivot_cfg = new TalonFXConfiguration();
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
         pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
@@ -74,20 +76,21 @@ public class CoralArm extends SubsystemBase {
         pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
         pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
 
-        pivot_cfg.CurrentLimits.SupplyCurrentLimit = 40;
+        pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit.in(Amps);
         pivot_cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
 
         pivotMotor.getConfigurator().apply(pivot_cfg);
 
-        // Configure gripper motor
+        // Gripper motor
         var gripper_cfg = new SparkMaxConfig();
         gripper_cfg.idleMode(IdleMode.kBrake);
+        gripper_cfg.smartCurrentLimit((int) gripperMotorCurrentLimit.in(Amps));
         gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     // Gripper
     public Command setGripperVoltage(Voltage voltage) {
-        return run(() -> gripperMotor.setVoltage(voltage.magnitude()));
+        return run(() -> gripperMotor.setVoltage(voltage.in(Volts)));
     }
 
     // Pivot
@@ -95,32 +98,24 @@ public class CoralArm extends SubsystemBase {
         Angle current_angle = pivotEncoder.getAbsolutePosition().getValue();
         return current_angle.isNear(goalAngle, pivotMotorTolerance);
     }
+    private boolean isAtAngle(Angle goalAngle, Angle tolerance) {
+        Angle current_angle = pivotEncoder.getAbsolutePosition().getValue();
+        return current_angle.isNear(goalAngle, tolerance);
+    }
 
     private Command setPivotAngle(Angle goalAngle) {
         return run(() -> pivotMotor.setControl(
             position_voltage.withPosition(goalAngle.in(Rotations))));
     }
 
-    public enum CoralArmPreset {
-        Initial(Degrees.of(0)), // straight up
-        Intake(Degrees.of(180)), // straight down
-        L4(Degrees.of(60)),
-        L3(Degrees.of(60)),
-        L2(Degrees.of(60)),
-        L1(Degrees.of(125));
-
-        private final Angle angle;
-
-        CoralArmPreset(Angle a) {
-            angle = a;
-        }
-
-        public Angle getAngle() {
-            return angle;
-        }
+    public Command setPivotAngleFromPreset(Preset preset) {
+        return setPivotAngle(preset.getAngle());
     }
 
-    public Command setPivotAngleFromPreset(CoralArmPreset preset) {
-        return setPivotAngle(preset.getAngle());
+    public boolean isAtAngleFromPreset(Preset preset) {
+        return isAtAngle(preset.getAngle());
+    }
+    public boolean isAtAngleFromPreset(Preset preset, Angle tolerance) {
+        return isAtAngle(preset.getAngle(), tolerance);
     }
 }

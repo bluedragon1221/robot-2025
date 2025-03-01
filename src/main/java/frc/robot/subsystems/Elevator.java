@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.ElevatorConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -20,6 +21,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Preset;
 
 public class Elevator extends SubsystemBase {
     private static Elevator instance;
@@ -75,7 +77,7 @@ public class Elevator extends SubsystemBase {
     // Commands to nudge elevator (doesn't rely on setHeight)
     public Command startNudgeElevator(Voltage volts) {
         return run(() -> {
-            leftMotor.setVoltage(volts.magnitude());
+            leftMotor.setVoltage(volts.in(Volts));
         });
     }
 
@@ -94,25 +96,8 @@ public class Elevator extends SubsystemBase {
     private boolean isAtHeight(Distance goalHeight) {
         return getHeight().isNear(goalHeight, heightTolerance);
     }
-
-    // TODO: measure elevator height presets
-    public enum ElevatorHeightPreset {
-        Initial(Inches.of(0)), // not zero!!!
-        Intake(Inches.of(0)),
-        L1(Inches.of(0)),
-        L2(Inches.of(0)),
-        L3(Inches.of(0)),
-        L4(Inches.of(0));
-
-        private final Distance distance;
-
-        ElevatorHeightPreset(Distance d) {
-            distance = d;
-        }
-
-        public Distance getHeight() {
-            return distance;
-        }
+    private boolean isAtHeight(Distance goalHeight, Distance tolerance) {
+        return getHeight().isNear(goalHeight, tolerance);
     }
 
     private static Angle translateHeightToRotations(Distance goalHeight) {
@@ -125,15 +110,18 @@ public class Elevator extends SubsystemBase {
 
         return runOnce(() -> {
             leftMotor.setControl(position_voltage);
-        })
-            .until(() -> isAtHeight(goalHeight))
-            .andThen(() -> {
-                leftMotor.setVoltage(0);
-            });
+        });
     }
 
-    public Command setHeightFromPreset(ElevatorHeightPreset preset) {
+    public Command setHeightFromPreset(Preset preset) {
         return setHeight(preset.getHeight());
+    }
+
+    public boolean isAtHeightFromPreset(Preset preset) {
+        return isAtHeight(preset.getHeight());
+    }
+    public boolean isAtHeightFromPreset(Preset preset, Distance tolerance) {
+        return isAtHeight(preset.getHeight(), tolerance);
     }
 
     @Override

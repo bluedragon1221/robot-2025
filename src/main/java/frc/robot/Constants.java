@@ -1,14 +1,39 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 
-public final class Constants {
+public class Constants {
+    public static enum Preset {
+        Initial       (Inches.of(0),  Degrees.of(0)),
+        ScoreL1       (Inches.of(6),  Degrees.of(90)),
+        ScoreL2       (Inches.of(6),  Degrees.of(60)),
+        ScoreL3       (Inches.of(14), Degrees.of(60)),
+        ScoreL4       (Inches.of(26), Degrees.of(70)),
+        IntakeCatch   (Inches.of(24), Degrees.of(180)),
+        IntakeGrip    (Inches.of(12), Degrees.of(180));
+
+        private Distance height;
+        private Angle angle;
+
+        private Preset(Distance h, Angle a) { height = h; angle = a; }
+
+        public Distance getHeight() { return height; }
+        public Angle getAngle() { return angle; }
+
+        public Preset angleMinus(Angle o) {
+            angle = angle.minus(o);
+            return this;
+        }
+    }
+
     public static final class ElevatorConstants {
         public static final int leftMotorID = 20;
         public static final int rightMotorID = 21;
@@ -16,9 +41,10 @@ public final class Constants {
         public static final int motorMaxAcceleration = 48;
         public static final int motorCruiseVelocity = 70;
 
-        public static final double motorGearRatio = 1.0;
+        public static final double motorGearRatio = 7.75;
 
         public static final Distance heightTolerance = Inches.of(1);
+        public static final Distance heightToleranceLoose = Inches.of(3);
         public static final Angle angleTolerance = Rotations.of(0.5);
 
         public static final Distance sprocketRadius = Inches.of(1);
@@ -37,10 +63,12 @@ public final class Constants {
         public static final int pivotMotorAcceleration = 50;
         public static final int pivotMotorCruiseVelocity = 17;
 
-        public static final double pivotMotorGearRatio = 40.0;
+        public static final Current pivotMotorCurrentLimit = Amps.of(40);
 
+        public static final double pivotMotorGearRatio = 40.0;
         public static final Angle pivotMotorTolerance = Degrees.of(1.0);
 
+        public static final Current gripperMotorCurrentLimit = Amps.of(40);
     }
 
     public static final class AlgaeArmConstants {
@@ -51,6 +79,8 @@ public final class Constants {
         public static final int pivotMotorCruiseVelocity = 0;
 
         public static final double pivotMotorGearRatio = 10.0;
+
+        public static final Current gripperMotorCurrentLimit = Amps.of(15);
     }
 
     public static final class ClimberConstants {
@@ -62,5 +92,6 @@ public final class Constants {
     }
 
     public static final class ElevatorSupersystemConstants {
+        public static final int beamBreakSensorDIO = 0;
     }
 }

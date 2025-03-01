@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
@@ -67,14 +68,14 @@ public class AlgaeArm extends SubsystemBase {
         pivotMotor.getConfigurator().apply(pivot_cfg);
 
         var gripper_cfg = new SparkMaxConfig();
-        gripper_cfg.smartCurrentLimit(15); // 15 amp current limit
+        gripper_cfg.smartCurrentLimit((int)gripperMotorCurrentLimit.in(Amps)); // 15 amp current limit
         gripper_cfg.openLoopRampRate(0.5);      // 0.5 volts/sec ramp rate
         gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     // Gripper
     private Command setGripperVoltage(Voltage voltage) {
-        return runOnce(() -> gripperMotor.setVoltage(voltage.magnitude()));
+        return runOnce(() -> gripperMotor.setVoltage(voltage.in(Volts)));
     }
 
     // Pivot
