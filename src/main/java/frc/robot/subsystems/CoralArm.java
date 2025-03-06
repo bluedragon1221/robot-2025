@@ -4,8 +4,14 @@ import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.AlgaeArmConstants.pivotMotorGearRatio;
-import static frc.robot.Constants.CoralArmConstants.*;
-import frc.robot.Constants.Preset;
+import static frc.robot.Constants.CoralArmConstants.gripperMotorCurrentLimit;
+import static frc.robot.Constants.CoralArmConstants.gripperMotorID;
+import static frc.robot.Constants.CoralArmConstants.pivotEncoderID;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorAcceleration;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorCruiseVelocity;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorCurrentLimit;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorID;
+import static frc.robot.Constants.CoralArmConstants.pivotMotorTolerance;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -26,23 +32,19 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Preset;
 
 public class CoralArm extends SubsystemBase {
     private static CoralArm instance;
 
-    private final PositionVoltage position_voltage = new PositionVoltage(0).withEnableFOC(true);
+    private static final TalonFX pivot_motor = new TalonFX(pivotMotorID, "canivore");
+    private static final CANcoder pivot_encoder = new CANcoder(pivotEncoderID, "canivore");
+    private static final PositionVoltage pivot_position_voltage = new PositionVoltage(0).withEnableFOC(true);
+    private static Angle pivot_goal_angle;
 
-    private static TalonFX pivotMotor;
-    private static CANcoder pivotEncoder;
-
-    private static SparkMax gripperMotor;
+    private final SparkMax gripper_motor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
     private CoralArm() {
-        pivotMotor = new TalonFX(pivotMotorID, "canviore");
-        pivotEncoder = new CANcoder(pivotEncoderID, "canivore");
-
-        gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
-
         configureMotors();
     }
 
@@ -59,7 +61,7 @@ public class CoralArm extends SubsystemBase {
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         encoder_cfg.MagnetOffset = 0;
-        pivotEncoder.getConfigurator().apply(encoder_cfg);
+        pivot_encoder.getConfigurator().apply(encoder_cfg);
 
         // Pivot motor
         var pivot_cfg = new TalonFXConfiguration();
@@ -79,43 +81,47 @@ public class CoralArm extends SubsystemBase {
         pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit.in(Amps);
         pivot_cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-        pivotMotor.getConfigurator().apply(pivot_cfg);
+        pivot_motor.getConfigurator().apply(pivot_cfg);
 
         // Gripper motor
         var gripper_cfg = new SparkMaxConfig();
         gripper_cfg.idleMode(IdleMode.kBrake);
         gripper_cfg.smartCurrentLimit((int) gripperMotorCurrentLimit.in(Amps));
-        gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        gripper_motor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     // Gripper
     public Command setGripperVoltage(Voltage voltage) {
-        return run(() -> gripperMotor.setVoltage(voltage.in(Volts)));
+        return run(() -> gripper_motor.setVoltage(voltage.in(Volts)));
     }
 
     // Pivot
     private boolean isAtAngle(Angle goalAngle) {
-        Angle current_angle = pivotEncoder.getAbsolutePosition().getValue();
+        Angle current_angle = pivot_encoder.getAbsolutePosition().getValue();
         return current_angle.isNear(goalAngle, pivotMotorTolerance);
     }
     private boolean isAtAngle(Angle goalAngle, Angle tolerance) {
-        Angle current_angle = pivotEncoder.getAbsolutePosition().getValue();
+        Angle current_angle = pivot_encoder.getAbsolutePosition().getValue();
         return current_angle.isNear(goalAngle, tolerance);
     }
-
-    private Command setPivotAngle(Angle goalAngle) {
-        return run(() -> pivotMotor.setControl(
-            position_voltage.withPosition(goalAngle.in(Rotations))));
-    }
-
-    public Command setPivotAngleFromPreset(Preset preset) {
-        return setPivotAngle(preset.getAngle());
-    }
-
     public boolean isAtAngleFromPreset(Preset preset) {
         return isAtAngle(preset.getAngle());
     }
     public boolean isAtAngleFromPreset(Preset preset, Angle tolerance) {
         return isAtAngle(preset.getAngle(), tolerance);
+    }
+
+    private void setPivotAngle(Angle goalAngle) {
+        pivot_goal_angle = goalAngle;
+    }
+    public void setPivotAngleFromPreset(Preset preset) {
+        setPivotAngle(preset.getAngle());
+    }
+
+    @Override
+    public void periodic() {
+        pivot_motor.setControl(
+            pivot_position_voltage.withPosition(pivot_goal_angle.in(Rotations))
+        );
     }
 }
