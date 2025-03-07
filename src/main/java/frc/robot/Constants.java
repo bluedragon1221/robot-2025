@@ -12,13 +12,17 @@ import edu.wpi.first.units.measure.Distance;
 
 public class Constants {
     public static enum Preset {
-        Initial       (Inches.of(0),  Degrees.of(0)),
-        ScoreL1       (Inches.of(6),  Degrees.of(90)),
-        ScoreL2       (Inches.of(6),  Degrees.of(60)),
-        ScoreL3       (Inches.of(14), Degrees.of(60)),
-        ScoreL4       (Inches.of(26), Degrees.of(70)),
-        IntakeCatch   (Inches.of(24), Degrees.of(180)),
-        IntakeGrip    (Inches.of(12), Degrees.of(180));
+        // Height: Don't worry about canrangeOffset in these heights; the subsystem takes care of it
+        // Angle: 0 degrees is horizontal, 90 up, and -90 down because cosine arm mechanics
+        Initial         (Inches.of(0),  Degrees.of(90)), // I think the angle here is wrong becuase we can't go 90deg up
+        ScoreL1         (Inches.of(6),  Degrees.of(0)),
+        ScoreL2         (Inches.of(6),  Degrees.of(30)),
+        ScoreL3         (Inches.of(14), Degrees.of(30)),
+        ScoreL4         (Inches.of(26), Degrees.of(40)),
+        ExtractAlgaeLow (Inches.of(14), Degrees.of(0)),
+        ExtractAlgaeHigh(Inches.of(26), Degrees.of(0)),
+        IntakeCatch     (Inches.of(24), Degrees.of(-90)),
+        IntakeGrip      (Inches.of(12), Degrees.of(-90));
 
         private Distance height;
         private Angle angle;
@@ -68,7 +72,7 @@ public class Constants {
         public static final double pivotMotorGearRatio = 40.0;
         public static final Angle pivotMotorTolerance = Degrees.of(1.0);
 
-        public static final Current gripperMotorCurrentLimit = Amps.of(40);
+        public static final Current gripperMotorCurrentLimit = Amps.of(30);
     }
 
     public static final class AlgaeArmConstants {
