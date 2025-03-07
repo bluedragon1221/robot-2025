@@ -26,10 +26,13 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.supersystems.ElevatorSupersystem;
+import frc.robot.supersystems.ElevatorSupersystem.CoralLayer;
 
 public class RobotContainer {
     // initialize subsystems
     Elevator elevator = Elevator.getInstance();
+    ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
     Climber climber = Climber.getInstance();
 
     private LinearVelocity max_speed = TunerConstants.kSpeedAt12Volts; // kSpeedAt12Volts desired top speed
@@ -56,7 +59,12 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Add Autos
-        auto_factory = drivetrain.createAutoFactory();
+        auto_factory = drivetrain.createAutoFactory()
+            .bind("set_l4_height", supersystem.coralPrepareElevator(CoralLayer.L4))
+            .bind("score_l4", supersystem.coralScoreCoral(CoralLayer.L4))
+            .bind("prepare_accept_coral", supersystem.intakeSetupIntake())
+            .bind("accept_coral", supersystem.intakeLoadIntake());
+
         auto_routines = new AutoRoutines(auto_factory);
         auto_chooser.addRoutine("Center Cage 2L4", auto_routines::CenterCage2l4);
         
