@@ -15,7 +15,7 @@ import static frc.robot.Constants.CoralArmConstants.pivotMotorTolerance;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -39,12 +39,14 @@ public class CoralArm extends SubsystemBase {
 
     private static final TalonFX pivot_motor = new TalonFX(pivotMotorID, "canivore");
     private static final CANcoder pivot_encoder = new CANcoder(pivotEncoderID, "canivore");
-    private static final PositionVoltage pivot_position_voltage = new PositionVoltage(0).withEnableFOC(true);
+    private static final MotionMagicVoltage pivot_position_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
     private static Angle pivot_goal_angle;
 
     private final SparkMax gripper_motor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
     private CoralArm() {
+        pivot_goal_angle = Preset.Initial.getAngle();
+
         configureMotors();
     }
 
