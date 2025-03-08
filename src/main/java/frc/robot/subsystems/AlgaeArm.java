@@ -106,12 +106,10 @@ public class AlgaeArm extends SubsystemBase {
         gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
-    // Gripper
     private Command setGripperVoltage(Voltage voltage) {
-        return runOnce(() -> gripperMotor.setVoltage(voltage.in(Volts)));
+        return run(() -> gripperMotor.setVoltage(voltage.in(Volts)));
     }
 
-    // Pivot
     private Command setPivotAngle(Angle goalAngle) {
         return run(() -> pivotMotor.setControl(
             pivot_position_voltage.withPosition(goalAngle.in(Rotations))
@@ -151,5 +149,13 @@ public class AlgaeArm extends SubsystemBase {
 
     public Command armClimbingMode() {
         return setPivotAngle(Degrees.of(90));
+    }
+
+    @Override
+    public void periodic() {
+        boolean changed = TuneableConstants.updateDashboard();
+        if (changed) {
+            configureMotors();
+        }
     }
 }
