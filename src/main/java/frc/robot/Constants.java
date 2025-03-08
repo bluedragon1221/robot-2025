@@ -50,7 +50,6 @@ public class Constants {
         public static final double motorGearRatio = 7.75;
 
         public static final Distance heightTolerance = Inches.of(1);
-        public static final Distance heightToleranceLoose = Inches.of(3);
         public static final Angle angleTolerance = Rotations.of(0.5);
 
         public static final Distance sprocketRadius = Inches.of(1);
@@ -71,7 +70,7 @@ public class Constants {
 
         public static final Current pivotMotorCurrentLimit = Amps.of(40);
 
-        public static final double pivotMotorGearRatio = 40.0;
+        public static final double pivotMotorGearRatio = 30.0;
         public static final Angle pivotMotorTolerance = Degrees.of(1.0);
 
         public static final Current gripperMotorCurrentLimit = Amps.of(30);

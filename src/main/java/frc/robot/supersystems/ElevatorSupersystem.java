@@ -69,9 +69,9 @@ public class ElevatorSupersystem extends SubsystemBase {
         public Preset toPreset() {
             return switch (this) {
                 case L1 -> Preset.ScoreL1;
-                case L2 ->  Preset.ScoreL2;
+                case L2 -> Preset.ScoreL2;
                 case L3 -> Preset.ScoreL3;
-                case L4 ->  Preset.ScoreL4;
+                case L4 -> Preset.ScoreL4;
             };
         }
     };
@@ -114,7 +114,7 @@ public class ElevatorSupersystem extends SubsystemBase {
         public Preset toPreset() {
             return switch (this) {
                 case High -> Preset.ExtractAlgaeLow;
-                case Low -> Preset.ExtractAlgaeHigh;
+                case Low  -> Preset.ExtractAlgaeHigh;
             };
         }
     };

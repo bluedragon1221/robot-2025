@@ -156,6 +156,7 @@ public class AlgaeArm extends SubsystemBase {
         boolean changed = TuneableConstants.updateDashboard();
         if (changed) {
             configureMotors();
+            System.out.println("Reconfigured Algae Arm");
         }
     }
 }

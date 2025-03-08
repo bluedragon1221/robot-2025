@@ -3,15 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
-import static frc.robot.Constants.AlgaeArmConstants.pivotMotorGearRatio;
-import static frc.robot.Constants.CoralArmConstants.gripperMotorCurrentLimit;
-import static frc.robot.Constants.CoralArmConstants.gripperMotorID;
-import static frc.robot.Constants.CoralArmConstants.pivotEncoderID;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorAcceleration;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorCruiseVelocity;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorCurrentLimit;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorID;
-import static frc.robot.Constants.CoralArmConstants.pivotMotorTolerance;
+import static frc.robot.Constants.CoralArmConstants.*;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -167,6 +159,7 @@ public class CoralArm extends SubsystemBase {
         boolean changed = TuneableConstants.updateDashboard();
         if (changed) {
             configureMotors();
+            System.out.println("Reconfigured Coral Arm");
         }
     }
 }

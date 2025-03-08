@@ -175,6 +175,7 @@ public class Elevator extends SubsystemBase {
         boolean changed = TuneableConstants.updateDashboard();
         if (changed) {
             configureMotors();
+            System.out.println("Reconfigured Elevator");
         }
     }
 }
