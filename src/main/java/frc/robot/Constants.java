@@ -5,10 +5,12 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 
 public class Constants {
     public static enum Preset {
@@ -85,6 +87,7 @@ public class Constants {
         public static final double pivotMotorGearRatio = 10.0;
 
         public static final Current gripperMotorCurrentLimit = Amps.of(15);
+        public static final Time gripperMotorRampRate = Seconds.of(3); // time to max voltage
     }
 
     public static final class ClimberConstants {

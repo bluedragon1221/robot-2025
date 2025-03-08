@@ -19,9 +19,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Climber extends SubsystemBase {
     private static Climber instance;
 
-    private static ClimbState climber_state;
-    private static SparkMax motor;
-
+    private static final SparkMax motor = new SparkMax(climberMotorID, MotorType.kBrushless);
     private enum ClimbState {
         Initial,
         Phase1Active,
@@ -31,11 +29,12 @@ public class Climber extends SubsystemBase {
         Phase3Active,
         ClimbComplete;
     };
+    private static ClimbState climber_state;
 
     private Climber() {
+        // Set initial state of climber
         climber_state = ClimbState.Initial;
 
-        motor = new SparkMax(climberMotorID, MotorType.kBrushless);
         configureMotors();
     }
 
@@ -53,10 +52,10 @@ public class Climber extends SubsystemBase {
         cfg.idleMode(IdleMode.kBrake);
         cfg.smartCurrentLimit(climberMotorCurrentLimit);
         cfg.closedLoop
-                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(0.5)
-                .i(0)
-                .d(0.05);
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            .p(0.5)
+            .i(0)
+            .d(0.05);
 
         motor.configure(cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }

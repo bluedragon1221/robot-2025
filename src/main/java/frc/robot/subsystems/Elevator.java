@@ -3,16 +3,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Millimeters;
 import static edu.wpi.first.units.Units.Radians;
-import static frc.robot.Constants.ElevatorConstants.angleTolerance;
-import static frc.robot.Constants.ElevatorConstants.canrangeOffset;
-import static frc.robot.Constants.ElevatorConstants.heightSensorID;
-import static frc.robot.Constants.ElevatorConstants.heightTolerance;
-import static frc.robot.Constants.ElevatorConstants.leftMotorID;
-import static frc.robot.Constants.ElevatorConstants.motorCruiseVelocity;
-import static frc.robot.Constants.ElevatorConstants.motorGearRatio;
-import static frc.robot.Constants.ElevatorConstants.motorMaxAcceleration;
-import static frc.robot.Constants.ElevatorConstants.rightMotorID;
-import static frc.robot.Constants.ElevatorConstants.sprocketRadius;
+import static frc.robot.Constants.ElevatorConstants.*;
 
 import java.util.function.BooleanSupplier;
 
@@ -41,9 +32,52 @@ public class Elevator extends SubsystemBase {
 
     private static CANrange canrange = new CANrange(heightSensorID, "canivore");
 
+    private static class TuneableConstants {
+        private static double kA = 0.01;
+        private static double kG = 0.067;
+        private static double kS = 0;
+        private static double kP = 60;
+        private static double kI = 0;
+        private static double kD = 0.5;
+
+        public static void initDashboard() {
+            SmartDashboard.putNumber("Elevator/kA", kA);
+            SmartDashboard.putNumber("Elevator/kG", kG);
+            SmartDashboard.putNumber("Elevator/kS", kS);
+            SmartDashboard.putNumber("Elevator/kP", kP);
+            SmartDashboard.putNumber("Elevator/kI", kI);
+            SmartDashboard.putNumber("Elevator/kD", kD);
+        }
+
+        public static boolean updateDashboard() {
+            double newKA = SmartDashboard.getNumber("CoralArm/kA", kA);
+            double newKG = SmartDashboard.getNumber("CoralArm/kG", kG);
+            double newKS = SmartDashboard.getNumber("CoralArm/kS", kS);
+            double newKP = SmartDashboard.getNumber("CoralArm/kP", kP);
+            double newKI = SmartDashboard.getNumber("CoralArm/kI", kI);
+            double newKD = SmartDashboard.getNumber("CoralArm/kD", kD);
+            
+            // Check if any values have changed
+            boolean changed = newKA != kA || newKG != kG|| newKS != kS ||
+                newKP != kP || newKI != kI || newKD != kD;
+            
+            // Update stored values
+            kA = newKA;
+            kG = newKG;
+            kS = newKS;
+            kP = newKP;
+            kI = newKI;
+            kD = newKD;
+            
+            return changed;
+        }
+    }
+
     private Elevator() {
         // initial goal height (when the robot starts)
         goal_height = Preset.Initial.getHeight();
+
+        TuneableConstants.initDashboard();
 
         configureMotors();
     }
@@ -70,15 +104,15 @@ public class Elevator extends SubsystemBase {
 
         // PID + motionmagic constants
         cfg.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-        cfg.Slot0.kA = 0.01;
-        cfg.Slot0.kG = 0.067;
-        cfg.Slot0.kS = 0;
-        cfg.Slot0.kP = 60;
-        cfg.Slot0.kI = 0;
-        cfg.Slot0.kD = 0.5;
+        cfg.Slot0.kA = TuneableConstants.kA;
+        cfg.Slot0.kG = TuneableConstants.kG;
+        cfg.Slot0.kS = TuneableConstants.kS;
+        cfg.Slot0.kP = TuneableConstants.kP;
+        cfg.Slot0.kI = TuneableConstants.kI;
+        cfg.Slot0.kD = TuneableConstants.kD;
 
-        follower_motor.getConfigurator().apply(cfg);
         leader_motor.getConfigurator().apply(cfg);
+        follower_motor.getConfigurator().apply(cfg);
 
         follower_motor.setControl(new Follower(leftMotorID, false));
     }
@@ -100,12 +134,17 @@ public class Elevator extends SubsystemBase {
         return canrange.getDistance().getValue().minus(canrangeOffset); // subtracts canrangeOffset to get the "actual" position
     }
 
-    // setHeight-related methods
     private BooleanSupplier isAtHeight(Distance goalHeight) {
         return () -> getHeight().isNear(goalHeight, heightTolerance);
     }
     private boolean isAtHeight(Distance goalHeight, Distance tolerance) {
         return getHeight().isNear(goalHeight, tolerance);
+    }
+    public BooleanSupplier isAtHeightFromPreset(Preset preset) {
+        return isAtHeight(preset.getHeight());
+    }
+    public boolean isAtHeightFromPreset(Preset preset, Distance tolerance) {
+        return isAtHeight(preset.getHeight(), tolerance);
     }
 
     private static Angle translateHeightToRotations(Distance goalHeight) {
@@ -120,13 +159,6 @@ public class Elevator extends SubsystemBase {
         setHeight(preset.getHeight());
     }
 
-    public BooleanSupplier isAtHeightFromPreset(Preset preset) {
-        return isAtHeight(preset.getHeight());
-    }
-    public boolean isAtHeightFromPreset(Preset preset, Distance tolerance) {
-        return isAtHeight(preset.getHeight(), tolerance);
-    }
-
     @Override
     public void periodic() {
         var curr_estimate_rotations = translateHeightToRotations(getHeight());
@@ -139,5 +171,10 @@ public class Elevator extends SubsystemBase {
         leader_motor.setControl(position_voltage.withPosition(goalRotations));
 
         SmartDashboard.putString("CANrange Reading", String.format("%.9f", canrange.getDistance().getValue().in(Millimeters)));
+    
+        boolean changed = TuneableConstants.updateDashboard();
+        if (changed) {
+            configureMotors();
+        }
     }
 }

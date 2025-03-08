@@ -30,6 +30,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Preset;
@@ -44,10 +45,45 @@ public class CoralArm extends SubsystemBase {
 
     private final SparkMax gripper_motor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
+    private static class TuneableConstants {
+        private static double kG = 0.067;
+        private static double kP = 60;
+        private static double kI = 0;
+        private static double kD = 0.5;
+
+        public static void initDashboard() {
+            SmartDashboard.putNumber("CoralArm/kG", kG);
+            SmartDashboard.putNumber("CoralArm/kP", kP);
+            SmartDashboard.putNumber("CoralArm/kI", kI);
+            SmartDashboard.putNumber("CoralArm/kD", kD);
+        }
+        
+        // Method to update constants from SmartDashboard
+        public static boolean updateDashboard() {
+            double newKG = SmartDashboard.getNumber("CoralArm/kG", kG);
+            double newKP = SmartDashboard.getNumber("CoralArm/kP", kP);
+            double newKI = SmartDashboard.getNumber("CoralArm/kI", kI);
+            double newKD = SmartDashboard.getNumber("CoralArm/kD", kD);
+            
+            // Check if any values have changed
+            boolean changed = newKG != kG|| newKP != kP || newKI != kI || newKD != kD;
+            
+            // Update stored values
+            kG = newKG;
+            kP = newKP;
+            kI = newKI;
+            kD = newKD;
+            
+            return changed;
+        }
+    }
+
     private CoralArm() {
         pivot_goal_angle = Preset.Initial.getAngle();
 
         configureMotors();
+
+        TuneableConstants.initDashboard();
     }
 
     public static synchronized CoralArm getInstance() {
@@ -72,10 +108,10 @@ public class CoralArm extends SubsystemBase {
         pivot_cfg.Feedback.RotorToSensorRatio = pivotMotorGearRatio;
 
         pivot_cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        pivot_cfg.Slot0.kG = 0.06;
-        pivot_cfg.Slot0.kP = 2;
-        pivot_cfg.Slot0.kI = 0;
-        pivot_cfg.Slot0.kD = 0.2;
+        pivot_cfg.Slot0.kG = TuneableConstants.kG;
+        pivot_cfg.Slot0.kP = TuneableConstants.kP;
+        pivot_cfg.Slot0.kI = TuneableConstants.kI;
+        pivot_cfg.Slot0.kD = TuneableConstants.kD;
 
         pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
         pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
@@ -125,5 +161,10 @@ public class CoralArm extends SubsystemBase {
         pivot_motor.setControl(
             pivot_position_voltage.withPosition(pivot_goal_angle.in(Rotations))
         );
+
+        boolean changed = TuneableConstants.updateDashboard();
+        if (changed) {
+            configureMotors();
+        }
     }
 }
