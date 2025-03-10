@@ -1,43 +1,35 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Millimeters;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Time;
 
 public class Constants {
     public static enum Preset {
         // Height: Don't worry about canrangeOffset in these heights; the subsystem takes care of it
         // Angle: 0 degrees is horizontal, 90 up, and -90 down because cosine arm mechanics
-        Initial         (Inches.of(0),  Degrees.of(90)), // I think the angle here is wrong becuase we can't go 90deg up
-        ScoreL1         (Inches.of(6),  Degrees.of(0)),
-        ScoreL2         (Inches.of(6),  Degrees.of(30)),
-        ScoreL3         (Inches.of(14), Degrees.of(30)),
-        ScoreL4         (Inches.of(26), Degrees.of(40)),
-        ExtractAlgaeLow (Inches.of(14), Degrees.of(0)),
-        ExtractAlgaeHigh(Inches.of(26), Degrees.of(0)),
-        IntakeCatch     (Inches.of(24), Degrees.of(-90)),
-        IntakeGrip      (Inches.of(12), Degrees.of(-90));
 
-        private Distance height;
-        private Angle angle;
+        // TODO: make all elevator presets doubles in meters
+        // TODO: make all angles doubles in rotations
+        Initial         (0,      0.25), // I think the angle here is wrong becuase we can't go 90deg up
+        ScoreL1         (0.1524, 0),
+        ScoreL2         (0.1524, 0.0833),
+        ScoreL3         (0.3556, 0.0833),
+        ScoreL4         (0.6604, 0.1111),
+        ExtractAlgaeLow (0.3556, 0),
+        ExtractAlgaeHigh(0.6604, 0),
+        IntakeCatch     (0.6096, -0.25),
+        IntakeGrip      (0.3048, -0.25);
 
-        private Preset(Distance h, Angle a) { height = h; angle = a; }
+        private double height_meters;
+        private double angle;
 
-        public Distance getHeight() { return height; }
-        public Angle getAngle() { return angle; }
+        private Preset(double h, double a) { height_meters = h; angle = a; }
 
-        public Preset angleMinus(Angle o) {
-            angle = angle.minus(o);
-            return this;
-        }
+        public double getHeight() { return height_meters; }
+        public double getAngle() { return angle; }
     }
 
     public static final class ElevatorConstants {
@@ -49,12 +41,11 @@ public class Constants {
 
         public static final double motorGearRatio = 7.75;
 
-        public static final Distance heightTolerance = Inches.of(1);
-        public static final Angle angleTolerance = Rotations.of(0.5);
+        public static final double heightTolerance = 0.02;
 
-        public static final Distance sprocketRadius = Inches.of(1);
+        public static final double sprocketRadius = 0.0254;
 
-        public static final Distance canrangeOffset = Millimeters.of(128.5875);
+        public static final double canrangeOffset = 0.1285875;
 
         public static final int heightSensorID = 22;
         public static final int bottomSensorDIO = 0;
@@ -68,12 +59,12 @@ public class Constants {
         public static final int pivotMotorAcceleration = 50;
         public static final int pivotMotorCruiseVelocity = 17;
 
-        public static final Current pivotMotorCurrentLimit = Amps.of(40);
+        public static final double pivotMotorCurrentLimit = 40;
 
         public static final double pivotMotorGearRatio = 37.0;
-        public static final Angle pivotMotorTolerance = Degrees.of(1.0);
+        public static final double pivotMotorTolerance = 0.1;
 
-        public static final Current gripperMotorCurrentLimit = Amps.of(30);
+        public static final double gripperMotorCurrentLimit = 30;
     }
 
     public static final class AlgaeArmConstants {
@@ -85,8 +76,8 @@ public class Constants {
 
         public static final double pivotMotorGearRatio = 10.0;
 
-        public static final Current gripperMotorCurrentLimit = Amps.of(15);
-        public static final Time gripperMotorRampRate = Seconds.of(3); // time to max voltage
+        public static final int gripperMotorCurrentLimit = 15;
+        public static final double gripperMotorRampRate = 3; // seconds to max voltage
     }
 
     public static final class ClimberConstants {

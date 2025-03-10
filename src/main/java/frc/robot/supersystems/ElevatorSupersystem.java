@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Preset;
 import frc.robot.subsystems.CoralArm;
 import frc.robot.subsystems.Elevator;
@@ -16,15 +17,12 @@ import frc.robot.subsystems.Elevator;
 public class ElevatorSupersystem extends SubsystemBase {
     private static ElevatorSupersystem instance;
 
-    private static Elevator elevator;
-    private static CoralArm coral_arm;
+    private static final Elevator elevator = Elevator.getInstance();
+    private static final CoralArm coral_arm = CoralArm.getInstance();
 
     private static DigitalInput beamBreakSensor;
 
     private ElevatorSupersystem() {
-        elevator = Elevator.getInstance();
-        coral_arm = CoralArm.getInstance();
-
         beamBreakSensor = new DigitalInput(beamBreakSensorDIO);
     }
 
@@ -36,27 +34,25 @@ public class ElevatorSupersystem extends SubsystemBase {
         return instance; 
     }
 
-    public boolean hasCoral() {
-        return beamBreakSensor.get();
+    public Trigger hasCoral() {
+        return new Trigger(() -> beamBreakSensor.get());
     }
 
     // Intake
     public Command intakeSetupIntake() {
-        return run(() -> {
-            elevator.setHeightFromPreset(Preset.IntakeCatch);
-            coral_arm.setPivotAngleFromPreset(Preset.IntakeCatch);
-        });
+        return Commands.parallel(
+            elevator.setHeight(Preset.IntakeCatch.getHeight()),
+            coral_arm.setAngle(Preset.IntakeCatch.getAngle())
+        );
     }
     public Command intakeLoadIntake() {
-        if (elevator.isAtHeightFromPreset(Preset.IntakeCatch, Inches.of(3)) &&
-                coral_arm.isAtAngleFromPreset(Preset.IntakeCatch, Degrees.of(2))) {
-            return run(() -> {
-                elevator.setHeightFromPreset(Preset.IntakeGrip); // ideally this would run slower than usual
-                
-                coral_arm.setGripperVoltage(Volts.of(2))
-                    .until(this::hasCoral)
-                    .andThen(() -> coral_arm.setGripperVoltage(Volts.of(0)));                
-            });
+        if (elevator.getHeight() >= Preset.IntakeCatch.getHeight()) {
+            return Commands.parallel(
+                elevator.setHeight(Preset.IntakeGrip.getHeight()),
+                coral_arm.setGripperVoltage(2)
+                    .until(hasCoral())
+                    .andThen(coral_arm.setGripperVoltage(0))
+            );
         } else {
             return Commands.none();
         }
@@ -76,32 +72,24 @@ public class ElevatorSupersystem extends SubsystemBase {
         }
     };
     public Command coralPrepareElevator(CoralLayer selected_layer) {
-        return run(() -> {
-            elevator.setHeightFromPreset(selected_layer.toPreset());
-        }).until(elevator.isAtHeightFromPreset(selected_layer.toPreset()));
+        return elevator.setHeight(selected_layer.toPreset().getHeight());
     }
+
     public Command coralPrepareArm(CoralLayer selected_layer) {
-        return run(() -> {
-            coral_arm.setPivotAngleFromPreset(selected_layer.toPreset());
-        }).until(() -> coral_arm.isAtAngleFromPreset(selected_layer.toPreset()));
+        return coral_arm.setAngle(selected_layer.toPreset().getAngle());
     }
+
     public Command coralScoreCoral(CoralLayer selected_layer) {
         if (selected_layer == CoralLayer.L1) {
             // it's at 90deg, driver drives forward while we spin gripper motors negative
-            return coral_arm.setGripperVoltage(Volts.of(-3));
+            return coral_arm.setGripperVoltage(-3);
         } else if (selected_layer == CoralLayer.L2) {
             // it's at 60deg. needs to rotate down, then driver drives away
-            return run(() -> coral_arm.setPivotAngleFromPreset(
-                Preset.ScoreL2.angleMinus(Degrees.of(10))) // rotate down 10deg
-            );
+            return coral_arm.setAngle(Preset.ScoreL2.getAngle() - 0.0277); // rotate down 10deg
         } else if (selected_layer == CoralLayer.L3) {
-            return run(() -> coral_arm.setPivotAngleFromPreset(
-                Preset.ScoreL3.angleMinus(Degrees.of(10)))
-            );
+            return coral_arm.setAngle(Preset.ScoreL3.getAngle() - 0.0277);
         } else if (selected_layer == CoralLayer.L4) {
-            return run(() -> coral_arm.setPivotAngleFromPreset(
-                Preset.ScoreL4.angleMinus(Degrees.of(10)))
-            );
+            return coral_arm.setAngle(Preset.ScoreL1.getAngle());
         } else {
             return Commands.none();
         }
@@ -119,14 +107,13 @@ public class ElevatorSupersystem extends SubsystemBase {
         }
     };
     public Command algaeExtractionPrepareElevator(AlgaeExtractionLayer selected_layer) {
-        return run(() -> elevator.setHeightFromPreset(selected_layer.toPreset()))
-            .until(elevator.isAtHeightFromPreset(selected_layer.toPreset()));
+        return elevator.setHeight(selected_layer.toPreset().getHeight());
     }
+
     public Command algaeExtractionPrepareArm() {
-        return run(() -> coral_arm.setPivotAngleFromPreset(Preset.ExtractAlgaeLow))
-            .until(() -> coral_arm.isAtAngleFromPreset(Preset.ExtractAlgaeLow)); // 90deg for both of them, no need to pass it in
+        return coral_arm.setAngle(Preset.ExtractAlgaeLow.getAngle());
     }
-    public Command algaeExtractionextractAlgae() {
-        return coral_arm.setGripperVoltage(Volts.of(-3));
+    public Command algaeExtractionExtractAlgae() {
+        return coral_arm.setGripperVoltage(-3);
     }
 }
