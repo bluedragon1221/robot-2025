@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
@@ -16,12 +15,10 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.control.Launchpad;
@@ -44,8 +41,7 @@ public class RobotContainer {
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
 
     private LinearVelocity max_speed = TunerConstants.kSpeedAt12Volts; // kSpeedAt12Volts desired top speed
-    private AngularVelocity max_angular_rate = RotationsPerSecond.of(0.75); // 3/4 of a rotation per second max angular
-                                                                            // velocity
+    private AngularVelocity max_angular_rate = RotationsPerSecond.of(0.75); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -69,10 +65,10 @@ public class RobotContainer {
     public RobotContainer() {
         // Add Autos
         auto_factory = drivetrain.createAutoFactory()
-                .bind("set_l4_height", supersystem.coralPrepareElevator(CoralLayer.L4))
-                .bind("score_l4", supersystem.coralScoreCoral(CoralLayer.L4))
-                .bind("prepare_accept_coral", supersystem.intakeSetupIntake())
-                .bind("accept_coral", supersystem.intakeLoadIntake());
+            .bind("set_l4_height", supersystem.coralPrepareElevator(CoralLayer.L4))
+            .bind("score_l4", supersystem.coralScoreCoral(CoralLayer.L4))
+            .bind("prepare_accept_coral", supersystem.intakeSetupIntake())
+            .bind("accept_coral", supersystem.intakeLoadIntake());
 
         auto_routines = new AutoRoutines(auto_factory);
         auto_chooser.addRoutine("Center Cage 2L4", auto_routines::CenterCage2l4);
@@ -86,26 +82,25 @@ public class RobotContainer {
     private double turtle_mode = 1.0;
 
     public void updateTurtleMode() {
-        Distance curr_height = elevator.getHeight();
-        turtle_mode = (curr_height.gte(Inches.of(30)) || manual_turtle_mode) ? 0.357 : 1;
+        double curr_height = elevator.getHeight();
+        turtle_mode = ((curr_height >= Preset.ScoreL3.getHeight()) || manual_turtle_mode) ? 0.357 : 1;
     }
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
+        
+         // Drivetrain will execute this command periodically
         drivetrain.setDefaultCommand(
-                // Drivetrain will execute this command periodically
-                drivetrain.applyRequest(
-                    () -> drive.withVelocityX(-controller.getLeftY() * max_speed.in(MetersPerSecond) * turtle_mode) // Drive forward with negative Y (forward)
-                            .withVelocityY(-controller.getLeftX() * max_speed.in(MetersPerSecond) * turtle_mode) // Drive left with negative X (left)
-                            .withRotationalRate(-controller.getRightX() * max_angular_rate.in(RotationsPerSecond) * turtle_mode) // Drive counterclockwise with negative X (left)
-                ));
+            drivetrain.applyRequest(
+                () -> drive.withVelocityX(-controller.getLeftY() * max_speed.in(MetersPerSecond) * turtle_mode) // Drive forward with negative Y (forward)
+                        .withVelocityY(-controller.getLeftX() * max_speed.in(MetersPerSecond) * turtle_mode) // Drive left with negative X (left)
+                        .withRotationalRate(-controller.getRightX() * max_angular_rate.in(RotationsPerSecond) * turtle_mode) // Drive counterclockwise with negative X (left)
+        ));
 
         controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
         controller.b().whileTrue(drivetrain.applyRequest(
-                () -> point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))));
-
-        controller.x().whileTrue(Commands.runOnce(() -> coral_arm.setPivotAngleFromPreset(Preset.ScoreL4)));
+            () -> point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))));
 
         // Run SysId routines when holding back/start and X/Y.
         // Note that each routine should be run exactly once in a single log.
@@ -117,12 +112,10 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        controller.povUp().onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL1))).onFalse(elevator.runOnce(()->elevator.setHeightFromPreset(Preset.Initial)));
-
-        launchpad.getButton(9, 1).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL4)));
-        launchpad.getButton(9, 2).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL3)));
-        launchpad.getButton(9, 3).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL2)));
-        launchpad.getButton(9, 4).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL1)));
+        launchpad.getButton(9, 1).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL4.getHeight())));
+        launchpad.getButton(9, 2).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL3.getHeight())));
+        launchpad.getButton(9, 3).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL2.getHeight())));
+        launchpad.getButton(9, 4).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL1.getHeight())));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

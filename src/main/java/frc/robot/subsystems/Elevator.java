@@ -1,35 +1,31 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Millimeters;
-import static edu.wpi.first.units.Units.Radians;
 import static frc.robot.Constants.ElevatorConstants.*;
-
-import java.util.function.BooleanSupplier;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.Preset;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Elevator extends SubsystemBase {
     private static Elevator instance;
 
     private static final TalonFX leader_motor = new TalonFX(leftMotorID, "canivore"); 
     private static final TalonFX follower_motor = new TalonFX(rightMotorID, "canivore");
-    private static final MotionMagicVoltage position_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
-    private static Distance goal_height;
-
+    private static final MotionMagicVoltage mm_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
+    
     private static CANrange canrange = new CANrange(heightSensorID, "canivore");
 
     private static class TuneableConstants {
@@ -74,9 +70,6 @@ public class Elevator extends SubsystemBase {
     }
 
     private Elevator() {
-        // initial goal height (when the robot starts)
-        goal_height = Preset.Initial.getHeight();
-
         TuneableConstants.initDashboard();
 
         configureMotors();
@@ -117,61 +110,45 @@ public class Elevator extends SubsystemBase {
         follower_motor.setControl(new Follower(leftMotorID, false));
     }
 
-    // // Commands to nudge elevator (doesn't rely on setHeight)
-    // public Command startNudgeElevator(Voltage volts) {
-    //     return run(() -> {
-    //         leader_motor.setVoltage(volts.in(Volts));
-    //     });
-    // }
-
-    // public Command stopNudgeElevator() {
-    //     return runOnce(() -> {
-    //         leader_motor.setVoltage(0);
-    //     });
-    // }
-
-    public Distance getHeight() {
-        return canrange.getDistance().getValue().minus(canrangeOffset); // subtracts canrangeOffset to get the "actual" position
+    public double getHeight() {
+        return canrange.getDistance().getValueAsDouble() - canrangeOffset; // subtracts canrangeOffset to get the "actual" position
     }
 
-    private BooleanSupplier isAtHeight(Distance goalHeight) {
-        return () -> getHeight().isNear(goalHeight, heightTolerance);
-    }
-    private boolean isAtHeight(Distance goalHeight, Distance tolerance) {
-        return getHeight().isNear(goalHeight, tolerance);
-    }
-    public BooleanSupplier isAtHeightFromPreset(Preset preset) {
-        return isAtHeight(preset.getHeight());
-    }
-    public boolean isAtHeightFromPreset(Preset preset, Distance tolerance) {
-        return isAtHeight(preset.getHeight(), tolerance);
+    public double getRotations() {
+        return leader_motor.getPosition().getValueAsDouble();
     }
 
-    private static Angle translateHeightToRotations(Distance goalHeight) {
-        return Radians.of(goalHeight.in(Inches) / (2 * Math.PI * sprocketRadius.in(Inches)));
+    public Trigger isAtHeight(double goalHeight) {
+        return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), heightTolerance));
     }
 
-    private void setHeight(Distance goalHeight) {
-        goal_height = goalHeight;
+    private static double translateHeightToRotations(double goalHeight) {
+        return goalHeight / (2 * Math.PI * sprocketRadius);
     }
 
-    public void setHeightFromPreset(Preset preset) {
-        setHeight(preset.getHeight());
+    private static double translateRotationsToHeight(double goalAngle) {
+        return (2 * Math.PI * sprocketRadius) / goalAngle;
+    }
+
+    public Command setHeight(double goalHeight) {
+        return Commands.run(() -> {
+            leader_motor.setPosition(translateHeightToRotations(getHeight()));
+
+            leader_motor.setControl(mm_voltage.withPosition(translateHeightToRotations(goalHeight)));
+        });
+    }
+
+    public Command stopElevator() {
+        return Commands.runOnce(() -> {
+            leader_motor.setControl(new VoltageOut(0));
+        });
     }
 
     @Override
     public void periodic() {
-        var curr_estimate_rotations = translateHeightToRotations(getHeight());
-        var curr_actual_rotations = leader_motor.getPosition().getValue();
-        if (!curr_actual_rotations.isNear(curr_estimate_rotations, angleTolerance)) {
-            leader_motor.setPosition(curr_estimate_rotations);
-        }
+        SmartDashboard.putString("CANrange Reading", String.format("%.9f", getHeight() + canrangeOffset));
+        SmartDashboard.putString("Elevator Reported Height (meters)", String.format("%.9f", translateRotationsToHeight(getRotations())));
 
-        Angle goalRotations = translateHeightToRotations(goal_height);
-        leader_motor.setControl(position_voltage.withPosition(goalRotations));
-
-        SmartDashboard.putString("CANrange Reading", String.format("%.9f", canrange.getDistance().getValue().in(Millimeters)));
-    
         boolean changed = TuneableConstants.updateDashboard();
         if (changed) {
             configureMotors();
