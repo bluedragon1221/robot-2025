@@ -70,7 +70,7 @@ public class Constants {
 
         public static final Current pivotMotorCurrentLimit = Amps.of(40);
 
-        public static final double pivotMotorGearRatio = 30.0;
+        public static final double pivotMotorGearRatio = 37.0;
         public static final Angle pivotMotorTolerance = Degrees.of(1.0);
 
         public static final Current gripperMotorCurrentLimit = Amps.of(30);
