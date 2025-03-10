@@ -119,6 +119,11 @@ public class RobotContainer {
 
         controller.povUp().onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL1))).onFalse(elevator.runOnce(()->elevator.setHeightFromPreset(Preset.Initial)));
 
+        launchpad.getButton(9, 1).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL4)));
+        launchpad.getButton(9, 2).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL3)));
+        launchpad.getButton(9, 3).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL2)));
+        launchpad.getButton(9, 4).onTrue(elevator.runOnce(() -> elevator.setHeightFromPreset(Preset.ScoreL1)));
+
         drivetrain.registerTelemetry(logger::telemeterize);
     }
 
