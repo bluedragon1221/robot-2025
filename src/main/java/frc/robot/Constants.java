@@ -36,16 +36,16 @@ public class Constants {
         public static final int leftMotorID = 20;
         public static final int rightMotorID = 21;
 
-        public static final int motorMaxAcceleration = 48;
-        public static final int motorCruiseVelocity = 70;
+        public static final int motorMaxAcceleration = 3;
+        public static final int motorCruiseVelocity = 3;
 
         public static final double motorGearRatio = 7.75;
 
         public static final double heightTolerance = 0.02;
 
-        public static final double sprocketRadius = 0.0254;
+        public static final double sprocketRadius = 0.0254 * 0.905;
 
-        public static final double canrangeOffset = 0.1285875;
+        // public static final double canrangeOffset = 0.16;
 
         public static final int heightSensorID = 22;
         public static final int bottomSensorDIO = 0;
@@ -56,12 +56,14 @@ public class Constants {
         public static final int pivotEncoderID = 31;
         public static final int gripperMotorID = 32;
 
-        public static final int pivotMotorAcceleration = 50;
-        public static final int pivotMotorCruiseVelocity = 17;
+        public static final double pivotMotorAcceleration = 1;
+        public static final double pivotMotorCruiseVelocity = 0.5;
+
+        public static final double pivotEncoderOffset = 0.437255859375;
 
         public static final double pivotMotorCurrentLimit = 40;
 
-        public static final double pivotMotorGearRatio = 37.0;
+        public static final double pivotMotorGearRatio = 37.5;
         public static final double pivotMotorTolerance = 0.1;
 
         public static final double gripperMotorCurrentLimit = 30;

@@ -112,10 +112,13 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        launchpad.getButton(9, 1).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL4.getHeight())));
-        launchpad.getButton(9, 2).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL3.getHeight())));
-        launchpad.getButton(9, 3).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL2.getHeight())));
-        launchpad.getButton(9, 4).onTrue(elevator.runOnce(() -> elevator.setHeight(Preset.ScoreL1.getHeight())));
+        launchpad.getButton(8, 1).onTrue(elevator.setHeight(Preset.ScoreL1.getHeight()));
+        launchpad.getButton(8, 2).onTrue(elevator.setHeight(Preset.ScoreL2.getHeight()));
+        launchpad.getButton(8, 3).onTrue(elevator.setHeight(Preset.ScoreL3.getHeight()));
+        launchpad.getButton(8, 4).onTrue(elevator.setHeight(Preset.ScoreL4.getHeight()));
+        launchpad.getButton(8, 5).onTrue(elevator.setHeight(Preset.Initial.getHeight()));
+        launchpad.getButton(7, 1).onTrue(coral_arm.setAngle(0.125));
+        launchpad.getButton(7, 5).onTrue(coral_arm.setAngle(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

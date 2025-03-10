@@ -15,10 +15,10 @@ public class Launchpad {
     //This table is visually accurate to the launchpad each of these rbg sets will change it's respective button
     public long[][][] rgbTable = {
         {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
-        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
-        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
-        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
-        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
+        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {63,0,0}},
+        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {63,0,0}},
+        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {63,0,0}},
+        {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {63,0,0}},
         {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
         {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
         {{0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}},
@@ -51,13 +51,16 @@ public class Launchpad {
             //     System.out.println("("+row+","+col+","+vjoy_num+") "+button_num);
 
             // Change me!
-            changeLED(col, row, rgbTable[col][row]);
+            changeLED(col, row, rgbTable[row][col]);
 
             int button = button_num - (32 * Math.floorDiv(i,32));
+            if(button != 0)
+            {
             buttons[row][col] = vjoys[vjoy_num].button(button);
-            buttons[row][col].onTrue(Commands.print("("+row+","+col+") pressed"));
+            buttons[row][col].onTrue(Commands.print("("+row+","+(col)+") pressed"));
             buttons[row][col].onFalse(Commands.runOnce((()->this.restoreSavedLED(col,row))));
             buttons[row][col].onTrue(Commands.runOnce((()->this.feedback(col,row, pressedColor))));
+            }
         }
     }
 
@@ -70,7 +73,7 @@ public class Launchpad {
      * @throws IllegalArgumentException if x or y is not within 0-7
      */
     public Trigger getButton(int x, int y) {
-        if (x > 7 || y > 7 || x < 0 || y < 0) {
+        if (x > 8 || y > 8 || x < 0 || y < 0) {
             throw new IllegalArgumentException("Coords must be less than 7");
         }
         return buttons[y][x];
