@@ -25,7 +25,7 @@ import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.CoralArm;
+import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.supersystems.ElevatorSupersystem;
 import frc.robot.supersystems.ElevatorSupersystem.CoralLayer;
@@ -35,7 +35,7 @@ public class RobotContainer {
     // initialize subsystems
     Elevator elevator = Elevator.getInstance();
     ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
-    CoralArm coral_arm = CoralArm.getInstance();
+    CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
     Climber climber = Climber.getInstance();
 
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
@@ -117,8 +117,9 @@ public class RobotContainer {
         launchpad.getButton(8, 3).onTrue(elevator.setHeight(Preset.ScoreL3.getHeight()));
         launchpad.getButton(8, 4).onTrue(elevator.setHeight(Preset.ScoreL4.getHeight()));
         launchpad.getButton(8, 5).onTrue(elevator.setHeight(Preset.Initial.getHeight()));
-        launchpad.getButton(7, 1).onTrue(coral_arm.setAngle(0.125));
-        launchpad.getButton(7, 5).onTrue(coral_arm.setAngle(0));
+        
+        launchpad.getButton(7, 1).onTrue(coral_arm_pivot.setAngle(0.125));
+        launchpad.getButton(7, 5).onTrue(coral_arm_pivot.setAngle(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     
