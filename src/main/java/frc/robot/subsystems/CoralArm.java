@@ -20,6 +20,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -46,10 +47,10 @@ public class CoralArm extends SubsystemBase {
     private final SparkMax gripper_motor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
     private static class TuneableConstants {
-        private static double kG = 0.067;
-        private static double kP = 60;
+        private static double kG = 0.06;
+        private static double kP = 0.12;
         private static double kI = 0;
-        private static double kD = 0.5;
+        private static double kD = 0.01;
 
         public static void initDashboard() {
             SmartDashboard.putNumber("CoralArm/kG", kG);
@@ -103,6 +104,7 @@ public class CoralArm extends SubsystemBase {
 
         // Pivot motor
         var pivot_cfg = new TalonFXConfiguration();
+        pivot_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
         pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
         pivot_cfg.Feedback.RotorToSensorRatio = pivotMotorGearRatio;
