@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.CoralArmConstants.*;
+import static frc.robot.Constants.CoralArmPivotConstants.*;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -11,12 +11,6 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,14 +19,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-public class CoralArm extends SubsystemBase {
-    private static CoralArm instance;
+public class CoralArmPivot extends SubsystemBase {
+    private static CoralArmPivot instance;
 
     private static final TalonFX pivot_motor = new TalonFX(pivotMotorID, "canivore");
     private static final CANcoder pivot_encoder = new CANcoder(pivotEncoderID, "canivore");
     private static final MotionMagicVoltage pivot_mm_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
-
-    private final SparkMax gripper_motor = new SparkMax(gripperMotorID, MotorType.kBrushless);
 
     private static class TuneableConstants {
         private static double kG = 0.06;
@@ -67,28 +59,28 @@ public class CoralArm extends SubsystemBase {
         }
     }
 
-    private CoralArm() {
+    private CoralArmPivot() {
         configureMotors();
 
         TuneableConstants.initDashboard();
     }
 
-    public static synchronized CoralArm getInstance() {
+    public static synchronized CoralArmPivot getInstance() {
         if (instance == null) {
-            instance = new CoralArm();
+            instance = new CoralArmPivot();
         }
 
         return instance;
-    }
+    }    
 
     private void configureMotors() {
-        // Pivot encoder
+        // Encoder
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         encoder_cfg.MagnetOffset = 0;
         pivot_encoder.getConfigurator().apply(encoder_cfg);
 
-        // Pivot motor
+        // Motor
         var pivot_cfg = new TalonFXConfiguration();
         pivot_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
@@ -108,17 +100,6 @@ public class CoralArm extends SubsystemBase {
         pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit;
 
         pivot_motor.getConfigurator().apply(pivot_cfg);
-
-        // Gripper motor
-        var gripper_cfg = new SparkMaxConfig();
-        gripper_cfg.idleMode(IdleMode.kBrake);
-        gripper_cfg.smartCurrentLimit((int) gripperMotorCurrentLimit);
-        gripper_motor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-    }
-
-    // Gripper
-    public Command setGripperVoltage(double voltage) {
-        return run(() -> gripper_motor.setVoltage(voltage));
     }
 
     private double getAngle() {
@@ -131,7 +112,9 @@ public class CoralArm extends SubsystemBase {
 
     public Command setAngle(double goalAngle) {
         return Commands.run(() -> {
-            pivot_mm_voltage.withPosition(goalAngle);
+            pivot_motor.setControl(
+                pivot_mm_voltage.withPosition(goalAngle)
+            );
         });
     }
 

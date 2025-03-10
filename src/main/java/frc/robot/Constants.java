@@ -51,10 +51,9 @@ public class Constants {
         public static final int bottomSensorDIO = 0;
     }
 
-    public static final class CoralArmConstants {
+    public static final class CoralArmPivotConstants {
         public static final int pivotMotorID = 30;
         public static final int pivotEncoderID = 31;
-        public static final int gripperMotorID = 32;
 
         public static final int pivotMotorAcceleration = 50;
         public static final int pivotMotorCruiseVelocity = 17;
@@ -63,7 +62,10 @@ public class Constants {
 
         public static final double pivotMotorGearRatio = 37.0;
         public static final double pivotMotorTolerance = 0.1;
+    }
 
+    public static final class CoralArmGripperConstants {
+        public static final int gripperMotorID = 32;
         public static final double gripperMotorCurrentLimit = 30;
     }
 
