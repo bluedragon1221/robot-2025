@@ -121,8 +121,10 @@ public class RobotContainer {
         launchpad.getButton(7, 5).onTrue(coral_arm.setAngle(0));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+    
+        controller.x().whileTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
     }
-
+    
     public Command getAutonomousCommand() {
         return auto_chooser.selectedCommand();
     }

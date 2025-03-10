@@ -64,6 +64,12 @@ public class Climber extends SubsystemBase {
         return Math.abs(motor.getEncoder().getPosition() - rotations) > climberMotorTolerance;
     }
 
+    public Command setVoltage(double voltage) {
+        return run(() -> {
+            motor.setVoltage(voltage);
+        });
+    }
+
     private Command addRotations(double rotations) {
         double currentPosition = motor.getEncoder().getPosition();
         double targetPosition = (currentPosition + rotations);

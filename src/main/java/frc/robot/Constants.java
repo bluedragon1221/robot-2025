@@ -1,19 +1,10 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Seconds;
-
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Time;
-
 public class Constants {
     public static enum Preset {
         // Height: Don't worry about canrangeOffset in these heights; the subsystem takes care of it
-        // Angle: 0 degrees is horizontal, 90 up, and -90 down because cosine arm mechanics
-
-        // TODO: make all elevator presets doubles in meters
-        // TODO: make all angles doubles in rotations
-        Initial         (0,      0.25), // I think the angle here is wrong becuase we can't go 90deg up
+        // Angle: 0rot is horizontal, 0.25rot up, and -0.25rot down because cosine arm mechanics
+        Initial         (0,      0.25),
         ScoreL1         (0.1524, 0),
         ScoreL2         (0.1524, 0.0833),
         ScoreL3         (0.3556, 0.0833),

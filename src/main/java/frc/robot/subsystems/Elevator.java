@@ -12,9 +12,11 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Elevator extends SubsystemBase {
     private static Elevator instance;
@@ -68,26 +70,21 @@ public class Elevator extends SubsystemBase {
         follower_motor.setPosition(0);
     }
 
-    // public double getHeight() {
-    //     return canrange.getDistance().getValueAsDouble() - canrangeOffset; // subtracts canrangeOffset to get the "actual" position
-    // }
-
-    // private double getHeightNoOffset() {
-    //     return canrange.getDistance().getValueAsDouble();
-    // }
+    public double getHeight() {
+        return leader_motor.getPosition().getValueAsDouble();
+    }
 
     public double getRotations() {
         return leader_motor.getPosition().getValueAsDouble(); // millimeters -> meters
     }
 
-    // public Trigger isAtHeight(double goalHeight) {
-    //     return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), heightTolerance));
-    // }
-
-    private static double translateHeightToRotations(double goalHeight) {
-        return (goalHeight) / (2 * Math.PI * sprocketRadius);
+    public Trigger isAtHeight(double goalHeight) {
+        return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), heightTolerance));
     }
 
+    private static double translateHeightToRotations(double goalHeight) {
+        return goalHeight / (2 * Math.PI * sprocketRadius);
+    }
     private static double translateRotationsToHeight(double goalAngle) {
         return (2 * Math.PI * sprocketRadius) * goalAngle;
     }
