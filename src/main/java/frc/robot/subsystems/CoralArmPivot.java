@@ -62,6 +62,8 @@ public class CoralArmPivot extends SubsystemBase {
     private CoralArmPivot() {
         configureMotors();
 
+        SmartDashboard.putNumber("Coral Arm Pivot", 0);
+
         TuneableConstants.initDashboard();
     }
 
@@ -122,6 +124,8 @@ public class CoralArmPivot extends SubsystemBase {
         pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit;
 
         pivot_motor.getConfigurator().apply(pivot_cfg);
+
+        System.out.println("Reconfigured CoralArmPivot");
     }
 
     private double getAngle() {
@@ -133,10 +137,16 @@ public class CoralArmPivot extends SubsystemBase {
     }
 
     public Command setAngle(double goalAngle) {
-        return Commands.run(() -> {
+        return run(() -> {
             pivot_motor.setControl(
                 pivot_mm_voltage.withPosition(goalAngle)
             );
         });
+    }
+
+
+    public Command setAngleFromDashboard() {
+        double angle = SmartDashboard.getNumber("Pivot Angle", 0);
+        return setAngle(angle);
     }
 }
