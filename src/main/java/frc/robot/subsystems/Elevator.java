@@ -65,21 +65,9 @@ public class Elevator extends SubsystemBase {
 
         leader_motor.getConfigurator().apply(cfg);
         follower_motor.getConfigurator().apply(cfg);
-
+        
         leader_motor.setPosition(0);
         follower_motor.setPosition(0);
-    }
-
-    public double getHeight() {
-        return leader_motor.getPosition().getValueAsDouble();
-    }
-
-    public double getRotations() {
-        return leader_motor.getPosition().getValueAsDouble(); // millimeters -> meters
-    }
-
-    public Trigger isAtHeight(double goalHeight) {
-        return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), heightTolerance));
     }
 
     private static double translateHeightToRotations(double goalHeight) {
@@ -87,6 +75,18 @@ public class Elevator extends SubsystemBase {
     }
     private static double translateRotationsToHeight(double goalAngle) {
         return (2 * Math.PI * sprocketRadius) * goalAngle;
+    }
+    
+    // public double getHeight() {
+    //     return canrange.getDistance().getValueAsDouble() / 1000;
+    // }
+
+    public double getHeight() {
+        return translateRotationsToHeight(leader_motor.getPosition().getValueAsDouble());
+    }
+
+    public Trigger isAtHeight(double goalHeight) {
+        return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), heightTolerance));
     }
 
     public Command setHeight(double goalHeight) {
@@ -107,6 +107,6 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
         // SmartDashboard.putNumber("CANrange Reading (meters)", getHeightNoOffset());
-        SmartDashboard.putNumber("Elevator Reported Height (meters)", translateRotationsToHeight(getRotations()));
+        SmartDashboard.putNumber("Elevator Reported Height (meters)", getHeight());
     }
 }

@@ -5,24 +5,22 @@ import static frc.robot.Constants.ElevatorSupersystemConstants.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Preset;
 import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.Elevator;
 
-public class ElevatorSupersystem extends SubsystemBase {
+public class ElevatorSupersystem {
     private static ElevatorSupersystem instance;
 
     private static final Elevator elevator = Elevator.getInstance();
     private static final CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
     private static final CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
 
-    private static DigitalInput beamBreakSensor;
+    private static final DigitalInput beamBreakSensor = new DigitalInput(beamBreakSensorDIO);
 
     private ElevatorSupersystem() {
-        beamBreakSensor = new DigitalInput(beamBreakSensorDIO);
     }
 
     public static synchronized ElevatorSupersystem getInstance() {

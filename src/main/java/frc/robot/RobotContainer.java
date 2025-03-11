@@ -19,6 +19,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.control.Launchpad;
@@ -120,6 +121,8 @@ public class RobotContainer {
         
         launchpad.getButton(7, 1).onTrue(coral_arm_pivot.setAngle(0.125));
         launchpad.getButton(7, 5).onTrue(coral_arm_pivot.setAngle(0));
+
+        launchpad.getButton(2, 2).onTrue(Commands.runOnce(() -> coral_arm_pivot.reconfigurePivotMotor()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     
