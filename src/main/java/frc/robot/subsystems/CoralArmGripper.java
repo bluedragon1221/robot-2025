@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -26,6 +27,8 @@ public class CoralArmGripper extends SubsystemBase {
 
     private CoralArmGripper() {
         configureMotors();
+
+        SmartDashboard.putNumber("Set Gripper Voltage", 0);
     }
 
     public static synchronized CoralArmGripper getInstance() {
@@ -50,5 +53,11 @@ public class CoralArmGripper extends SubsystemBase {
     // Gripper
     public Command setGripperVoltage(double voltage) {
         return run(() -> gripper_motor.setVoltage(voltage));
+    }
+
+    public Command setVoltageFromDashboard() {
+        return run(() -> {
+            gripper_motor.setVoltage(SmartDashboard.getNumber("Set Gripper Voltage", 0));
+        });
     }
 }

@@ -160,6 +160,8 @@ public class RobotContainer {
         launchpad.getButton(6, 3).onTrue(supersystem.coralScoreCoral(CoralLayer.L2));
         launchpad.getButton(6, 4).onTrue(supersystem.coralScoreCoral(CoralLayer.L1));
 
+        launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
+
         /// manual testing voltage sets
         controller.leftBumper().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
         controller.leftTrigger().onTrue(climber.setVoltage(-6)).onFalse(climber.setVoltage(0));

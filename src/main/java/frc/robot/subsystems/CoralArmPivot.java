@@ -41,7 +41,7 @@ public class CoralArmPivot extends SubsystemBase {
     
         SmartDashboard.putNumber("Set Coral Arm Pivot", 0);
 
-        SignalLogger.start();
+        // SignalLogger.start();
     }
 
     private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
@@ -74,7 +74,7 @@ public class CoralArmPivot extends SubsystemBase {
 
     private void configureMotors() {
         // Encoder
-        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_encoder.getPosition(), pivot_encoder.getVelocity());
+        // BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_encoder.getPosition(), pivot_encoder.getVelocity());
         pivot_encoder.optimizeBusUtilization();
 
         var encoder_cfg = new MagnetSensorConfigs();
@@ -83,7 +83,7 @@ public class CoralArmPivot extends SubsystemBase {
         pivot_encoder.getConfigurator().apply(encoder_cfg);
 
         // Motor
-        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_motor.getPosition(), pivot_motor.getVelocity(), pivot_motor.getMotorVoltage(), pivot_motor.getRotorVelocity(), pivot_motor.getRotorPosition());
+        // BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_motor.getPosition(), pivot_motor.getVelocity(), pivot_motor.getMotorVoltage(), pivot_motor.getRotorVelocity(), pivot_motor.getRotorPosition());
         pivot_motor.optimizeBusUtilization();
 
         var pivot_cfg = new TalonFXConfiguration();

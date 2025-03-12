@@ -57,6 +57,14 @@ public class ElevatorSupersystem {
         return setState(preset.getHeight(), preset.getAngle(), gripper_voltage);
     }
 
+    public Command setStateFromDashboard() {
+        return Commands.parallel(
+            elevator.setHeightFromDashboard(),
+            coral_arm_pivot.setAngleFromDashboard(),
+            coral_arm_gripper.setVoltageFromDashboard()
+        );
+    }
+
     public static synchronized ElevatorSupersystem getInstance() {
         if (instance == null) {
             instance = new ElevatorSupersystem();
