@@ -82,14 +82,12 @@ public class RobotContainer {
     }
 
     private boolean manual_turtle_mode = false;
-    private double turtle_mode = 1.0;
 
-    public void updateTurtleMode() {
-        turtle_mode = ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode) ? 0.357 : 1;
-    }
+    private final double turtle_mode = 0.657;
+    private Trigger turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL2.getHeight())));
 
-    private Trigger turtle_trigger = new Trigger(
-            () -> ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode));
+    private final double slower_turtle_mode = 0.357;
+    private Trigger slower_turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode));
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
@@ -97,25 +95,22 @@ public class RobotContainer {
 
         // Drivetrain will execute this command periodically
         drivetrain.setDefaultCommand(
-                drivetrain.applyRequest(
-                        () -> drive.withVelocityX(-controller.getLeftY() * max_speed) // Drive forward with negative Y
-                                                                                      // (forward)
-                                .withVelocityY(-controller.getLeftX() * max_speed) // Drive left with negative X (left)
-                                .withRotationalRate(-controller.getRightX() * max_angular_rate) // Drive
-                                                                                                // counterclockwise with
-                                                                                                // negative X (left)
-                ));
+            drivetrain.applyRequest(
+                () -> drive.withVelocityX(-controller.getLeftY() * max_speed) // Drive forward with negative Y (forward)
+                           .withVelocityY(-controller.getLeftX() * max_speed) // Drive left with negative X (left) Drive counterclockwise with negative X (left)
+            ));
 
-        turtle_trigger.whileTrue(drivetrain.applyRequest(
-                () -> drive.withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive forward with
-                                                                                            // negative Y (forward)
-                        .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive left with negative X
-                                                                                         // (left)
-                        .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive
-                                                                                                      // counterclockwise
-                                                                                                      // with negative X
-                                                                                                      // (left)
+        turtle_trigger.and(slower_turtle_trigger.negate()).whileTrue(drivetrain.applyRequest(
+            () -> drive.withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive forward with negative Y (forward)
+                       .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive left with negative X (left)
+                       .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive counterclockwise with negative X (left)
         ));
+
+        slower_turtle_trigger.whileTrue(drivetrain.applyRequest(
+                () -> drive.withVelocityX(-controller.getLeftY() * max_speed * slower_turtle_mode) // Drive forward with negative Y (forward)
+                           .withVelocityY(-controller.getLeftX() * max_speed * slower_turtle_mode) // Drive left with negative X (left)
+                           .withRotationalRate(-controller.getRightX() * max_angular_rate * slower_turtle_mode) // Drive counterclockwise with negative X (left)
+            ));
 
         controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
         controller.b().whileTrue(drivetrain.applyRequest(
