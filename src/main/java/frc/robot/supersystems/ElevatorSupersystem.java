@@ -93,11 +93,11 @@ public class ElevatorSupersystem {
 
     // Intake
     public Command intakeSetupIntake() {
-        return setStatePivot(0.15)
+        return setStatePivot(0)
                 .until(coral_arm_pivot.isGreaterThan(0))
                 .andThen(setStateElevator(Preset.IntakeCatch.getHeight()))
                 .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
-                .andThen(setStatePivot(Preset.IntakeGrip.getAngle()));
+                .andThen(setStatePreset(Preset.IntakeCatch));
     }
 
     public Command intakeLoadIntake() {

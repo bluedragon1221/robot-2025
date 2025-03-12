@@ -38,7 +38,7 @@ public class RobotContainer {
     Vision vision = Vision.getInstance();
 
     private double max_speed = TunerConstants.kSpeedAt12Volts.magnitude(); // kSpeedAt12Volts desired top speed
-    private double max_robot_centric_speed = TunerConstants.kSpeedAt12Volts.magnitude() * 0.2; // kSpeedAt12Volts
+    private double max_robot_centric_speed = TunerConstants.kSpeedAt12Volts.magnitude() * 0.08; // kSpeedAt12Volts
                                                                                                // desired top speed
     private double max_angular_rate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
@@ -141,20 +141,20 @@ public class RobotContainer {
                 drivetrain.applyRequest(() -> robot_centric.withVelocityX(-max_robot_centric_speed).withVelocityY(0)));
 
         // Elevator/coral arm controls
-        launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareElevator(CoralLayer.L4));
-        launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareElevator(CoralLayer.L3));
-        launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareElevator(CoralLayer.L2));
-        launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareElevator(CoralLayer.L1));
+        // launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareElevator(CoralLayer.L4));
+        // launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareElevator(CoralLayer.L3));
+        // launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareElevator(CoralLayer.L2));
+        // launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareElevator(CoralLayer.L1));
 
-        launchpad.getButton(7, 1).onTrue(supersystem.coralPrepareArm(CoralLayer.L4));
-        launchpad.getButton(7, 2).onTrue(supersystem.coralPrepareArm(CoralLayer.L3));
-        launchpad.getButton(7, 3).onTrue(supersystem.coralPrepareArm(CoralLayer.L2));
-        launchpad.getButton(7, 4).onTrue(supersystem.coralPrepareArm(CoralLayer.L1));
+        // launchpad.getButton(7, 1).onTrue(supersystem.coralPrepareArm(CoralLayer.L4));
+        // launchpad.getButton(7, 2).onTrue(supersystem.coralPrepareArm(CoralLayer.L3));
+        // launchpad.getButton(7, 3).onTrue(supersystem.coralPrepareArm(CoralLayer.L2));
+        // launchpad.getButton(7, 4).onTrue(supersystem.coralPrepareArm(CoralLayer.L1));
 
-        launchpad.getButton(6, 1).onTrue(supersystem.coralScoreCoral(CoralLayer.L4));
-        launchpad.getButton(6, 2).onTrue(supersystem.coralScoreCoral(CoralLayer.L3));
-        launchpad.getButton(6, 3).onTrue(supersystem.coralScoreCoral(CoralLayer.L2));
-        launchpad.getButton(6, 4).onTrue(supersystem.coralScoreCoral(CoralLayer.L1));
+        // launchpad.getButton(6, 1).onTrue(supersystem.coralScoreCoral(CoralLayer.L4));
+        // launchpad.getButton(6, 2).onTrue(supersystem.coralScoreCoral(CoralLayer.L3));
+        // launchpad.getButton(6, 3).onTrue(supersystem.coralScoreCoral(CoralLayer.L2));
+        // launchpad.getButton(6, 4).onTrue(supersystem.coralScoreCoral(CoralLayer.L1));
 
         launchpad.getButton(8, 5).onTrue(supersystem.intakeSetupIntake());
         launchpad.getButton(7, 5).onTrue(supersystem.intakeLoadIntake());
@@ -164,7 +164,7 @@ public class RobotContainer {
         launchpad.getButton(3, 3).onTrue(supersystem.testTriggers());
 
         /// manual testing voltage sets
-        controller.leftBumper().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
+        controller.rightTrigger().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
         controller.leftTrigger().onTrue(climber.setVoltage(-6)).onFalse(climber.setVoltage(0));
 
         // Telemetrize our drive train
