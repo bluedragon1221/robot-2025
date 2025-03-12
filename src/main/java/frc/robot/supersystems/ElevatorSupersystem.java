@@ -100,6 +100,9 @@ public class ElevatorSupersystem {
                 Preset.ScoreL4.getAngle()
             ));       
     }
+    public Command storagePosition() {
+        return intakePostIntake();
+    }
 
     // Score Coral
     public static enum CoralLayer {
