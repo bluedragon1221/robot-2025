@@ -27,8 +27,8 @@ public class Constants {
         public static final int leftMotorID = 20;
         public static final int rightMotorID = 21;
 
-        public static final int motorMaxAcceleration = 3;
-        public static final int motorCruiseVelocity = 3;
+        public static final int motorMaxAcceleration = 6;
+        public static final int motorCruiseVelocity = 5;
 
         public static final double motorGearRatio = 7.75;
 
@@ -49,7 +49,7 @@ public class Constants {
         public static final double pivotMotorAcceleration = 1;
         public static final double pivotMotorCruiseVelocity = 0.5;
 
-        public static final double pivotEncoderOffset = 0.437255859375;
+        public static final double pivotEncoderOffset = -0.55166015625;
 
         public static final double pivotMotorCurrentLimit = 40;
 

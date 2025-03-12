@@ -7,9 +7,12 @@ package frc.robot;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static frc.robot.Constants.AlgaeArmConstants.gripperMotorID;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -21,11 +24,14 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.AlgaeArm;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.supersystems.ElevatorSupersystem;
@@ -36,23 +42,25 @@ public class RobotContainer {
     // initialize subsystems
     Elevator elevator = Elevator.getInstance();
     ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
+    private static final SparkMax gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
     CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
+    CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
     Climber climber = Climber.getInstance();
 
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
 
-    private LinearVelocity max_speed = TunerConstants.kSpeedAt12Volts; // kSpeedAt12Volts desired top speed
-    private AngularVelocity max_angular_rate = RotationsPerSecond.of(0.75); // 3/4 of a rotation per second max angular velocity
+    private double max_speed = TunerConstants.kSpeedAt12Volts.magnitude(); // kSpeedAt12Volts desired top speed
+    private double max_angular_rate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(max_speed.in(MetersPerSecond) * 0.1)
-            .withRotationalDeadband(max_angular_rate.in(RadiansPerSecond) * 0.1) // Add a 10% deadband
+            .withDeadband(max_speed * 0.1)
+            .withRotationalDeadband(max_angular_rate * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final Telemetry logger = new Telemetry(max_speed.in(MetersPerSecond));
+    private final Telemetry logger = new Telemetry(max_speed);
 
     private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -83,9 +91,10 @@ public class RobotContainer {
     private double turtle_mode = 1.0;
 
     public void updateTurtleMode() {
-        double curr_height = elevator.getHeight();
-        turtle_mode = ((curr_height >= Preset.ScoreL3.getHeight()) || manual_turtle_mode) ? 0.357 : 1;
+        turtle_mode = ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode) ? 0.357 : 1;
     }
+
+    private Trigger turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode));
 
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
@@ -94,9 +103,15 @@ public class RobotContainer {
          // Drivetrain will execute this command periodically
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(
-                () -> drive.withVelocityX(-controller.getLeftY() * max_speed.in(MetersPerSecond) * turtle_mode) // Drive forward with negative Y (forward)
-                        .withVelocityY(-controller.getLeftX() * max_speed.in(MetersPerSecond) * turtle_mode) // Drive left with negative X (left)
-                        .withRotationalRate(-controller.getRightX() * max_angular_rate.in(RotationsPerSecond) * turtle_mode) // Drive counterclockwise with negative X (left)
+                () -> drive.withVelocityX(-controller.getLeftY() * max_speed) // Drive forward with negative Y (forward)
+                        .withVelocityY(-controller.getLeftX() * max_speed) // Drive left with negative X (left)
+                        .withRotationalRate(-controller.getRightX() * max_angular_rate) // Drive counterclockwise with negative X (left)
+        ));
+
+        turtle_trigger.whileTrue(drivetrain.applyRequest(
+            () -> drive.withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive forward with negative Y (forward)
+                    .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive left with negative X (left)
+                    .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive counterclockwise with negative X (left)
         ));
 
         controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
@@ -124,9 +139,19 @@ public class RobotContainer {
 
         launchpad.getButton(2, 2).onTrue(Commands.runOnce(() -> coral_arm_pivot.reconfigurePivotMotor()));
 
+        // launchpad.getButton(6, 1).onTrue(elevator.runSysICommand());
+        // launchpad.getButton(6, 2).onTrue(coral_arm_pivot.runSysICommand());
+
+        launchpad.getButton(7, 6).onTrue(elevator.setHeightFromDashboard());
+        launchpad.getButton(6, 6).onTrue(coral_arm_pivot.setAngleFromDashboard());
+        launchpad.getButton(1, 0).onTrue(coral_arm_gripper.setGripperVoltage(12)).onFalse(coral_arm_gripper.setGripperVoltage(0));
+
+        launchpad.getButton(1, 8).onTrue(Commands.runOnce(()->gripperMotor.setVoltage(-12))).onFalse(Commands.runOnce(()->gripperMotor.setVoltage(0)));
+
         drivetrain.registerTelemetry(logger::telemeterize);
     
-        controller.x().whileTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
+        controller.x().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
+        controller.povDown().onTrue(climber.setVoltage(-6)).onFalse(climber.setVoltage(0));
     }
     
     public Command getAutonomousCommand() {
