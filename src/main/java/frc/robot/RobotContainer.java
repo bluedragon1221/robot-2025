@@ -72,6 +72,7 @@ public class RobotContainer {
         // Add Autos
         auto_factory = drivetrain.createAutoFactory()
                 .bind("set_l4_height", supersystem.coralPrepareElevator(CoralLayer.L4))
+                .bind("set_l4_angle", supersystem.coralPrepareArm(CoralLayer.L4))
                 .bind("score_l4", supersystem.coralScoreCoral(CoralLayer.L4))
                 .bind("prepare_accept_coral", supersystem.intakeSetupIntake())
                 .bind("accept_coral", supersystem.intakeLoadIntake());
