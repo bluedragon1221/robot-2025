@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.photonvision.EstimatedRobotPose;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -12,25 +14,34 @@ public class Robot extends TimedRobot {
   private Command autonomous_command;
 
   private final RobotContainer robot_container;
+  private final Vision vision;
 
   public Robot() {
     robot_container = new RobotContainer();
+    vision = Vision.getInstance();
   }
 
   @Override
   public void robotPeriodic() {
-    robot_container.updateTurtleMode();
-    CommandScheduler.getInstance().run(); 
+    // for (EstimatedRobotPose estimated_pose : vision.getCameraPoseEstimations()) {
+    //   robot_container.drivetrain.addVisionMeasurement(estimated_pose.estimatedPose.toPose2d(),
+    //       estimated_pose.timestampSeconds);
+    // }
+
+    CommandScheduler.getInstance().run();
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+  }
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  }
 
   @Override
-  public void disabledExit() {}
+  public void disabledExit() {
+  }
 
   @Override
   public void autonomousInit() {
@@ -42,10 +53,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
-  public void autonomousExit() {}
+  public void autonomousExit() {
+  }
 
   @Override
   public void teleopInit() {
@@ -55,10 +68,12 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+  }
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+  }
 
   @Override
   public void testInit() {
@@ -66,11 +81,14 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
-  public void testExit() {}
+  public void testExit() {
+  }
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+  }
 }

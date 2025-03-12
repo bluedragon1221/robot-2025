@@ -124,6 +124,10 @@ public class Elevator extends SubsystemBase {
         return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), heightTolerance));
     }
 
+    public Trigger isGreaterThanHeight(double height) {
+        return new Trigger(() -> getHeight() >= (height + heightTolerance));
+    }
+
     public Command setHeight(double goalHeight) {
         return run(() -> {
             // leader_motor.setPosition(translateHeightToRotations(getHeight()));

@@ -4,18 +4,14 @@
 
 package frc.robot;
 
-import org.photonvision.EstimatedRobotPose;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -135,14 +131,14 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         
-        controller.povUp().whileTrue(
-                drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(max_robot_centric_speed)));
-        controller.povDown().whileTrue(
-                drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(-max_robot_centric_speed)));
         controller.povLeft().whileTrue(
-                drivetrain.applyRequest(() -> robot_centric.withVelocityX(max_robot_centric_speed).withVelocityY(0)));
+                drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(max_robot_centric_speed)));
         controller.povRight().whileTrue(
+                drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(-max_robot_centric_speed)));
+        controller.povUp().whileTrue(
                 drivetrain.applyRequest(() -> robot_centric.withVelocityX(max_robot_centric_speed).withVelocityY(0)));
+        controller.povDown().whileTrue(
+                drivetrain.applyRequest(() -> robot_centric.withVelocityX(-max_robot_centric_speed).withVelocityY(0)));
 
         // Elevator/coral arm controls
         launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareElevator(CoralLayer.L4));
@@ -160,7 +156,12 @@ public class RobotContainer {
         launchpad.getButton(6, 3).onTrue(supersystem.coralScoreCoral(CoralLayer.L2));
         launchpad.getButton(6, 4).onTrue(supersystem.coralScoreCoral(CoralLayer.L1));
 
+        launchpad.getButton(8, 5).onTrue(supersystem.intakeSetupIntake());
+        launchpad.getButton(7, 5).onTrue(supersystem.intakeLoadIntake());
+        launchpad.getButton(6, 5).onTrue(supersystem.intakePostIntake());
+
         launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
+        launchpad.getButton(3, 3).onTrue(supersystem.testTriggers());
 
         /// manual testing voltage sets
         controller.leftBumper().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
@@ -168,15 +169,6 @@ public class RobotContainer {
 
         // Telemetrize our drive train
         drivetrain.registerTelemetry(logger::telemeterize);
-
-        // Vision commands
-        Commands.run(() -> {
-            for (EstimatedRobotPose estimated_pose : vision.getCameraPoseEstimations()) {
-                drivetrain.addVisionMeasurement(estimated_pose.estimatedPose.toPose2d(),
-                        estimated_pose.timestampSeconds);
-
-            }
-        });
     }
 
     public Command getAutonomousCommand() {

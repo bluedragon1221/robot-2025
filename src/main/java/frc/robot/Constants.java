@@ -32,7 +32,7 @@ public class Constants {
 
         public static final double motorGearRatio = 7.75;
 
-        public static final double heightTolerance = 0.02;
+        public static final double heightTolerance = 0.015;
 
         public static final double sprocketRadius = 0.0254 * 0.905;
 
@@ -60,7 +60,6 @@ public class Constants {
     public static final class CoralArmGripperConstants {
         public static final int gripperMotorID = 32;
         public static final double gripperMotorCurrentLimit = 40;
-        public static final int beamBreakChannelDIO = 6;
     }
 
     public static final class AlgaeArmPivotConstants {
@@ -88,6 +87,6 @@ public class Constants {
     }
 
     public static final class ElevatorSupersystemConstants {
-        public static final int beamBreakSensorDIO = 0;
+        public static final int beamBreakSensorDIO = 9;
     }
 }
