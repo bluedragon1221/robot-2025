@@ -4,31 +4,20 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static frc.robot.Constants.AlgaeArmConstants.gripperMotorID;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.AlgaeArm;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralArmGripper;
@@ -42,7 +31,6 @@ public class RobotContainer {
     // initialize subsystems
     Elevator elevator = Elevator.getInstance();
     ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
-    private static final SparkMax gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
     CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
     CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
     Climber climber = Climber.getInstance();
@@ -136,17 +124,6 @@ public class RobotContainer {
         
         launchpad.getButton(7, 1).onTrue(coral_arm_pivot.setAngle(0.125));
         launchpad.getButton(7, 5).onTrue(coral_arm_pivot.setAngle(0));
-
-        launchpad.getButton(2, 2).onTrue(Commands.runOnce(() -> coral_arm_pivot.reconfigurePivotMotor()));
-
-        // launchpad.getButton(6, 1).onTrue(elevator.runSysICommand());
-        // launchpad.getButton(6, 2).onTrue(coral_arm_pivot.runSysICommand());
-
-        launchpad.getButton(7, 6).onTrue(elevator.setHeightFromDashboard());
-        launchpad.getButton(6, 6).onTrue(coral_arm_pivot.setAngleFromDashboard());
-        launchpad.getButton(1, 0).onTrue(coral_arm_gripper.setGripperVoltage(12)).onFalse(coral_arm_gripper.setGripperVoltage(0));
-
-        launchpad.getButton(1, 8).onTrue(Commands.runOnce(()->gripperMotor.setVoltage(-12))).onFalse(Commands.runOnce(()->gripperMotor.setVoltage(0)));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     

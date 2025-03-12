@@ -144,33 +144,6 @@ public class CoralArmPivot extends SubsystemBase {
         pivot_motor.getConfigurator().apply(pivot_cfg);
     }
 
-    public void reconfigurePivotMotor() {
-        TuneableConstants.updateDashboard();
-        System.out.println("Reconfigured coral pivot");
-
-        var pivot_cfg = new TalonFXConfiguration();
-        pivot_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
-        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        pivot_cfg.Feedback.RotorToSensorRatio = pivotMotorGearRatio;
-
-        pivot_cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        pivot_cfg.Slot0.kG = TuneableConstants.kG;
-        pivot_cfg.Slot0.kP = TuneableConstants.kP;
-        pivot_cfg.Slot0.kI = TuneableConstants.kI;
-        pivot_cfg.Slot0.kD = TuneableConstants.kD;
-
-        pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
-        pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
-
-        pivot_cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
-        pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit;
-
-        pivot_motor.getConfigurator().apply(pivot_cfg);
-
-        System.out.println("Reconfigured CoralArmPivot");
-    }
-
     private double getAngle() {
         return pivot_encoder.getAbsolutePosition().getValueAsDouble();
     }
