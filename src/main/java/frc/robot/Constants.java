@@ -12,7 +12,7 @@ public class Constants {
         ExtractAlgaeLow (0.3556, 0),
         ExtractAlgaeHigh(0.6604, 0),
         IntakeCatch     (0.6096, -0.25),
-        IntakeGrip      (0.3048, -0.25);
+        IntakeGrip      (0.3048, -0.255);
 
         private double height_meters;
         private double angle;

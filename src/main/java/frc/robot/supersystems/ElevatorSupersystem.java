@@ -46,13 +46,28 @@ public class ElevatorSupersystem {
         if (elevator.getHeight() >= Preset.IntakeCatch.getHeight()) {
             return Commands.parallel(
                 elevator.setHeight(Preset.IntakeGrip.getHeight()),
-                coral_arm_gripper.setGripperVoltage(2)
-                    .until(hasCoral())
-                    .andThen(coral_arm_gripper.setGripperVoltage(0))
-            );
+                coral_arm_gripper.setGripperVoltage(2),
+                coral_arm_pivot.setAngle(Preset.IntakeGrip.getAngle())
+            )
+                .until(hasCoral())
+                .andThen(Commands.parallel(
+                    coral_arm_gripper.setGripperVoltage(1),
+                    elevator.setHeight(Preset.IntakeCatch.getHeight())
+                ));
         } else {
             return Commands.none();
         }
+    }
+
+    public Command intakePostIntake() {
+        return Commands.parallel(
+            elevator.setHeight(Preset.IntakeCatch.getHeight()),
+            coral_arm_gripper.setGripperVoltage(1)
+        )
+            .andThen(Commands.parallel(
+                coral_arm_pivot.setAngle(Preset.ScoreL4.getAngle()),
+                elevator.setHeight(Preset.ScoreL1.getHeight())
+            ));       
     }
 
     // Score Coral
@@ -82,11 +97,20 @@ public class ElevatorSupersystem {
             return coral_arm_gripper.setGripperVoltage(-3);
         } else if (selected_layer == CoralLayer.L2) {
             // it's at 60deg. needs to rotate down, then driver drives away
-            return coral_arm_pivot.setAngle(Preset.ScoreL2.getAngle() - 0.0277); // rotate down 10deg
+            return Commands.parallel(
+                coral_arm_pivot.setAngle(Preset.ScoreL2.getAngle() - 0.0277), // rotate down 10dex
+                coral_arm_gripper.setGripperVoltage(0) // 
+            );
         } else if (selected_layer == CoralLayer.L3) {
-            return coral_arm_pivot.setAngle(Preset.ScoreL3.getAngle() - 0.0277);
+            return Commands.parallel(
+                coral_arm_pivot.setAngle(Preset.ScoreL3.getAngle() - 0.0277),
+                coral_arm_gripper.setGripperVoltage(0)
+            );
         } else if (selected_layer == CoralLayer.L4) {
-            return coral_arm_pivot.setAngle(Preset.ScoreL1.getAngle());
+            return Commands.parallel(
+                coral_arm_pivot.setAngle(0),
+                coral_arm_gripper.setGripperVoltage(0)
+            );
         } else {
             return Commands.none();
         }
