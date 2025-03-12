@@ -1,5 +1,5 @@
 {
- "name":"test_auto",
+ "name":"autos",
  "version":1,
  "type":"Swerve",
  "variables":{
