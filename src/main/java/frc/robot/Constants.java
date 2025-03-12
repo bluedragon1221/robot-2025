@@ -63,15 +63,18 @@ public class Constants {
         public static final int beamBreakChannelDIO = 6;
     }
 
-    public static final class AlgaeArmConstants {
+    public static final class AlgaeArmPivotConstants {
         public static final int pivotMotorID = 35;
-        public static final int gripperMotorID = 36;
-
+        
         public static final int pivotMotorAcceleration = 0;
         public static final int pivotMotorCruiseVelocity = 0;
 
         public static final double pivotMotorGearRatio = 10.0;
-
+    }
+    
+    public static final class AlgaeArmGripperConstants {
+        public static final int gripperMotorID = 36;
+        
         public static final int gripperMotorCurrentLimit = 15;
         public static final double gripperMotorRampRate = 3; // seconds to max voltage
     }

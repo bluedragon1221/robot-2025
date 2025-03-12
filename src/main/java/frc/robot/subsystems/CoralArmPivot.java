@@ -21,7 +21,6 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -36,71 +35,33 @@ public class CoralArmPivot extends SubsystemBase {
     private final Trigger atMax = new Trigger(() -> MathUtil.isNear(pivot_motor.getPosition().getValueAsDouble(), 0.23, 0.01));
     private final Trigger atMin = new Trigger(() -> MathUtil.isNear(pivot_motor.getPosition().getValueAsDouble(), -0.23, 0.01));
 
-    private static class TuneableConstants {
-        private static double kG = 0.06;
-        private static double kP = 0.12;
-        private static double kI = 0;
-        private static double kD = 0.01;
-
-        public static void initDashboard() {
-            SmartDashboard.putNumber("CoralArm/kG", kG);
-            SmartDashboard.putNumber("CoralArm/kP", kP);
-            SmartDashboard.putNumber("CoralArm/kI", kI);
-            SmartDashboard.putNumber("CoralArm/kD", kD);
-        }
-        
-        // Method to update constants from SmartDashboard
-        public static boolean updateDashboard() {
-            double newKG = SmartDashboard.getNumber("CoralArm/kG", kG);
-            double newKP = SmartDashboard.getNumber("CoralArm/kP", kP);
-            double newKI = SmartDashboard.getNumber("CoralArm/kI", kI);
-            double newKD = SmartDashboard.getNumber("CoralArm/kD", kD);
-            
-            // Check if any values have changed
-            boolean changed = newKG != kG|| newKP != kP || newKI != kI || newKD != kD;
-            
-            // Update stored values
-            kG = newKG;
-            kP = newKP;
-            kI = newKI;
-            kD = newKD;
-            
-            return changed;
-        }
-    }
-
     private CoralArmPivot() {
         configureMotors();
-
-        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_motor.getPosition(), pivot_motor.getVelocity(), pivot_motor.getMotorVoltage(), pivot_motor.getRotorVelocity(), pivot_motor.getRotorPosition());
-        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_encoder.getPosition(), pivot_encoder.getVelocity());
-
-        pivot_motor.optimizeBusUtilization();
-        pivot_encoder.optimizeBusUtilization();
-
+    
         SmartDashboard.putNumber("Set Coral Arm Pivot", 0);
 
         SignalLogger.start();
-
-        TuneableConstants.initDashboard();
     }
 
-    private final SysIdRoutine      m_sysIdRoutine   =
-        new SysIdRoutine(
-            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-            new SysIdRoutine.Config(Volts.per(Second).of(0.5),
-                                    Volts.of(2),
-                                    null,
-                                    state -> SignalLogger.writeString("stateA", state.toString())),
-            new SysIdRoutine.Mechanism(
-                // Tell SysId how to plumb the driving voltage to the motor(s).
-                output -> {
-                    pivot_motor.setControl(new VoltageOut(output));
-                },
-                // Tell SysId how to record a frame of data for each motor on the mechanism being
-                // characterized.
-                null,
-                this));
+    private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
+        // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+        new SysIdRoutine.Config(
+            Volts.per(Second).of(0.5),
+            Volts.of(2),
+            null,
+            state -> SignalLogger.writeString("stateA", state.toString())
+        ),
+        new SysIdRoutine.Mechanism(
+            // Tell SysId how to plumb the driving voltage to the motor(s).
+            output -> {
+                pivot_motor.setControl(new VoltageOut(output));
+            },
+            // Tell SysId how to record a frame of data for each motor on the mechanism being
+            // characterized.
+            null,
+            this
+        )
+    );
 
     public static synchronized CoralArmPivot getInstance() {
         if (instance == null) {
@@ -112,16 +73,22 @@ public class CoralArmPivot extends SubsystemBase {
 
     private void configureMotors() {
         // Encoder
+        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_encoder.getPosition(), pivot_encoder.getVelocity());
+        pivot_encoder.optimizeBusUtilization();
+
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         encoder_cfg.MagnetOffset = pivotEncoderOffset;
         pivot_encoder.getConfigurator().apply(encoder_cfg);
 
         // Motor
+        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_motor.getPosition(), pivot_motor.getVelocity(), pivot_motor.getMotorVoltage(), pivot_motor.getRotorVelocity(), pivot_motor.getRotorPosition());
+        pivot_motor.optimizeBusUtilization();
+
         var pivot_cfg = new TalonFXConfiguration();
         pivot_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
-        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         pivot_cfg.Feedback.RotorToSensorRatio = pivotMotorGearRatio;
 
         pivot_cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -142,33 +109,6 @@ public class CoralArmPivot extends SubsystemBase {
         pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit;
 
         pivot_motor.getConfigurator().apply(pivot_cfg);
-    }
-
-    public void reconfigurePivotMotor() {
-        TuneableConstants.updateDashboard();
-        System.out.println("Reconfigured coral pivot");
-
-        var pivot_cfg = new TalonFXConfiguration();
-        pivot_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
-        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-        pivot_cfg.Feedback.RotorToSensorRatio = pivotMotorGearRatio;
-
-        pivot_cfg.Slot0.GravityType = GravityTypeValue.Arm_Cosine;
-        pivot_cfg.Slot0.kG = TuneableConstants.kG;
-        pivot_cfg.Slot0.kP = TuneableConstants.kP;
-        pivot_cfg.Slot0.kI = TuneableConstants.kI;
-        pivot_cfg.Slot0.kD = TuneableConstants.kD;
-
-        pivot_cfg.MotionMagic.MotionMagicAcceleration = pivotMotorAcceleration;
-        pivot_cfg.MotionMagic.MotionMagicCruiseVelocity = pivotMotorCruiseVelocity;
-
-        pivot_cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
-        pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit;
-
-        pivot_motor.getConfigurator().apply(pivot_cfg);
-
-        System.out.println("Reconfigured CoralArmPivot");
     }
 
     private double getAngle() {
@@ -196,10 +136,10 @@ public class CoralArmPivot extends SubsystemBase {
     }
 
     public Command runSysICommand() {
-        return (m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
-                .andThen(m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
+        return (sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
+                .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
+                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
+                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
                 .andThen(Commands.print("DONE"));
     }
 

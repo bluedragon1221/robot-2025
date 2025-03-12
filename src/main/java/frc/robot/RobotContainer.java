@@ -4,14 +4,10 @@
 
 package frc.robot;
 
-import static frc.robot.Constants.AlgaeArmConstants.gripperMotorID;
-
 import org.photonvision.EstimatedRobotPose;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
@@ -38,7 +34,6 @@ public class RobotContainer {
     // initialize subsystems
     Elevator elevator = Elevator.getInstance();
     ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
-    private static final SparkMax gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
     CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
     CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
     Climber climber = Climber.getInstance();
@@ -138,7 +133,7 @@ public class RobotContainer {
 
         // reset the field-centric heading on left bumper press
         controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+        
         controller.povUp().whileTrue(
                 drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(max_robot_centric_speed)));
         controller.povDown().whileTrue(
@@ -148,29 +143,21 @@ public class RobotContainer {
         controller.povRight().whileTrue(
                 drivetrain.applyRequest(() -> robot_centric.withVelocityX(max_robot_centric_speed).withVelocityY(0)));
 
-        // Elevator height presets
-        launchpad.getButton(8, 1).onTrue(elevator.setHeight(Preset.ScoreL1.getHeight()));
-        launchpad.getButton(8, 2).onTrue(elevator.setHeight(Preset.ScoreL2.getHeight()));
-        launchpad.getButton(8, 3).onTrue(elevator.setHeight(Preset.ScoreL3.getHeight()));
-        launchpad.getButton(8, 4).onTrue(elevator.setHeight(Preset.ScoreL4.getHeight()));
-        launchpad.getButton(8, 5).onTrue(elevator.setHeight(Preset.Initial.getHeight()));
+        // Elevator/coral arm controls
+        launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareElevator(CoralLayer.L4));
+        launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareElevator(CoralLayer.L3));
+        launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareElevator(CoralLayer.L2));
+        launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareElevator(CoralLayer.L1));
 
-        // Coral arm presets
-        launchpad.getButton(7, 1).onTrue(coral_arm_pivot.setAngle(0.125));
-        launchpad.getButton(7, 5).onTrue(coral_arm_pivot.setAngle(0));
+        launchpad.getButton(7, 1).onTrue(supersystem.coralPrepareArm(CoralLayer.L4));
+        launchpad.getButton(7, 2).onTrue(supersystem.coralPrepareArm(CoralLayer.L3));
+        launchpad.getButton(7, 3).onTrue(supersystem.coralPrepareArm(CoralLayer.L2));
+        launchpad.getButton(7, 4).onTrue(supersystem.coralPrepareArm(CoralLayer.L1));
 
-        // Reconfigure our pivot motor
-        launchpad.getButton(2, 2).onTrue(Commands.runOnce(() -> coral_arm_pivot.reconfigurePivotMotor()));
-
-        // Elevator testing buttons
-        launchpad.getButton(7, 6).onTrue(elevator.setHeightFromDashboard());
-        launchpad.getButton(6, 6).onTrue(coral_arm_pivot.setAngleFromDashboard());
-        launchpad.getButton(1, 0).onTrue(coral_arm_gripper.setGripperVoltage(12))
-                .onFalse(coral_arm_gripper.setGripperVoltage(0));
-
-        // manual gripper voltage set
-        launchpad.getButton(1, 8).onTrue(Commands.runOnce(() -> gripperMotor.setVoltage(-12)))
-                .onFalse(Commands.runOnce(() -> gripperMotor.setVoltage(0)));
+        launchpad.getButton(6, 1).onTrue(supersystem.coralScoreCoral(CoralLayer.L4));
+        launchpad.getButton(6, 2).onTrue(supersystem.coralScoreCoral(CoralLayer.L3));
+        launchpad.getButton(6, 3).onTrue(supersystem.coralScoreCoral(CoralLayer.L2));
+        launchpad.getButton(6, 4).onTrue(supersystem.coralScoreCoral(CoralLayer.L1));
 
         /// manual testing voltage sets
         controller.leftBumper().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
