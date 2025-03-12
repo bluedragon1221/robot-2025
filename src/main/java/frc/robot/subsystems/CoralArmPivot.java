@@ -167,6 +167,8 @@ public class CoralArmPivot extends SubsystemBase {
         pivot_cfg.CurrentLimits.SupplyCurrentLimit = pivotMotorCurrentLimit;
 
         pivot_motor.getConfigurator().apply(pivot_cfg);
+
+        System.out.println("Reconfigured CoralArmPivot");
     }
 
     private double getAngle() {
