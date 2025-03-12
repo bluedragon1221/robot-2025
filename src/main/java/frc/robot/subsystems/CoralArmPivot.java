@@ -36,39 +36,6 @@ public class CoralArmPivot extends SubsystemBase {
     private final Trigger atMax = new Trigger(() -> MathUtil.isNear(pivot_motor.getPosition().getValueAsDouble(), 0.23, 0.01));
     private final Trigger atMin = new Trigger(() -> MathUtil.isNear(pivot_motor.getPosition().getValueAsDouble(), -0.23, 0.01));
 
-    private static class TuneableConstants {
-        private static double kG = 0.06;
-        private static double kP = 0.12;
-        private static double kI = 0;
-        private static double kD = 0.01;
-
-        public static void initDashboard() {
-            SmartDashboard.putNumber("CoralArm/kG", kG);
-            SmartDashboard.putNumber("CoralArm/kP", kP);
-            SmartDashboard.putNumber("CoralArm/kI", kI);
-            SmartDashboard.putNumber("CoralArm/kD", kD);
-        }
-        
-        // Method to update constants from SmartDashboard
-        public static boolean updateDashboard() {
-            double newKG = SmartDashboard.getNumber("CoralArm/kG", kG);
-            double newKP = SmartDashboard.getNumber("CoralArm/kP", kP);
-            double newKI = SmartDashboard.getNumber("CoralArm/kI", kI);
-            double newKD = SmartDashboard.getNumber("CoralArm/kD", kD);
-            
-            // Check if any values have changed
-            boolean changed = newKG != kG|| newKP != kP || newKI != kI || newKD != kD;
-            
-            // Update stored values
-            kG = newKG;
-            kP = newKP;
-            kI = newKI;
-            kD = newKD;
-            
-            return changed;
-        }
-    }
-
     private CoralArmPivot() {
         configureMotors();
 
@@ -81,8 +48,6 @@ public class CoralArmPivot extends SubsystemBase {
         SmartDashboard.putNumber("Set Coral Arm Pivot", 0);
 
         SignalLogger.start();
-
-        TuneableConstants.initDashboard();
     }
 
     private final SysIdRoutine      m_sysIdRoutine   =
