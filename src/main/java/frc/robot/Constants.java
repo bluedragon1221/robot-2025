@@ -60,6 +60,7 @@ public class Constants {
     public static final class CoralArmGripperConstants {
         public static final int gripperMotorID = 32;
         public static final double gripperMotorCurrentLimit = 30;
+        public static final int beamBreakChannelDIO = 6;
     }
 
     public static final class AlgaeArmConstants {
