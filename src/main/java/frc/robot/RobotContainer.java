@@ -116,14 +116,22 @@ public class RobotContainer {
         // reset the field-centric heading on left bumper press
         controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        launchpad.getButton(8, 1).onTrue(elevator.setHeight(Preset.ScoreL1.getHeight()));
-        launchpad.getButton(8, 2).onTrue(elevator.setHeight(Preset.ScoreL2.getHeight()));
-        launchpad.getButton(8, 3).onTrue(elevator.setHeight(Preset.ScoreL3.getHeight()));
-        launchpad.getButton(8, 4).onTrue(elevator.setHeight(Preset.ScoreL4.getHeight()));
-        launchpad.getButton(8, 5).onTrue(elevator.setHeight(Preset.Initial.getHeight()));
+        launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareElevator(CoralLayer.L4));
+        launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareElevator(CoralLayer.L3));
+        launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareElevator(CoralLayer.L2));
+        launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareElevator(CoralLayer.L1));
         
-        launchpad.getButton(7, 1).onTrue(coral_arm_pivot.setAngle(0.125));
-        launchpad.getButton(7, 5).onTrue(coral_arm_pivot.setAngle(0));
+        launchpad.getButton(8, 5).onTrue(elevator.setHeight(Preset.Initial.getHeight()));
+
+        launchpad.getButton(7, 1).onTrue(supersystem.coralPrepareArm(CoralLayer.L4));
+        launchpad.getButton(7, 2).onTrue(supersystem.coralPrepareArm(CoralLayer.L3));
+        launchpad.getButton(7, 3).onTrue(supersystem.coralPrepareArm(CoralLayer.L2));
+        launchpad.getButton(7, 4).onTrue(supersystem.coralPrepareArm(CoralLayer.L1));
+
+        launchpad.getButton(6, 1).onTrue(supersystem.coralScoreCoral(CoralLayer.L4));
+        launchpad.getButton(6, 2).onTrue(supersystem.coralScoreCoral(CoralLayer.L3));
+        launchpad.getButton(6, 3).onTrue(supersystem.coralScoreCoral(CoralLayer.L2));
+        launchpad.getButton(6, 4).onTrue(supersystem.coralScoreCoral(CoralLayer.L1));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     

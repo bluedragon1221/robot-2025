@@ -38,13 +38,7 @@ public class CoralArmPivot extends SubsystemBase {
 
     private CoralArmPivot() {
         configureMotors();
-
-        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_motor.getPosition(), pivot_motor.getVelocity(), pivot_motor.getMotorVoltage(), pivot_motor.getRotorVelocity(), pivot_motor.getRotorPosition());
-        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_encoder.getPosition(), pivot_encoder.getVelocity());
-
-        pivot_motor.optimizeBusUtilization();
-        pivot_encoder.optimizeBusUtilization();
-
+    
         SmartDashboard.putNumber("Set Coral Arm Pivot", 0);
 
         SignalLogger.start();
@@ -80,16 +74,22 @@ public class CoralArmPivot extends SubsystemBase {
 
     private void configureMotors() {
         // Encoder
+        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_encoder.getPosition(), pivot_encoder.getVelocity());
+        pivot_encoder.optimizeBusUtilization();
+
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         encoder_cfg.MagnetOffset = pivotEncoderOffset;
         pivot_encoder.getConfigurator().apply(encoder_cfg);
 
         // Motor
+        BaseStatusSignal.setUpdateFrequencyForAll(250, pivot_motor.getPosition(), pivot_motor.getVelocity(), pivot_motor.getMotorVoltage(), pivot_motor.getRotorVelocity(), pivot_motor.getRotorPosition());
+        pivot_motor.optimizeBusUtilization();
+
         var pivot_cfg = new TalonFXConfiguration();
         pivot_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
-        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        pivot_cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         pivot_cfg.Feedback.RotorToSensorRatio = pivotMotorGearRatio;
 
         pivot_cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;

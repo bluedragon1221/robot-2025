@@ -61,11 +61,7 @@ public class Elevator extends SubsystemBase {
 
     private Elevator() {
         configureMotors();
-
-        BaseStatusSignal.setUpdateFrequencyForAll(250, leader_motor.getPosition(), leader_motor.getVelocity(), leader_motor.getMotorVoltage());
-
-        leader_motor.optimizeBusUtilization();
-
+        
         SmartDashboard.putNumber("Set Elevator Height", 0);
 
         SignalLogger.start();
@@ -78,20 +74,22 @@ public class Elevator extends SubsystemBase {
 
         return instance;
     }
-
+    
     private void configureMotors() {
+        BaseStatusSignal.setUpdateFrequencyForAll(250, leader_motor.getPosition(), leader_motor.getVelocity(), leader_motor.getMotorVoltage());
+        
         var cfg = new TalonFXConfiguration();
         cfg.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
+        
         // Encoder
         cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         cfg.Feedback.SensorToMechanismRatio = motorGearRatio;
-
+        
         // MotionMagic
         cfg.MotionMagic.MotionMagicAcceleration = motorMaxAcceleration;
         cfg.MotionMagic.MotionMagicCruiseVelocity = motorCruiseVelocity;
-
+        
         // PID + motionmagic constants
         cfg.Slot0.GravityType = GravityTypeValue.Elevator_Static;
         cfg.Slot0.kA = 0.017551;
@@ -101,9 +99,11 @@ public class Elevator extends SubsystemBase {
         cfg.Slot0.kP = 83.066;
         cfg.Slot0.kI = 0;
         cfg.Slot0.kD = 2.3041;
-
+        
         leader_motor.getConfigurator().apply(cfg);
         follower_motor.getConfigurator().apply(cfg);
+        
+        leader_motor.optimizeBusUtilization();
         
         leader_motor.setPosition(0);
         follower_motor.setPosition(0);
