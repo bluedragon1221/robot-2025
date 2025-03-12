@@ -50,22 +50,25 @@ public class CoralArmPivot extends SubsystemBase {
         SignalLogger.start();
     }
 
-    private final SysIdRoutine      m_sysIdRoutine   =
-        new SysIdRoutine(
-            // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-            new SysIdRoutine.Config(Volts.per(Second).of(0.5),
-                                    Volts.of(2),
-                                    null,
-                                    state -> SignalLogger.writeString("stateA", state.toString())),
-            new SysIdRoutine.Mechanism(
-                // Tell SysId how to plumb the driving voltage to the motor(s).
-                output -> {
-                    pivot_motor.setControl(new VoltageOut(output));
-                },
-                // Tell SysId how to record a frame of data for each motor on the mechanism being
-                // characterized.
-                null,
-                this));
+    private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
+        // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+        new SysIdRoutine.Config(
+            Volts.per(Second).of(0.5),
+            Volts.of(2),
+            null,
+            state -> SignalLogger.writeString("stateA", state.toString())
+        ),
+        new SysIdRoutine.Mechanism(
+            // Tell SysId how to plumb the driving voltage to the motor(s).
+            output -> {
+                pivot_motor.setControl(new VoltageOut(output));
+            },
+            // Tell SysId how to record a frame of data for each motor on the mechanism being
+            // characterized.
+            null,
+            this
+        )
+    );
 
     public static synchronized CoralArmPivot getInstance() {
         if (instance == null) {
@@ -134,10 +137,10 @@ public class CoralArmPivot extends SubsystemBase {
     }
 
     public Command runSysICommand() {
-        return (m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(m_sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
-                .andThen(m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(m_sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
+        return (sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
+                .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
+                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
+                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
                 .andThen(Commands.print("DONE"));
     }
 
