@@ -56,6 +56,8 @@ public class ElevatorSupersystem {
         return setState(cur_elevator_height, arm_angle, cur_gripper_voltage);
     }
 
+
+
     public Command setStatePreset(Preset preset) {
         cur_elevator_height = preset.getHeight();
         cur_arm_angle = preset.getAngle();
@@ -84,8 +86,8 @@ public class ElevatorSupersystem {
         return instance;
     }
 
-    public Command  storagePosition() {
-        return setStatePivot(Preset.Storage.getAngle())
+    public Command storagePosition() {
+        return setState(cur_elevator_height, Preset.Storage.getAngle(), 0)
             .until(coral_arm_pivot.isGreaterThanAngle(0))
             .andThen(setStatePreset(Preset.Storage));
     }
@@ -202,6 +204,7 @@ public class ElevatorSupersystem {
         return setStateGripper(12)
             .until(hasCoral)
             .withTimeout(1)
+            .andThen(setStateGripper(5))
         .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
             .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
     }
