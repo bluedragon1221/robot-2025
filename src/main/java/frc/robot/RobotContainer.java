@@ -24,7 +24,6 @@ import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.supersystems.ElevatorSupersystem;
-import frc.robot.supersystems.ElevatorSupersystem.CoralLayer;
 
 public class RobotContainer {
     // initialize subsystems
@@ -35,7 +34,6 @@ public class RobotContainer {
     Climber climber = Climber.getInstance();
 
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
-    Vision vision = Vision.getInstance();
 
     private double max_speed = TunerConstants.kSpeedAt12Volts.magnitude(); // kSpeedAt12Volts desired top speed
     private double max_robot_centric_speed = TunerConstants.kSpeedAt12Volts.magnitude() * 0.08; // kSpeedAt12Volts
@@ -66,12 +64,12 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Add Autos
-        auto_factory = drivetrain.createAutoFactory()
-                .bind("set_l4_height", supersystem.coralPrepareElevator(CoralLayer.L4))
-                .bind("set_l4_angle", supersystem.coralPrepareArm(CoralLayer.L4))
-                .bind("score_l4", supersystem.coralScoreCoral(CoralLayer.L4))
-                .bind("prepare_accept_coral", supersystem.intakeSetupIntake())
-                .bind("accept_coral", supersystem.intakeLoadIntake());
+        auto_factory = drivetrain.createAutoFactory();
+                // .bind("set_l4_height", supersystem.coralPrepareElevator(CoralLayer.L4))
+                // .bind("set_l4_angle", supersystem.coralPrepareArm(CoralLayer.L4))
+                // .bind("score_l4", supersystem.coralScoreCoral(CoralLayer.L4))
+                // .bind("prepare_accept_coral", supersystem.intakeSetupIntake())
+                // .bind("accept_coral", supersystem.intakeLoadIntake());
 
         auto_routines = new AutoRoutines(auto_factory);
         auto_chooser.addRoutine("Center Cage 2L4", auto_routines::CenterCage2l4);
@@ -83,10 +81,10 @@ public class RobotContainer {
 
     private boolean manual_turtle_mode = false;
 
-    private final double turtle_mode = 0.657;
+    private final double turtle_mode = 0.25;
     private Trigger turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL2.getHeight())));
 
-    private final double slower_turtle_mode = 0.357;
+    private final double slower_turtle_mode = 0.15;
     private Trigger slower_turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode));
 
     private void configureBindings() {
@@ -151,12 +149,12 @@ public class RobotContainer {
         // launchpad.getButton(6, 3).onTrue(supersystem.coralScoreCoral(CoralLayer.L2));
         // launchpad.getButton(6, 4).onTrue(supersystem.coralScoreCoral(CoralLayer.L1));
 
-        launchpad.getButton(8, 5).onTrue(supersystem.intakeSetupIntake());
-        launchpad.getButton(7, 5).onTrue(supersystem.intakeLoadIntake());
-        launchpad.getButton(6, 5).onTrue(supersystem.intakePostIntake());
+        launchpad.getButton(8, 5).onTrue(supersystem.intakePrepare());
+        launchpad.getButton(7, 5).onTrue(supersystem.intakeLoad());
+        launchpad.getButton(6, 5).onTrue(supersystem.intakePost());
 
-        launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
-        launchpad.getButton(3, 3).onTrue(supersystem.testTriggers());
+        // launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
+        // launchpad.getButton(3, 3).onTrue(supersystem.testTriggers());
 
         /// manual testing voltage sets
         controller.rightTrigger().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));

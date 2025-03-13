@@ -1,14 +1,17 @@
 package frc.robot;
 
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
+
 public class Constants {
     public static enum Preset {
         // Height: Don't worry about canrangeOffset in these heights; the subsystem takes care of it
         // Angle: 0rot is horizontal, 0.25rot up, and -0.25rot down because cosine arm mechanics
         Initial         (0,      0.25),
+        Storage         (0.12,   0.15),
         ScoreL1         (0.1524, 0),
         ScoreL2         (0.1524, 0.0833),
         ScoreL3         (0.3556, 0.0833),
-        ScoreL4         (0.6604, 0.1111),
+        ScoreL4         (0.6604, 0.14),
         ExtractAlgaeLow (0.3556, 0),
         ExtractAlgaeHigh(0.6604, 0),
         IntakeCatch     (0.5148, -0.255),

@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import org.photonvision.EstimatedRobotPose;
+import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,7 +18,7 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     robot_container = new RobotContainer();
-    vision = Vision.getInstance();
+    vision = new Vision(robot_container.drivetrain);
   }
 
   @Override
@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
     // }
 
     CommandScheduler.getInstance().run();
+    vision.updateVision();
   }
 
   @Override

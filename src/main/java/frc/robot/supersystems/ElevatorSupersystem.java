@@ -84,11 +84,10 @@ public class ElevatorSupersystem {
         return instance;
     }
 
-    public Command storagePosition() {
-        return setState(Preset.IntakeCatch.getHeight(), Preset.ScoreL4.getAngle())
-            .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight())
-                .and(coral_arm_pivot.isGreaterThanAngle(0)))
-            .andThen(setState(Preset.Initial.getHeight(), Preset.ScoreL4.getAngle()));
+    public Command  storagePosition() {
+        return setStatePivot(Preset.Storage.getAngle())
+            .until(coral_arm_pivot.isGreaterThanAngle(0))
+            .andThen(setStatePreset(Preset.Storage));
     }
 
     // INTAKE
@@ -106,13 +105,17 @@ public class ElevatorSupersystem {
             .until(hasCoral)
             .withTimeout(3)
             .andThen(setStatePreset(Preset.IntakeCatch, 1))
-        .onlyIf(elevator.isGreaterThanHeight(Preset.IntakeCatch.getHeight())
+            .onlyIf(elevator.isAtHeight(Preset.IntakeCatch.getHeight())
             .and(coral_arm_pivot.isAtAngle(Preset.IntakeCatch.getAngle()))
             .and(hasCoral.negate())); // don't try to intake with a low elevator
     }
 
     public Command intakePost() {
-        return storagePosition();
+        return setStateElevator(Preset.IntakeCatch.getHeight()+0.02)
+            .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()+0.02))
+            .andThen(setStatePivot(Preset.Storage.getAngle()))
+            .until(coral_arm_pivot.isGreaterThanAngle(0.1))
+            .andThen(setStatePreset(Preset.Storage));
     }
 
     // SCORE CORAL
