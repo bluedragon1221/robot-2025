@@ -178,7 +178,7 @@ public class ElevatorSupersystem {
 
     // EXTRACT ALGAE
     public Command extractionPrepareLow() {
-        return setStatePivot(0)
+        return setState(cur_elevator_height, Preset.ExtractAlgaeLow.getAngle(), 0)
             .until(coral_arm_pivot.isAtAngle(0))
             .andThen(setStatePreset(Preset.ExtractAlgaeLow))
         .onlyIf(hasCoral.negate()); // can't run if we already have a algae
@@ -192,20 +192,21 @@ public class ElevatorSupersystem {
     }
 
     public Command extractionExtractLow() {
-        return setStateGripper(12)
+        return setStateGripper(10)
             .until(hasCoral) // TODO: does the coral trigger the beam break?
-            .withTimeout(1)
+            .withTimeout(2)
+            .andThen(setStateGripper(6))
         .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
             .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
     }
 
     public Command extractionExtractHigh() {
-        return setStateGripper(12)
+        return setStateGripper(10)
             .until(hasCoral)
-            .withTimeout(1)
-            .andThen(setStateGripper(5))
-        .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
-            .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
+            .withTimeout(3)
+            .andThen(setStateGripper(6))
+        .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeHigh.getHeight())
+            .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeHigh.getAngle())));
     }
 
     public Command extractionStop() {
