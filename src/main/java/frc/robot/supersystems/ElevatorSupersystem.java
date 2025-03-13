@@ -23,7 +23,7 @@ public class ElevatorSupersystem {
     private double cur_gripper_voltage = 0.0;
 
     private static final DigitalInput beam_break_sensor = new DigitalInput(beamBreakSensorDIO);
-    private static final Trigger hasCoral = new Trigger(() -> beam_break_sensor.get());
+    public static final Trigger hasCoral = new Trigger(() -> beam_break_sensor.get()).negate();
 
     public Command setState(double elevator_height, double arm_angle, double gripper_voltage) {
         cur_elevator_height = elevator_height;
@@ -84,7 +84,7 @@ public class ElevatorSupersystem {
         return instance;
     }
 
-    public Command  storagePosition() {
+    public Command storagePosition() {
         return setStatePivot(Preset.Storage.getAngle())
             .until(coral_arm_pivot.isGreaterThanAngle(0))
             .andThen(setStatePreset(Preset.Storage));
@@ -96,23 +96,24 @@ public class ElevatorSupersystem {
             .until(coral_arm_pivot.isAtAngle(0))
             .andThen(setStateElevator(Preset.IntakeCatch.getHeight()))
             .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
-            .andThen(setStatePreset(Preset.IntakeCatch))
+            .andThen(setStatePreset(Preset.IntakeCatch, 0))
         .onlyIf(hasCoral.negate()); // only run of we don't already have a coral
     }
+
 
     public Command intakeLoad() {
         return setStatePreset(Preset.IntakeGrip, 2)
             .until(hasCoral)
             .withTimeout(3)
-            .andThen(setStatePreset(Preset.IntakeCatch, 1))
+            .andThen(setStatePreset(Preset.IntakeCatch, 0))
             .onlyIf(elevator.isAtHeight(Preset.IntakeCatch.getHeight())
             .and(coral_arm_pivot.isAtAngle(Preset.IntakeCatch.getAngle()))
             .and(hasCoral.negate())); // don't try to intake with a low elevator
     }
 
     public Command intakePost() {
-        return setStateElevator(Preset.IntakeCatch.getHeight()+0.02) // we only pivot a bit higher than IntakeCatch to be safe
-            .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()+0.02))
+        return setStateElevator(Preset.IntakeCatch.getHeight())
+            .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
             .andThen(setStatePivot(Preset.Storage.getAngle()))
             .until(coral_arm_pivot.isGreaterThanAngle(0.1))
             .andThen(setStatePreset(Preset.Storage));
@@ -180,7 +181,7 @@ public class ElevatorSupersystem {
         return setStatePivot(0)
             .until(coral_arm_pivot.isAtAngle(0))
             .andThen(setStatePreset(Preset.ExtractAlgaeLow))
-        .onlyIf(hasCoral.negate()); // can't run if we already have a coral
+        .onlyIf(hasCoral.negate()); // can't run if we already have a algae
     }
 
     public Command extractionPrepareHigh() {
@@ -202,7 +203,12 @@ public class ElevatorSupersystem {
         return setStateGripper(12)
             .until(hasCoral)
             .withTimeout(1)
+            .andThen(setStateGripper(5))
         .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
             .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
+    }
+
+    public Command extractionStop() {
+        return setStateGripper(0);
     }
 }

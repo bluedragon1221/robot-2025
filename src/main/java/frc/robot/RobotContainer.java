@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -96,9 +97,11 @@ public class RobotContainer {
             drivetrain.applyRequest(
                 () -> drive.withVelocityX(-controller.getLeftY() * max_speed) // Drive forward with negative Y (forward)
                            .withVelocityY(-controller.getLeftX() * max_speed) // Drive left with negative X (left) Drive counterclockwise with negative X (left)
+                           .withRotationalRate(-controller.getRightX() * max_angular_rate) // Drive counterclockwise with negative X (left)
+
             ));
 
-        turtle_trigger.and(slower_turtle_trigger.negate()).whileTrue(drivetrain.applyRequest(
+        turtle_trigger.whileTrue(drivetrain.applyRequest(
             () -> drive.withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive forward with negative Y (forward)
                        .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive left with negative X (left)
                        .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive counterclockwise with negative X (left)
@@ -134,19 +137,29 @@ public class RobotContainer {
                 drivetrain.applyRequest(() -> robot_centric.withVelocityX(-max_speed * slower_turtle_mode).withVelocityY(0)));
 
         // Elevator/coral arm controls
-        launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL4());
-        launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareL3());
-        launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareL2());
-        launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareL1());
-
-        launchpad.getButton(7, 1).onTrue(supersystem.coralScoreL4());
-        launchpad.getButton(7, 2).onTrue(supersystem.coralScoreL3());
-        launchpad.getButton(7, 3).onTrue(supersystem.coralScoreL2());
-        launchpad.getButton(7, 4).onTrue(supersystem.coralScoreL1());
+        launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
+        launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareL2());
+        launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareL3());
+        launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareL4());
+        
+        launchpad.getButton(7, 1).onTrue(supersystem.coralScoreL1());
+        launchpad.getButton(7, 2).onTrue(supersystem.coralScoreL2());
+        launchpad.getButton(7, 3).onTrue(supersystem.coralScoreL3());
+        launchpad.getButton(7, 4).onTrue(supersystem.coralScoreL4());
 
         launchpad.getButton(8, 5).onTrue(supersystem.intakePrepare());
         launchpad.getButton(7, 5).onTrue(supersystem.intakeLoad());
         launchpad.getButton(6, 5).onTrue(supersystem.intakePost());
+
+        launchpad.getButton(8, 6).onTrue(supersystem.extractionPrepareHigh());
+        launchpad.getButton(7, 6).onTrue(supersystem.extractionExtractHigh());
+
+        launchpad.getButton(8, 7).onTrue(supersystem.extractionPrepareLow());
+        launchpad.getButton(7, 7).onTrue(supersystem.extractionExtractLow());
+
+        launchpad.getButton(8, 8).onTrue(supersystem.extractionStop());
+
+        launchpad.getButton(0, 8).onTrue(supersystem.storagePosition());
 
         launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
 
