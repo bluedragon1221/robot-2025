@@ -23,10 +23,7 @@ public class ElevatorSupersystem {
     private double cur_gripper_voltage = 0.0;
 
     private static final DigitalInput beam_break_sensor = new DigitalInput(beamBreakSensorDIO);
-    private static final Trigger beam_broken = new Trigger(() -> beam_break_sensor.get());
-
-    private ElevatorSupersystem() {
-    }
+    private static final Trigger hasCoral = new Trigger(() -> beam_break_sensor.get());
 
     public Command setState(double elevator_height, double arm_angle, double gripper_voltage) {
         cur_elevator_height = elevator_height;
@@ -87,111 +84,122 @@ public class ElevatorSupersystem {
         return instance;
     }
 
-    public Trigger hasCoral() {
-        return beam_broken;
-    }
-
-    // Intake
-    public Command intakeSetupIntake() {
-        return setStatePivot(0)
-                .until(coral_arm_pivot.isGreaterThan(0))
-                .andThen(setStateElevator(Preset.IntakeCatch.getHeight()))
-                .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
-                .andThen(setStatePreset(Preset.IntakeCatch));
-    }
-
-    public Command intakeLoadIntake() {
-        return setStatePreset(Preset.IntakeGrip, 2)
-                .until(beam_broken)
-                .withTimeout(3)
-                .andThen(setStatePreset(Preset.IntakeCatch, 1))
-                .onlyIf(elevator.isGreaterThanHeight(Preset.IntakeCatch.getHeight()));
-    }
-
-    public Command testTriggers() {
-        return Commands.print("elevator above").onlyIf(elevator.isGreaterThanHeight(Preset.IntakeCatch.getHeight()));
-    }
-
-    public Command intakePostIntake() {
-        return setState(Preset.IntakeCatch.getHeight(),Preset.ScoreL4.getAngle())
-                .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()).and(coral_arm_pivot.isGreaterThan(0.1)))
-                .andThen(setState(
-                        Preset.ScoreL1.getHeight(),
-                        Preset.ScoreL4.getAngle()));
-    }
-
     public Command storagePosition() {
-        return intakePostIntake();
+        return setState(Preset.IntakeCatch.getHeight(), Preset.ScoreL4.getAngle())
+            .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight())
+                .and(coral_arm_pivot.isGreaterThanAngle(0)))
+            .andThen(setState(Preset.Initial.getHeight(), Preset.ScoreL4.getAngle()));
     }
 
-    // Score Coral
-    public static enum CoralLayer {
-        L1, L2, L3, L4;
-
-        public Preset toPreset() {
-            return switch (this) {
-                case L1 -> Preset.ScoreL1;
-                case L2 -> Preset.ScoreL2;
-                case L3 -> Preset.ScoreL3;
-                case L4 -> Preset.ScoreL4;
-            };
-        }
-    };
-
-    public Command coralPrepareElevator(CoralLayer selected_layer) {
-        return setStateElevator(selected_layer.toPreset().getHeight());
+    // INTAKE
+    public Command intakePrepare() {
+        return setStatePivot(0)
+            .until(coral_arm_pivot.isAtAngle(0))
+            .andThen(setStateElevator(Preset.IntakeCatch.getHeight()))
+            .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
+            .andThen(setStatePreset(Preset.IntakeCatch))
+        .onlyIf(hasCoral.negate()); // only run of we don't already have a coral
     }
 
-    public Command coralPrepareArm(CoralLayer selected_layer) {
-        return coral_arm_pivot.setAngle(selected_layer.toPreset().getAngle());
+    public Command intakeLoad() {
+        return setStatePreset(Preset.IntakeGrip, 2)
+            .until(hasCoral)
+            .withTimeout(3)
+            .andThen(setStatePreset(Preset.IntakeCatch, 1))
+        .onlyIf(elevator.isGreaterThanHeight(Preset.IntakeCatch.getHeight())
+            .and(coral_arm_pivot.isAtAngle(Preset.IntakeCatch.getAngle()))
+            .and(hasCoral.negate())); // don't try to intake with a low elevator
     }
 
-    public Command coralScoreCoral(CoralLayer selected_layer) {
-        if (selected_layer == CoralLayer.L1) {
-            // it's at 90deg, driver drives forward while we spin gripper motors negative
-            return setStateGripper(-3);
-        } else if (selected_layer == CoralLayer.L2) {
-            // it's at 60deg. needs to rotate down, then driver drives away
-            return setState(
-                    Preset.ScoreL2.getHeight(),
-                    Preset.ScoreL2.getAngle() - 0.0277,
-                    0);
-        } else if (selected_layer == CoralLayer.L3) {
-            return setState(
-                    Preset.ScoreL3.getHeight(),
-                    Preset.ScoreL4.getAngle() - 0.0277,
-                    0);
-        } else if (selected_layer == CoralLayer.L4) {
-            return setState(
-                    Preset.ScoreL4.getHeight(),
-                    0,
-                    0);
-        } else {
-            return Commands.none();
-        }
+    public Command intakePost() {
+        return storagePosition();
     }
 
-    // Extract Algae
-    public static enum AlgaeExtractionLayer {
-        High, Low;
-
-        private Preset toPreset() {
-            return switch (this) {
-                case High -> Preset.ExtractAlgaeLow;
-                case Low -> Preset.ExtractAlgaeHigh;
-            };
-        }
-    };
-
-    public Command algaeExtractionPrepareElevator(AlgaeExtractionLayer selected_layer) {
-        return setStateElevator(selected_layer.toPreset().getHeight());
+    // SCORE CORAL
+    public Command coralPrepareL4() {
+        return setStatePivot(Preset.ScoreL4.getAngle())
+            .until(coral_arm_pivot.isGreaterThanAngle(0))
+            .andThen(setStatePreset(Preset.ScoreL4))
+        .onlyIf(hasCoral);
     }
 
-    public Command algaeExtractionPrepareArm() {
-        return setStatePivot(Preset.ExtractAlgaeLow.getAngle());
+    public Command coralPrepareL3() {
+        return setStatePivot(Preset.ScoreL3.getAngle())
+            .until(coral_arm_pivot.isGreaterThanAngle(0))
+            .andThen(setStatePreset(Preset.ScoreL3))
+        .onlyIf(hasCoral);
     }
 
-    public Command algaeExtractionExtractAlgae() {
-        return setStateGripper(-3);
+    public Command coralPrepareL2() {
+        return setStatePivot(Preset.ScoreL2.getAngle())
+            .until(coral_arm_pivot.isGreaterThanAngle(0))
+            .andThen(setStatePreset(Preset.ScoreL3))
+        .onlyIf(hasCoral);
+    }
+
+    public Command coralPrepareL1() {
+        return setStatePivot(0)
+            .until(coral_arm_pivot.isAtAngle(0))
+            .andThen(setStateElevator(Preset.ScoreL1.getHeight()))
+        .onlyIf(hasCoral);
+    }
+
+    public Command coralScoreL4() {
+        return setState(Preset.ScoreL4.getHeight(), 0)
+            .onlyIf(elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
+                .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
+                .and(hasCoral));
+    }
+
+    public Command coralScoreL3() {
+        return setState(Preset.ScoreL3.getHeight(), Preset.ScoreL3.getAngle() - 0.0277)
+            .onlyIf(elevator.isAtHeight(Preset.ScoreL3.getHeight(), 0.02)
+                .and(coral_arm_pivot.isAtAngle(Preset.ScoreL3.getAngle()))
+                .and(hasCoral));
+    }
+
+    public Command coralScoreL2() {
+        return setState(Preset.ScoreL2.getHeight(), Preset.ScoreL2.getAngle() - 0.0277)
+            .onlyIf(elevator.isAtHeight(Preset.ScoreL2.getHeight(), 0.02)
+                .and(coral_arm_pivot.isAtAngle(Preset.ScoreL2.getAngle()))
+                .and(hasCoral));
+    }
+
+    public Command coralScoreL1() {
+        return setStateGripper(-0.5)
+            .onlyIf(elevator.isAtHeight(Preset.ScoreL1.getHeight(), 0.02)
+                .and(coral_arm_pivot.isAtAngle(0))
+                .and(hasCoral));
+    }
+
+    // EXTRACT ALGAE
+    public Command extractionPrepareLow() {
+        return setStatePivot(0)
+            .until(coral_arm_pivot.isAtAngle(0))
+            .andThen(setStatePreset(Preset.ExtractAlgaeLow))
+        .onlyIf(hasCoral.negate()); // can't run if we already have a coral
+    }
+
+    public Command extractionPrepareHigh() {
+        return setStatePivot(0)
+            .until(coral_arm_pivot.isAtAngle(0))
+            .andThen(setStatePreset(Preset.ExtractAlgaeHigh))
+        .onlyIf(hasCoral.negate());
+    }
+
+    public Command extractionExtractLow() {
+        return setStateGripper(12)
+            .until(hasCoral) // TODO: does the coral trigger the beam break?
+            .withTimeout(1)
+        .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
+            .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
+    }
+
+    public Command extractionExtractHigh() {
+        return setStateGripper(12)
+            .until(hasCoral)
+            .withTimeout(1)
+        .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
+            .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
     }
 }

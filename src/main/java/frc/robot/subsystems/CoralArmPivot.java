@@ -120,7 +120,7 @@ public class CoralArmPivot extends SubsystemBase {
         return new Trigger(() -> MathUtil.isNear(goalAngle, getAngle(), pivotMotorTolerance));
     }
 
-    public Trigger isGreaterThan(double angle) {
+    public Trigger isGreaterThanAngle(double angle) {
         return new Trigger(() -> getAngle() >= angle);
     }
 

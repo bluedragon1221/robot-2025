@@ -32,7 +32,7 @@ public class Constants {
 
         public static final double motorGearRatio = 7.75;
 
-        public static final double heightTolerance = 0.015;
+        public static final double heightTolerance = 0.0015;
 
         public static final double sprocketRadius = 0.0254 * 0.905;
 

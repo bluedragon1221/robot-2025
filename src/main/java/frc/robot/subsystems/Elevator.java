@@ -123,6 +123,9 @@ public class Elevator extends SubsystemBase {
     public Trigger isAtHeight(double goalHeight) {
         return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), heightTolerance));
     }
+    public Trigger isAtHeight(double goalHeight, double tolerance) {
+        return new Trigger(() -> MathUtil.isNear(goalHeight, getHeight(), tolerance));
+    }
 
     public Trigger isGreaterThanHeight(double height) {
         return new Trigger(() -> getHeight() >= (height + heightTolerance));
