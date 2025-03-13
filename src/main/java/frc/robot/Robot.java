@@ -7,6 +7,8 @@ package frc.robot;
 import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -16,9 +18,12 @@ public class Robot extends TimedRobot {
   private final RobotContainer robot_container;
   private final Vision vision;
 
+  private final Field2d field = new Field2d();
+
   public Robot() {
     robot_container = new RobotContainer();
     vision = new Vision(robot_container.drivetrain);
+    SmartDashboard.putData("field2d", field);
   }
 
   @Override
@@ -30,6 +35,7 @@ public class Robot extends TimedRobot {
 
     CommandScheduler.getInstance().run();
     vision.updateVision();
+    field.setRobotPose(robot_container.drivetrain.getPose());
   }
 
   @Override

@@ -44,10 +44,10 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(max_speed * 0.1)
             .withRotationalDeadband(max_angular_rate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+            .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
 
     private final SwerveRequest.RobotCentric robot_centric = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+            .withDriveRequestType(DriveRequestType.Velocity);
 
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
@@ -156,6 +156,9 @@ public class RobotContainer {
 
         launchpad.getButton(8, 7).onTrue(supersystem.extractionPrepareLow());
         launchpad.getButton(7, 7).onTrue(supersystem.extractionExtractLow());
+
+        launchpad.getButton(6, 7).onTrue(supersystem.algaePrepareProcessor());
+        launchpad.getButton(5, 7).onTrue(supersystem.algaeScoreProcessor());
 
         launchpad.getButton(8, 8).onTrue(supersystem.extractionStop());
 

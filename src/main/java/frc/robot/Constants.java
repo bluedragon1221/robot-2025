@@ -5,15 +5,16 @@ public class Constants {
         // Height: Don't worry about canrangeOffset in these heights; the subsystem takes care of it
         // Angle: 0rot is horizontal, 0.25rot up, and -0.25rot down because cosine arm mechanics
         Initial         (0,      0.25),
-        Storage         (0.12,   0.15),
+        Storage         (0,   0.15),
         ScoreL1         (0.1524, 0),
-        ScoreL2         (0.1524, 0.0833),
-        ScoreL3         (0.3556, 0.0833),
+        ScoreL2         (0.1524, 0.0843),
+        ScoreL3         (0.3556, 0.0843),
         ScoreL4         (0.6604, 0.14),
         ExtractAlgaeLow (0.3400, 0),
         ExtractAlgaeHigh(0.6250, 0),
         IntakeCatch     (0.5148, -0.255),
-        IntakeGrip      (0.4387, -0.255);
+        IntakeGrip      (0.4387, -0.255),
+        ScoreProcessor  (0.1224,0);
 
         private double height_meters;
         private double angle;

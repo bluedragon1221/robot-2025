@@ -86,8 +86,8 @@ public class ElevatorSupersystem {
 
     public Command storagePosition() {
         return setState(cur_elevator_height, Preset.Storage.getAngle(), 0)
-            .until(coral_arm_pivot.isGreaterThanAngle(0))
-            .andThen(setStatePreset(Preset.Storage));
+                .until(coral_arm_pivot.isGreaterThanAngle(0))
+                .andThen(setStatePreset(Preset.Storage));
     }
 
     // INTAKE
@@ -136,7 +136,7 @@ public class ElevatorSupersystem {
     public Command coralPrepareL2() {
         return setStatePivot(Preset.ScoreL2.getAngle())
                 .until(coral_arm_pivot.isGreaterThanAngle(0))
-                .andThen(setStatePreset(Preset.ScoreL3))
+                .andThen(setStatePreset(Preset.ScoreL2))
                 .onlyIf(hasCoral);
     }
 
@@ -194,7 +194,7 @@ public class ElevatorSupersystem {
         return setStateGripper(10)
                 .until(hasCoral) // TODO: does the coral trigger the beam break?
                 .withTimeout(2)
-                .andThen(setStateGripper(6))
+                .andThen(setStateGripper(1))
                 .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
                         .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
     }
@@ -203,12 +203,25 @@ public class ElevatorSupersystem {
         return setStateGripper(10)
                 .until(hasCoral)
                 .withTimeout(3)
-                .andThen(setStateGripper(6))
+                .andThen(setStateGripper(1))
                 .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeHigh.getHeight())
                         .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeHigh.getAngle())));
     }
 
     public Command extractionStop() {
         return setStateGripper(0);
+    }
+
+    // SCORE ALGAE
+    public Command algaePrepareProcessor() {
+        return setState(cur_elevator_height, Preset.ScoreProcessor.getAngle(), 2)
+            .until(coral_arm_pivot.isAtAngle(0))
+            .andThen(setStatePreset(Preset.ScoreProcessor))
+        .onlyIf(hasCoral);
+    }
+
+    public Command algaeScoreProcessor() {
+        return setStateGripper(-6)
+            .withTimeout(1.5);
     }
 }

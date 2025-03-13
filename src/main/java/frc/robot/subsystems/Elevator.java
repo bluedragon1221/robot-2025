@@ -10,6 +10,7 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -57,7 +58,7 @@ public class Elevator extends SubsystemBase {
         )
     );
 
-    // private static CANrange canrange = new CANrange(heightSensorID, "canivore");
+    private static CANrange canrange = new CANrange(heightSensorID, "canivore");
 
     private Elevator() {
         configureMotors();
@@ -77,7 +78,7 @@ public class Elevator extends SubsystemBase {
     
     private void configureMotors() {
         BaseStatusSignal.setUpdateFrequencyForAll(250, leader_motor.getPosition(), leader_motor.getVelocity(), leader_motor.getMotorVoltage());
-        
+
         var cfg = new TalonFXConfiguration();
         cfg.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
