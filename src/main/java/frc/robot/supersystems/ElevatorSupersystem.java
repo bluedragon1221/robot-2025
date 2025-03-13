@@ -111,7 +111,7 @@ public class ElevatorSupersystem {
     }
 
     public Command intakePost() {
-        return setStateElevator(Preset.IntakeCatch.getHeight()+0.02)
+        return setStateElevator(Preset.IntakeCatch.getHeight()+0.02) // we only pivot a bit higher than IntakeCatch to be safe
             .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()+0.02))
             .andThen(setStatePivot(Preset.Storage.getAngle()))
             .until(coral_arm_pivot.isGreaterThanAngle(0.1))
