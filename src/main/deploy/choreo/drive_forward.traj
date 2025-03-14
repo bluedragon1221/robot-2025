@@ -79,5 +79,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"storage_position", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"storage_position"}}}]
+   {"name":"storage_position", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }

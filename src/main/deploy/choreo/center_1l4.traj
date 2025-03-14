@@ -72,11 +72,7 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Prepare L4", "from":{"target":1, "targetTimestamp":0.57522, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"race", "data":{"commands":[
-       {"type":"named", "data":{"name":"coral_prepare_l4"}},
-       {"type":"wait", "data":{"waitTime":{"exp":"99 s", "val":99.0}}}]}}},
-   {"name":"Score L4", "from":{"target":2, "targetTimestamp":1.15249, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"race", "data":{"commands":[
-       {"type":"named", "data":{"name":"score_l4"}},
-       {"type":"wait", "data":{"waitTime":{"exp":"1e+24 s", "val":1e24}}}]}}},
-   {"name":"Start Storage", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"storage_position"}}}]
+   {"name":"Prepare L4", "from":{"target":1, "targetTimestamp":0.57522, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"Score L4", "from":{"target":2, "targetTimestamp":1.15249, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"Storage Position", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }

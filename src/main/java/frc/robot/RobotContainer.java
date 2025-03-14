@@ -71,17 +71,17 @@ public class RobotContainer {
         // Add Autos
         auto_factory = drivetrain.createAutoFactory();
                 // .bind("storage_position", supersystem.storagePosition().withTimeout(0.3))
-        auto_factory
-                .bind("storage_position", Commands.print("sotrage_position"))
-                .bind("intake_prepare", supersystem.intakePrepare())
-                .bind("intake_load", supersystem.intakeLoad())
-                .bind("intake_post", supersystem.intakePost())
-                .bind("coral_prepare_l4", supersystem.coralPrepareL4())
-                .bind("coral_score_l4", supersystem.coralScoreL4());
+        // auto_factory
+        //         .bind("storage_position", Commands.print("sotrage_position"))
+        //         .bind("intake_prepare", supersystem.intakePrepare())
+        //         .bind("intake_load", supersystem.intakeLoad())
+        //         .bind("intake_post", supersystem.intakePost())
+        //         .bind("coral_prepare_l4", supersystem.coralPrepareL4())
+        //         .bind("coral_score_l4", supersystem.coralScoreL4());
 
-        auto_routines = new AutoRoutines(auto_factory);
-        auto_chooser.addRoutine("Center Cage 3L4", auto_routines::CenterCage3l4);
-        auto_chooser.addRoutine("Bottom Center Cage 3L4", auto_routines::BottomCenterCage3l4);
+        auto_routines = new AutoRoutines(auto_factory, drivetrain);
+        // auto_chooser.addRoutine("Center Cage 3L4", auto_routines::CenterCage3l4);
+        // auto_chooser.addRoutine("Bottom Center Cage 3L4", auto_routines::BottomCenterCage3l4);
         auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
         auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
 
