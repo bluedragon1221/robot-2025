@@ -1,5 +1,6 @@
 package frc.robot.supersystems;
 
+import static frc.robot.Constants.ElevatorSupersystemConstants.algaeHoldVoltage;
 import static frc.robot.Constants.ElevatorSupersystemConstants.beamBreakSensorDIO;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -21,9 +22,10 @@ public class ElevatorSupersystem {
     private double cur_elevator_height = 0.0;
     private double cur_arm_angle = 0.0;
     private double cur_gripper_voltage = 0.0;
-
-    private static final DigitalInput beam_break_sensor = new DigitalInput(beamBreakSensorDIO);
-    public static final Trigger hasCoral = new Trigger(() -> beam_break_sensor.get()).negate();
+    public static boolean beam_break_override = false;
+    
+    public static final DigitalInput beam_break_sensor = new DigitalInput(beamBreakSensorDIO);
+    public final Trigger hasCoral = new Trigger(() -> beam_break_sensor.get()).negate();
 
     public Command setState(double elevator_height, double arm_angle, double gripper_voltage) {
         cur_elevator_height = elevator_height;
@@ -69,12 +71,12 @@ public class ElevatorSupersystem {
         return setState(preset.getHeight(), preset.getAngle(), gripper_voltage);
     }
 
-    public Command setStateFromDashboard() {
-        return Commands.parallel(
-                elevator.setHeightFromDashboard(),
-                coral_arm_pivot.setAngleFromDashboard(),
-                coral_arm_gripper.setVoltageFromDashboard());
-    }
+    // public Command setStateFromDashboard() {
+    //     return Commands.parallel(
+    //             elevator.setHeightFromDashboard(),
+    //             coral_arm_pivot.setAngleFromDashboard(),
+    //             coral_arm_gripper.setVoltageFromDashboard());
+    // }
 
     public static synchronized ElevatorSupersystem getInstance() {
         if (instance == null) {
@@ -204,7 +206,7 @@ public class ElevatorSupersystem {
         return setStateGripper(10)
                 .until(hasCoral) // TODO: does the coral trigger the beam break?
                 .withTimeout(3)
-                .andThen(setStateGripper(1))
+                .andThen(setStateGripper(algaeHoldVoltage))
                 .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
                         .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
     }
@@ -213,7 +215,7 @@ public class ElevatorSupersystem {
         return setStateGripper(10)
                 .until(hasCoral)
                 .withTimeout(3)
-                .andThen(setStateGripper(1))
+                .andThen(setStateGripper(algaeHoldVoltage))
                 .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeHigh.getHeight())
                         .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeHigh.getAngle())));
     }
@@ -224,10 +226,9 @@ public class ElevatorSupersystem {
 
     // SCORE ALGAE
     public Command algaePrepareProcessor() {
-        return setState(cur_elevator_height, Preset.ScoreProcessor.getAngle(), 2)
-            .until(coral_arm_pivot.isAtAngle(0))
-            .andThen(setStatePreset(Preset.ScoreProcessor))
-        .onlyIf(hasCoral);
+        return setState(cur_elevator_height, Preset.ScoreProcessor.getAngle(), algaeHoldVoltage)
+            .until(coral_arm_pivot.isAtAngle(Preset.ScoreProcessor.getAngle()))
+            .andThen(setStatePreset(Preset.ScoreProcessor));
     }
 
     public Command algaeScoreProcessor() {

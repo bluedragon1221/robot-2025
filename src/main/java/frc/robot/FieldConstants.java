@@ -1,17 +1,11 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Contains various field dimensions and useful reference points. All units are
@@ -73,37 +67,37 @@ public class FieldConstants {
         }; // Starting facing the driver station in clockwise order
 
 
-        public static ArrayList<Pose2d> lefts;
-        public static ArrayList<Pose2d> rights;
+        public static ArrayList<Pose2d> lefts = new ArrayList<>();
+        public static ArrayList<Pose2d> rights = new ArrayList<>();
 
         static {
             for (int face = 0; face < 6; face++) {
-                Pose2d poseAngle = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
-                double adjustX = Units.inchesToMeters(30.738);
+                Pose2d centerWithAngle = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
+                double adjustX = Units.inchesToMeters(30.738+19); // set 19in back for aligning
                 double adjustY = Units.inchesToMeters(6.469);
 
                 lefts.add(new Pose2d(
                     new Translation2d(
-                        poseAngle
+                        centerWithAngle
                             .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
                             .getX(),
-                        poseAngle
-                            .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
+                        centerWithAngle
+                             .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
                             .getY()
                     ),
-                    new Rotation2d(poseAngle.getRotation().getRadians())
+                    new Rotation2d(centerWithAngle.getRotation().getRadians())
                 ));
 
                 rights.add(new Pose2d(
                     new Translation2d(
-                        poseAngle
+                        centerWithAngle
                             .transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d()))
                             .getX(),
-                        poseAngle
+                        centerWithAngle
                             .transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d()))
                             .getY()
                     ),
-                    new Rotation2d(poseAngle.getRotation().getRadians())
+                    new Rotation2d(centerWithAngle.getRotation().getRadians())
                 ));
             }
         }

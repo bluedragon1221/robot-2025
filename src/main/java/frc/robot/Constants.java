@@ -11,7 +11,7 @@ public class Constants {
         ScoreL3         (0.3556, 0.09),
         ScoreL4         (0.6604, 0.14),
         ExtractAlgaeLow (0.3400, 0),
-        ExtractAlgaeHigh(0.6, 0),
+        ExtractAlgaeHigh(0.5, 0),
         IntakeCatch     (0.5148, -0.255),
         IntakeGrip      (0.4387, -0.255),
         ScoreProcessor  (0.1224,0);
@@ -51,7 +51,7 @@ public class Constants {
         public static final double pivotMotorAcceleration = 1;
         public static final double pivotMotorCruiseVelocity = 0.5;
 
-        public static final double pivotEncoderOffset = -0.55166015625;
+        public static final double pivotEncoderOffset = -0.23828125;
 
         public static final double pivotMotorCurrentLimit = 40;
 
@@ -89,6 +89,7 @@ public class Constants {
     }
 
     public static final class ElevatorSupersystemConstants {
-        public static final int beamBreakSensorDIO = 9;
+        public static final int beamBreakSensorDIO = 6;
+        public static final double algaeHoldVoltage = 1;
     }
 }

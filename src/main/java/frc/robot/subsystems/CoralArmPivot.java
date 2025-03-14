@@ -1,15 +1,11 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.CoralArmPivotConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -21,10 +17,8 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class CoralArmPivot extends SubsystemBase {
     private static CoralArmPivot instance;
@@ -39,30 +33,28 @@ public class CoralArmPivot extends SubsystemBase {
     private CoralArmPivot() {
         configureMotors();
     
-        SmartDashboard.putNumber("Set Coral Arm Pivot", 0);
-
-        // SignalLogger.start();
+        // SmartDashboard.putNumber("Set Coral Arm Pivot", 0);
     }
 
-    private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
-        // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-        new SysIdRoutine.Config(
-            Volts.per(Second).of(0.5),
-            Volts.of(2),
-            null,
-            state -> SignalLogger.writeString("stateA", state.toString())
-        ),
-        new SysIdRoutine.Mechanism(
-            // Tell SysId how to plumb the driving voltage to the motor(s).
-            output -> {
-                pivot_motor.setControl(new VoltageOut(output));
-            },
-            // Tell SysId how to record a frame of data for each motor on the mechanism being
-            // characterized.
-            null,
-            this
-        )
-    );
+    // private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
+    //     // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+    //     new SysIdRoutine.Config(
+    //         Volts.per(Second).of(0.5),
+    //         Volts.of(2),
+    //         null,
+    //         state -> SignalLogger.writeString("stateA", state.toString())
+    //     ),
+    //     new SysIdRoutine.Mechanism(
+    //         // Tell SysId how to plumb the driving voltage to the motor(s).
+    //         output -> {
+    //             pivot_motor.setControl(new VoltageOut(output));
+    //         },
+    //         // Tell SysId how to record a frame of data for each motor on the mechanism being
+    //         // characterized.
+    //         null,
+    //         this
+    //     )
+    // );
 
     public static synchronized CoralArmPivot getInstance() {
         if (instance == null) {
@@ -132,28 +124,19 @@ public class CoralArmPivot extends SubsystemBase {
         });
     }
 
-    public Command setAngleFromDashboard() {
-        return run(() -> {
-            pivot_motor.setControl(
-                pivot_mm_voltage.withPosition(SmartDashboard.getNumber("Set Coral Arm Pivot", 0))
-            );
-        });
-    }
+    // public Command setAngleFromDashboard() {
+    //     return run(() -> {
+    //         pivot_motor.setControl(
+    //             pivot_mm_voltage.withPosition(SmartDashboard.getNumber("Set Coral Arm Pivot", 0))
+    //         );
+    //     });
+    // }
 
-    public Command runSysICommand() {
-        return (sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
-                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
-                .andThen(Commands.print("DONE"));
-    }
-
-    @Override
-    public void periodic() {
-        SmartDashboard.putNumber("Pivot Motor", pivot_motor.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Pivot Motor Velocity", pivot_motor.getVelocity().getValueAsDouble());
-
-        SmartDashboard.putNumber("Pivot Encoder", pivot_encoder.getPosition().getValueAsDouble());
-        SmartDashboard.putNumber("Pivot Encoder Velocity", pivot_encoder.getVelocity().getValueAsDouble());
-    }
+    // public Command runSysICommand() {
+    //     return (sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
+    //             .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
+    //             .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
+    //             .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
+    //             .andThen(Commands.print("DONE"));
+    // }
 }

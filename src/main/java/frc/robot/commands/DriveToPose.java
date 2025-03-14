@@ -44,7 +44,7 @@ public class DriveToPose extends Command {
     private double driveErrorAbs = 0.0;
     private double thetaErrorAbs = 0.0;
     private boolean running = false;
-    private Supplier<Pose2d> robot = chassis::getPose;
+    private Supplier<Pose2d> robot = () -> chassis.getPose();
 
     private Supplier<Translation2d> linearFF = () -> Translation2d.kZero;
     private DoubleSupplier omegaFF = () -> 0.0;

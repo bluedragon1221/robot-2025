@@ -1,16 +1,12 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.ElevatorConstants.*;
 
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
@@ -18,12 +14,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public class Elevator extends SubsystemBase {
     private static Elevator instance;
@@ -37,35 +30,31 @@ public class Elevator extends SubsystemBase {
     private final Trigger atMin = new Trigger(() -> MathUtil.isNear(getHeight(), 0, 0.0254));
 
     // SysID Routine
-    private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
-        // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-        new SysIdRoutine.Config(
-            Volts.per(Second).of(1),
-            Volts.of(4),
-            null,
-            state -> SignalLogger.writeString("state", state.toString())
-        ),
-        new SysIdRoutine.Mechanism(
-            // Tell SysId how to plumb the driving voltage to the motor(s).
-            output -> {
-                leader_motor.setControl(new VoltageOut(output));
-                follower_motor.setControl(follow);
-            },
-            // Tell SysId how to record a frame of data for each motor on the mechanism being
-            // characterized.
-            null,
-            this
-        )
-    );
+    // private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
+    //     // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
+    //     new SysIdRoutine.Config(
+    //         Volts.per(Second).of(1),
+    //         Volts.of(4),
+    //         null,
+    //         state -> SignalLogger.writeString("state", state.toString())
+    //     ),
+    //     new SysIdRoutine.Mechanism(
+    //         // Tell SysId how to plumb the driving voltage to the motor(s).
+    //         output -> {
+    //             leader_motor.setControl(new VoltageOut(output));
+    //             follower_motor.setControl(follow);
+    //         },
+    //         // Tell SysId how to record a frame of data for each motor on the mechanism being
+    //         // characterized.
+    //         null,
+    //         this
+    //     )
+    // );
 
-    private static CANrange canrange = new CANrange(heightSensorID, "canivore");
+    // private static CANrange canrange = new CANrange(heightSensorID, "canivore");
 
     private Elevator() {
         configureMotors();
-        
-        SmartDashboard.putNumber("Set Elevator Height", 0);
-
-        SignalLogger.start();
     }
 
     public static synchronized Elevator getInstance() {
@@ -141,14 +130,14 @@ public class Elevator extends SubsystemBase {
         });
     }
 
-    public Command setHeightFromDashboard() {
-        return run(() -> {
-            leader_motor.setControl(
-                mm_voltage.withPosition(translateHeightToRotations(SmartDashboard.getNumber("Set Elevator Height", 0)))
-            );
-            follower_motor.setControl(follow);
-        });
-    }
+    // public Command setHeightFromDashboard() {
+    //     return run(() -> {
+    //         leader_motor.setControl(
+    //             mm_voltage.withPosition(translateHeightToRotations(SmartDashboard.getNumber("Set Elevator Height", 0)))
+    //         );
+    //         follower_motor.setControl(follow);
+    //     });
+    // }
 
     public Command stopElevator() {
         return runOnce(() -> {
@@ -157,17 +146,11 @@ public class Elevator extends SubsystemBase {
         });
     }
 
-    public Command runSysICommand() {
-        return (sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
-                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
-                .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
-                .andThen(Commands.print("DONE"));
-    }
-
-    @Override
-    public void periodic() {
-        // SmartDashboard.putNumber("CANrange Reading (meters)", getHeightNoOffset());
-        SmartDashboard.putNumber("Elevator Reported Height (meters)", getHeight());
-    }
+    // public Command runSysICommand() {
+    //     return (sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))
+    //             .andThen(sysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse).until(atMin))
+    //             .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward).until(atMax))
+    //             .andThen(sysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse).until(atMin))
+    //             .andThen(Commands.print("DONE"));
+    // }
 }
