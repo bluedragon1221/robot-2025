@@ -90,6 +90,12 @@ public class ElevatorSupersystem {
                 .andThen(setStatePreset(Preset.Storage));
     }
 
+    public Command storagePositionAlgae() {
+        return setState(cur_elevator_height, Preset.Storage.getAngle(), 1)
+                .until(coral_arm_pivot.isGreaterThanAngle(0))
+                .andThen(setStatePreset(Preset.Storage));
+    }
+
     // INTAKE
     public Command intakePrepare() {
         return setStatePivot(0)
@@ -155,21 +161,21 @@ public class ElevatorSupersystem {
     }
 
     public Command coralScoreL3() {
-        return setState(Preset.ScoreL3.getHeight(), Preset.ScoreL3.getAngle() - 0.0277)
+        return setState(Preset.ScoreL3.getHeight(), 0, -1.5)
                 .onlyIf(elevator.isAtHeight(Preset.ScoreL3.getHeight(), 0.02)
                         .and(coral_arm_pivot.isAtAngle(Preset.ScoreL3.getAngle()))
                         .and(hasCoral));
     }
 
     public Command coralScoreL2() {
-        return setState(Preset.ScoreL2.getHeight(), Preset.ScoreL2.getAngle() - 0.0277)
+        return setState(Preset.ScoreL2.getHeight(), 0, -1.5)
                 .onlyIf(elevator.isAtHeight(Preset.ScoreL2.getHeight(), 0.02)
                         .and(coral_arm_pivot.isAtAngle(Preset.ScoreL2.getAngle()))
                         .and(hasCoral));
     }
 
     public Command coralScoreL1() {
-        return setStateGripper(-0.5)
+        return setState(Preset.ScoreL1.getHeight(), 0, -0.5)
                 .onlyIf(elevator.isAtHeight(Preset.ScoreL1.getHeight(), 0.02)
                         .and(coral_arm_pivot.isAtAngle(0))
                         .and(hasCoral));

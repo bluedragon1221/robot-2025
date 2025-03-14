@@ -16,7 +16,7 @@ public class AutoRoutines {
         final AutoTrajectory path = routine.trajectory("centercage_3l4");
 
         routine.active().onTrue(
-            path.resetOdometry().andThen(path.cmd())
+            path.resetOdometry().andThen(path.spawnCmd())
         );
 
         return routine;
@@ -27,7 +27,7 @@ public class AutoRoutines {
         final AutoTrajectory path = routine.trajectory("bottom_centercage_3l4");
 
         routine.active().onTrue(
-            path.resetOdometry().andThen(path.cmd())
+            path.resetOdometry().andThen(path.spawnCmd())
         );
 
         return routine;
@@ -38,7 +38,7 @@ public class AutoRoutines {
         final AutoTrajectory path = routine.trajectory("center_1l4");
 
         routine.active().onTrue(
-            path.resetOdometry().andThen(path.cmd())
+            path.resetOdometry().andThen(path.spawnCmd())
         );
 
         return routine;
@@ -49,7 +49,7 @@ public class AutoRoutines {
         final AutoTrajectory path = routine.trajectory("drive_forward");
 
         routine.active().onTrue(
-            path.resetOdometry().andThen(path.cmd())
+            path.resetOdometry().andThen(path.spawnCmd())
         );
 
         return routine;

@@ -165,6 +165,7 @@ public class RobotContainer {
 
         launchpad.getButton(8, 8).onTrue(supersystem.extractionStop());
 
+        launchpad.getButton(0, 7).onTrue(supersystem.storagePositionAlgae());
         launchpad.getButton(0, 8).onTrue(supersystem.storagePosition());
 
         launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
