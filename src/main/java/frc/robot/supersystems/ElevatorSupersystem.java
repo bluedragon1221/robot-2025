@@ -155,6 +155,10 @@ public class ElevatorSupersystem {
 
     public Command coralScoreL4() {
         return setState(Preset.ScoreL4.getHeight(), 0)
+                .until(coral_arm_pivot.isAtAngle(0))
+                .andThen(setStateGripper(-0.5))
+                .withTimeout(1)
+                .andThen(setStateGripper(0))
                 .onlyIf(elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
                         .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
                         .and(hasCoral));
@@ -199,7 +203,7 @@ public class ElevatorSupersystem {
     public Command extractionExtractLow() {
         return setStateGripper(10)
                 .until(hasCoral) // TODO: does the coral trigger the beam break?
-                .withTimeout(2)
+                .withTimeout(3)
                 .andThen(setStateGripper(1))
                 .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
                         .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));

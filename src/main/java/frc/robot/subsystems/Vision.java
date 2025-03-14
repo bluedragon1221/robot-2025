@@ -40,7 +40,7 @@ public class Vision {
                 new PhotonCamera("front_cam"),
                 new Transform3d(
                     new Translation3d(0.15, 0.30, 0.285),
-                    new Rotation3d(0.0, 0.0, 0)),
+                    new Rotation3d(0.0, 0.0, -0.17453292)),
                 "front_cam"
                 );
 

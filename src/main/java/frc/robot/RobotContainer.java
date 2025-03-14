@@ -4,11 +4,14 @@
 
 package frc.robot;
 
+import java.util.function.Supplier;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -91,6 +94,18 @@ public class RobotContainer {
     private final double slower_turtle_mode = 0.15;
     private Trigger slower_turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode));
 
+//     private Supplier<Pose2d> nearestLeftCoral() {
+//         return () -> {
+//                 return FieldConstants.Reef.
+//         };
+//     }
+
+//     private Supplier<Pose2d> nearestRightCoral() {
+//         return () -> {
+
+//         };
+//     }
+
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -133,7 +148,8 @@ public class RobotContainer {
         controller.povLeft().whileTrue(
                 drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(max_speed * slower_turtle_mode)));
         controller.povRight().whileTrue(
-                drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(-max_speed * slower_turtle_mode)));
+        
+        drivetrain.applyRequest(() -> robot_centric.withVelocityX(0).withVelocityY(-max_speed * slower_turtle_mode)));
         controller.povUp().whileTrue(
                 drivetrain.applyRequest(() -> robot_centric.withVelocityX(max_speed * slower_turtle_mode).withVelocityY(0)));
         controller.povDown().whileTrue(

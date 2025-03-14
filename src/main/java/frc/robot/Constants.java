@@ -11,7 +11,7 @@ public class Constants {
         ScoreL3         (0.3556, 0.09),
         ScoreL4         (0.6604, 0.14),
         ExtractAlgaeLow (0.3400, 0),
-        ExtractAlgaeHigh(0.6250, 0),
+        ExtractAlgaeHigh(0.6, 0),
         IntakeCatch     (0.5148, -0.255),
         IntakeGrip      (0.4387, -0.255),
         ScoreProcessor  (0.1224,0);
