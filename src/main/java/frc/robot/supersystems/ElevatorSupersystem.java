@@ -122,7 +122,7 @@ public class ElevatorSupersystem {
         return setStateElevator(Preset.IntakeCatch.getHeight())
                 .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
                 .andThen(setStatePivot(Preset.Storage.getAngle()))
-                .until(coral_arm_pivot.isGreaterThanAngle(0.1))
+                .until(coral_arm_pivot.isAtAngle(Preset.Storage.getAngle()))
                 .andThen(setStatePreset(Preset.Storage));
     }
 

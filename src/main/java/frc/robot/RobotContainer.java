@@ -24,7 +24,6 @@ import frc.robot.Constants.Preset;
 import frc.robot.commands.DriveToPose;
 import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmPivot;
@@ -49,7 +48,7 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(max_speed * 0.1)
             .withRotationalDeadband(max_angular_rate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.Velocity); // Use open-loop control for drive motors
+            .withDriveRequestType(DriveRequestType.Velocity); // Use closed-loop control for drive motors
 
     private final SwerveRequest.RobotCentric robot_centric = new SwerveRequest.RobotCentric()
             .withDriveRequestType(DriveRequestType.Velocity);
@@ -79,7 +78,7 @@ public class RobotContainer {
         //         .bind("coral_prepare_l4", supersystem.coralPrepareL4())
         //         .bind("coral_score_l4", supersystem.coralScoreL4());
 
-        auto_routines = new AutoRoutines(auto_factory, drivetrain);
+        auto_routines = new AutoRoutines(auto_factory);
         // auto_chooser.addRoutine("Center Cage 3L4", auto_routines::CenterCage3l4);
         // auto_chooser.addRoutine("Bottom Center Cage 3L4", auto_routines::BottomCenterCage3l4);
         auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
@@ -92,11 +91,11 @@ public class RobotContainer {
 
     private boolean manual_turtle_mode = false;
 
-    private final double turtle_mode = 0.25;
+    private final double turtle_mode = 0.15;
     private Trigger turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.IntakeCatch.getHeight())
             && (elevator.getHeight() <= Preset.ScoreL3.getHeight())));
 
-    private final double slower_turtle_mode = 0.15;
+    private final double slower_turtle_mode = 0.035;
     private Trigger slower_turtle_trigger = new Trigger(
             () -> ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode));
 

@@ -4,17 +4,14 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.supersystems.ElevatorSupersystem;
 
 public class AutoRoutines {
     private final ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
     
     private final AutoFactory factory;
-    private CommandSwerveDrivetrain drivetrain;
 
-    public AutoRoutines(AutoFactory factory, CommandSwerveDrivetrain drivetrain) {
-        this.drivetrain = drivetrain;
+    public AutoRoutines(AutoFactory factory) {
         this.factory = factory;
     }
 
@@ -44,13 +41,14 @@ public class AutoRoutines {
         final AutoRoutine routine = factory.newRoutine("Center 1L4");
         final AutoTrajectory path = routine.trajectory("center_1l4");
 
-        routine.active().onTrue(
-            path.resetOdometry().andThen(path.spawnCmd())
-        );
+        routine.active().onTrue(Commands.parallel(
+            path.resetOdometry(),
+            path.cmd()
+        ));
 
         path.atTime("Storage Position").onTrue(supersystem.storagePosition());
-        path.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4()); // TODO: needs to stop drivetrain until command finishes
-        path.atTime("Score L4").onTrue(supersystem.coralScoreL4());  // same thing here
+        path.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
+        path.atTime("Score L4").onTrue(supersystem.coralScoreL4());
 
         return routine;
     }
@@ -59,7 +57,7 @@ public class AutoRoutines {
         final AutoRoutine routine = factory.newRoutine("Drive Forward");
         final AutoTrajectory path = routine.trajectory("drive_forward");
 
-        routine.active().onTrue(Commands.parallel(
+        routine.active().onTrue(Commands.sequence(
             path.resetOdometry(),
             path.cmd()
         ));

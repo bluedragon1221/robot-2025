@@ -55,6 +55,8 @@ public class Elevator extends SubsystemBase {
 
     private Elevator() {
         configureMotors();
+
+        // this.setDefaultCommand(run(() -> leader_motor.setControl(new VoltageOut(0))));
     }
 
     public static synchronized Elevator getInstance() {

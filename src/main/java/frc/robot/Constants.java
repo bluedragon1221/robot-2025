@@ -29,8 +29,8 @@ public class Constants {
         public static final int leftMotorID = 20;
         public static final int rightMotorID = 21;
 
-        public static final int motorMaxAcceleration = 6;
-        public static final int motorCruiseVelocity = 5;
+        public static final double motorMaxAcceleration = 10;
+        public static final double motorCruiseVelocity = 7.5;
 
         public static final double motorGearRatio = 7.75;
 
