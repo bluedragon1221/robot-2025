@@ -113,7 +113,7 @@ public class CoralArmPivot extends SubsystemBase {
     }
 
     public Trigger isGreaterThanAngle(double angle) {
-        return new Trigger(() -> getAngle() >= angle);
+        return new Trigger(() -> getAngle() > angle);
     }
 
     public Command setAngle(double goalAngle) {

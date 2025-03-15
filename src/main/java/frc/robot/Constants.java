@@ -13,6 +13,7 @@ public class Constants {
         ExtractAlgaeLow (0.3400, 0),
         ExtractAlgaeHigh(0.5, 0),
         IntakeCatch     (0.5148, -0.255),
+        PostIntakeCatch (0.517, -0.0255),
         IntakeGrip      (0.4387, -0.255),
         ScoreProcessor  (0.1224,0);
 
@@ -56,7 +57,7 @@ public class Constants {
         public static final double pivotMotorCurrentLimit = 40;
 
         public static final double pivotMotorGearRatio = 37.5;
-        public static final double pivotMotorTolerance = 0.1;
+        public static final double pivotMotorTolerance = 0.01;
     }
 
     public static final class CoralArmGripperConstants {

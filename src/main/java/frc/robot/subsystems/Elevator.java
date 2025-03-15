@@ -120,7 +120,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Trigger isGreaterThanHeight(double height) {
-        return new Trigger(() -> getHeight() >= (height + heightTolerance));
+        return new Trigger(() -> getHeight() > (height + heightTolerance));
     }
 
     public Command setHeight(double goalHeight) {

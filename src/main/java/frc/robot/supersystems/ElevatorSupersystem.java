@@ -1,7 +1,6 @@
 package frc.robot.supersystems;
 
-import static frc.robot.Constants.ElevatorSupersystemConstants.algaeHoldVoltage;
-import static frc.robot.Constants.ElevatorSupersystemConstants.beamBreakSensorDIO;
+import static frc.robot.Constants.ElevatorSupersystemConstants.*;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -88,13 +87,13 @@ public class ElevatorSupersystem {
 
     public Command storagePosition() {
         return setState(cur_elevator_height, Preset.Storage.getAngle(), 0)
-                .until(coral_arm_pivot.isGreaterThanAngle(0))
+                .until(coral_arm_pivot.isGreaterThanAngle(0.01))
                 .andThen(setStatePreset(Preset.Storage));
     }
 
     public Command storagePositionAlgae() {
         return setState(cur_elevator_height, Preset.Storage.getAngle(), 1)
-                .until(coral_arm_pivot.isGreaterThanAngle(0))
+                .until(coral_arm_pivot.isGreaterThanAngle(0.01))
                 .andThen(setStatePreset(Preset.Storage));
     }
 
@@ -112,15 +111,15 @@ public class ElevatorSupersystem {
         return setStatePreset(Preset.IntakeGrip, 2)
                 .until(hasCoral)
                 .withTimeout(3)
-                .andThen(setStatePreset(Preset.IntakeCatch, 0))
-                .onlyIf(elevator.isAtHeight(Preset.IntakeCatch.getHeight())
-                        .and(coral_arm_pivot.isAtAngle(Preset.IntakeCatch.getAngle()))
+                .andThen(setStatePreset(Preset.PostIntakeCatch, 0))
+                .onlyIf(elevator.isAtHeight(Preset.PostIntakeCatch.getHeight())
+                        .and(coral_arm_pivot.isAtAngle(Preset.PostIntakeCatch.getAngle()))
                         .and(hasCoral.negate())); // don't try to intake with a low elevator
     }
 
     public Command intakePost() {
-        return setStateElevator(Preset.IntakeCatch.getHeight())
-                .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
+        return setStateElevator(Preset.PostIntakeCatch.getHeight())
+                .until(elevator.isAtHeight(Preset.PostIntakeCatch.getHeight()))
                 .andThen(setStatePivot(Preset.Storage.getAngle()))
                 .until(coral_arm_pivot.isAtAngle(Preset.Storage.getAngle()))
                 .andThen(setStatePreset(Preset.Storage));
@@ -129,21 +128,21 @@ public class ElevatorSupersystem {
     // SCORE CORAL
     public Command coralPrepareL4() {
         return setStatePivot(Preset.ScoreL4.getAngle())
-                .until(coral_arm_pivot.isGreaterThanAngle(0))
+                .until(coral_arm_pivot.isGreaterThanAngle(0.01))
                 .andThen(setStatePreset(Preset.ScoreL4))
                 .onlyIf(hasCoral);
     }
 
     public Command coralPrepareL3() {
         return setStatePivot(Preset.ScoreL3.getAngle())
-                .until(coral_arm_pivot.isGreaterThanAngle(0))
+                .until(coral_arm_pivot.isGreaterThanAngle(0.01))
                 .andThen(setStatePreset(Preset.ScoreL3))
                 .onlyIf(hasCoral);
     }
 
     public Command coralPrepareL2() {
         return setStatePivot(Preset.ScoreL2.getAngle())
-                .until(coral_arm_pivot.isGreaterThanAngle(0))
+                .until(coral_arm_pivot.isGreaterThanAngle(0.01))
                 .andThen(setStatePreset(Preset.ScoreL2))
                 .onlyIf(hasCoral);
     }
@@ -160,7 +159,7 @@ public class ElevatorSupersystem {
         .and(hasCoral);
 
     public Command coralScoreL4() {
-        return setState(Preset.ScoreL4.getHeight(), 0)
+        return setStatePivot(0)
                 .until(coral_arm_pivot.isAtAngle(0))
                 .andThen(setStateGripper(-0.5))
                 .withTimeout(1)
@@ -171,21 +170,21 @@ public class ElevatorSupersystem {
     }
 
     public Command coralScoreL3() {
-        return setState(Preset.ScoreL3.getHeight(), 0, -1.5)
+        return setState(cur_elevator_height, 0, -1.5)
                 .onlyIf(elevator.isAtHeight(Preset.ScoreL3.getHeight(), 0.02)
                         .and(coral_arm_pivot.isAtAngle(Preset.ScoreL3.getAngle()))
                         .and(hasCoral));
     }
 
     public Command coralScoreL2() {
-        return setState(Preset.ScoreL2.getHeight(), 0, -1.5)
+        return setState(cur_elevator_height, 0, -1.5)
                 .onlyIf(elevator.isAtHeight(Preset.ScoreL2.getHeight(), 0.02)
                         .and(coral_arm_pivot.isAtAngle(Preset.ScoreL2.getAngle()))
                         .and(hasCoral));
     }
 
     public Command coralScoreL1() {
-        return setState(Preset.ScoreL1.getHeight(), 0, -0.5)
+        return setState(cur_elevator_height, 0, -0.5)
                 .onlyIf(elevator.isAtHeight(Preset.ScoreL1.getHeight(), 0.02)
                         .and(coral_arm_pivot.isAtAngle(0))
                         .and(hasCoral));
