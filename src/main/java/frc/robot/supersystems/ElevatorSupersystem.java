@@ -155,6 +155,10 @@ public class ElevatorSupersystem {
                 .onlyIf(hasCoral);
     }
 
+    public Trigger canScoreL4 = elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
+        .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
+        .and(hasCoral);
+
     public Command coralScoreL4() {
         return setState(Preset.ScoreL4.getHeight(), 0)
                 .until(coral_arm_pivot.isAtAngle(0))

@@ -48,8 +48,9 @@ public class AutoRoutines {
 
         path.atTime("Storage Position").onTrue(supersystem.storagePosition());
         path.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
-        path.atTime("Score L4").onTrue(supersystem.coralScoreL4());
-
+        
+        path.done().and(supersystem.canScoreL4).onTrue(supersystem.coralScoreL4());
+                                   
         return routine;
     }
 
