@@ -85,7 +85,7 @@ public class FieldConstants {
                              .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
                             .getY()
                     ),
-                    new Rotation2d(centerWithAngle.getRotation().getRadians())
+                    new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
                 ));
 
                 rights.add(new Pose2d(
@@ -97,7 +97,7 @@ public class FieldConstants {
                             .transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d()))
                             .getY()
                     ),
-                    new Rotation2d(centerWithAngle.getRotation().getRadians())
+                    new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
                 ));
             }
         }

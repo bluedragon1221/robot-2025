@@ -39,18 +39,21 @@ public class AutoRoutines {
 
     public AutoRoutine Center1l4() {
         final AutoRoutine routine = factory.newRoutine("Center 1L4");
-        final AutoTrajectory path = routine.trajectory("center_1l4");
+        final AutoTrajectory path = routine.trajectory("center_1l4", 0);
+        final AutoTrajectory path1 = routine.trajectory("center_1l4", 1);
 
-        routine.active().onTrue(Commands.parallel(
+        routine.active().onTrue(Commands.sequence(
             path.resetOdometry(),
             path.cmd()
         ));
 
         path.atTime("Storage Position").onTrue(supersystem.storagePosition());
         path.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
+
+        path.recentlyDone().and(supersystem.canScoreL4).onTrue(supersystem.coralScoreL4());
+
+        supersystem.hasScoredL4.onTrue(path1.cmd());
         
-        path.done().and(supersystem.canScoreL4).onTrue(supersystem.coralScoreL4());
-                                   
         return routine;
     }
 

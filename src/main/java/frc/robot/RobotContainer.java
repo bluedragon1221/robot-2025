@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -13,10 +14,12 @@ import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -29,6 +32,7 @@ import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.supersystems.ElevatorSupersystem;
+import frc.robot.util.AllianceFlipUtil;
 
 public class RobotContainer {
     // initialize subsystems
@@ -67,6 +71,9 @@ public class RobotContainer {
     private final AutoChooser auto_chooser = new AutoChooser();
 
     public RobotContainer() {
+        if (Robot.isSimulation()) {
+                DriverStation.silenceJoystickConnectionWarning(true);
+        }
         // Add Autos
         auto_factory = drivetrain.createAutoFactory();
                 // .bind("storage_position", supersystem.storagePosition().withTimeout(0.3))
@@ -102,15 +109,13 @@ public class RobotContainer {
     // Auto align bindings
     private Supplier<Pose2d> nearestLeftCoral() {
         return () -> {
-            Pose2d curr_pose = drivetrain.getState().Pose;
-            return curr_pose.nearest(FieldConstants.Reef.lefts);
+            return drivetrain.getState().Pose.nearest(FieldConstants.Reef.lefts.stream().map(AllianceFlipUtil::apply).toList());
         };
     }
 
     private Supplier<Pose2d> nearestRightCoral() {
         return () -> {
-            Pose2d curr_pose = drivetrain.getState().Pose;
-            return curr_pose.nearest(FieldConstants.Reef.rights);
+            return drivetrain.getState().Pose.nearest(FieldConstants.Reef.rights.stream().map(AllianceFlipUtil::apply).toList());
         };
     }
 
@@ -185,8 +190,8 @@ public class RobotContainer {
                         () -> robot_centric.withVelocityX(-max_speed * slower_turtle_mode).withVelocityY(0)));
 
         // left/right reef align
-        launchpad.getButton(2, 0).onTrue(new DriveToPose(drivetrain, nearestLeftCoral()));
-        launchpad.getButton(3, 0).onTrue(new DriveToPose(drivetrain, nearestRightCoral()));
+        launchpad.getButton(2, 0).whileTrue(new DriveToPose(drivetrain, nearestLeftCoral()));
+        launchpad.getButton(3, 0).whileTrue(new DriveToPose(drivetrain, nearestRightCoral()));
 
         // Elevator/coral arm controls
         launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
