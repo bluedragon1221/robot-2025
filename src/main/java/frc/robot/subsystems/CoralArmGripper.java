@@ -42,7 +42,7 @@ CoralArmGripper extends SubsystemBase {
 
     // Gripper
     public Command setGripperVoltage(double voltage) {
-        return run(() -> gripper_motor.setVoltage(voltage));
+        return runOnce(() -> gripper_motor.setVoltage(voltage));
     }
 
     // public Command setVoltageFromDashboard() {
