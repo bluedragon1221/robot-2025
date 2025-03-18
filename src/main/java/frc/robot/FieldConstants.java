@@ -1,11 +1,13 @@
 package frc.robot;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import java.util.ArrayList;
+import frc.robot.util.AllianceFlipUtil;
 
 /**
  * Contains various field dimensions and useful reference points. All units are
@@ -76,7 +78,7 @@ public class FieldConstants {
                 double adjustX = Units.inchesToMeters(30.738+19); // set 19in back for aligning
                 double adjustY = Units.inchesToMeters(6.469);
 
-                lefts.add(new Pose2d(
+                Pose2d left = new Pose2d(
                     new Translation2d(
                         centerWithAngle
                             .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
@@ -85,10 +87,13 @@ public class FieldConstants {
                              .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
                             .getY()
                     ),
-                    new Rotation2d(centerWithAngle.getRotation().getRadians())
-                ));
+                    new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180)));
+                
 
-                rights.add(new Pose2d(
+                lefts.add(left);
+                lefts.add(AllianceFlipUtil.apply(left));
+
+                Pose2d right = new Pose2d(
                     new Translation2d(
                         centerWithAngle
                             .transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d()))
@@ -97,9 +102,14 @@ public class FieldConstants {
                             .transformBy(new Transform2d(adjustX, -adjustY, new Rotation2d()))
                             .getY()
                     ),
-                    new Rotation2d(centerWithAngle.getRotation().getRadians())
-                ));
+                    new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
+                );
+
+                rights.add(right);
+                rights.add(AllianceFlipUtil.apply(right));
             }
+            lefts.addAll(lefts.stream().map(AllianceFlipUtil::apply).toList());
+            rights.addAll(rights.stream().map(AllianceFlipUtil::apply).toList());
         }
     }
 }

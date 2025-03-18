@@ -42,7 +42,7 @@ public class Vision {
                     new Translation3d(0.15, 0.30, 0.285),
                     new Rotation3d(0.0, 0.0, -0.17453292)),
                 "front_cam"
-                );
+            );
 
         NamedPhotonPoseEstimator back_cam = 
                 new NamedPhotonPoseEstimator(
@@ -51,12 +51,12 @@ public class Vision {
                     new PhotonCamera("back_cam"),
                     new Transform3d(
                         new Translation3d(0.145, 0.59, 0.28),
-                        new Rotation3d(0.0, 0.0, 0.0)),
+                        new Rotation3d(0.0, 0.0, Math.PI)),
                     "back_cam"
-                    );
+                );
 
-        // poseEstimators = List.of(front_cam, back_cam);
-        poseEstimators = List.of(front_cam);
+        poseEstimators = List.of(front_cam, back_cam);
+        // poseEstimators = List.of(front_cam);
     }
 
     public void updateVision() {
@@ -66,6 +66,7 @@ public class Vision {
 
                 if (estimatedPoseOptional.isPresent()) {
                     EstimatedRobotPose estimatedRobotPose = estimatedPoseOptional.get();
+                    
                     Pose2d estPose = estimatedRobotPose.estimatedPose.toPose2d();
 
                     Matrix<N3, N1> estStdDevs = getEstimationStdDevs(estPose, estimatedRobotPose.targetsUsed);
@@ -86,6 +87,7 @@ public class Vision {
                 continue;
             }
             numTags++;
+            
             avgDist +=
                 tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
         }

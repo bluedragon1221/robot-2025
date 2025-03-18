@@ -13,7 +13,7 @@ public class Constants {
         ExtractAlgaeLow (0.3400, 0),
         ExtractAlgaeHigh(0.5, 0),
         IntakeCatch     (0.5148, -0.255),
-        PostIntakeCatch (0.517, -0.0255),
+        PostIntakeCatch (0.517, -0.255),
         IntakeGrip      (0.4387, -0.255),
         ScoreProcessor  (0.1224,0);
 
@@ -30,8 +30,8 @@ public class Constants {
         public static final int leftMotorID = 20;
         public static final int rightMotorID = 21;
 
-        public static final double motorMaxAcceleration = 10;
-        public static final double motorCruiseVelocity = 7.5;
+        public static final double motorMaxAcceleration = 8;
+        public static final double motorCruiseVelocity = 6;
 
         public static final double motorGearRatio = 7.75;
 
@@ -52,7 +52,7 @@ public class Constants {
         public static final double pivotMotorAcceleration = 1;
         public static final double pivotMotorCruiseVelocity = 0.5;
 
-        public static final double pivotEncoderOffset = -0.23828125;
+        public static final double pivotEncoderOffset = -0.242919921875;
 
         public static final double pivotMotorCurrentLimit = 40;
 
