@@ -107,16 +107,13 @@ public class RobotContainer {
         return () -> {
             return drivetrain.getState().Pose.nearest(FieldConstants.Reef.lefts.stream().map(AllianceFlipUtil::apply).toList());
         };
+        };
 
     private Supplier<Pose2d> nearestRightCoral() {
         return () -> {
             return drivetrain.getState().Pose.nearest(FieldConstants.Reef.rights.stream().map(AllianceFlipUtil::apply).toList());
         };
-
-        DriveToPose pose;
-
-        public Pose2d goalPose = new Pose2d();
-        public DriveToPose leftSide = new DriveToPose(drivetrain, nearestLeftCoral.get());
+        };
 
         public void configureBindings() {
                 // Note that X is defined as forward according to WPILib convention,
