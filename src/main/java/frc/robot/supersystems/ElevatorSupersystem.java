@@ -112,8 +112,8 @@ public class ElevatorSupersystem {
                 .until(hasCoral)
                 .withTimeout(3)
                 .andThen(setStatePreset(Preset.PostIntakeCatch, 0))
-                .onlyIf(elevator.isAtHeight(Preset.PostIntakeCatch.getHeight())
-                        .and(coral_arm_pivot.isAtAngle(Preset.PostIntakeCatch.getAngle()))
+                .onlyIf(elevator.isAtHeight(Preset.IntakeCatch.getHeight())
+                        .and(coral_arm_pivot.isAtAngle(Preset.IntakeCatch.getAngle()))
                         .and(hasCoral.negate())); // don't try to intake with a low elevator
     }
 

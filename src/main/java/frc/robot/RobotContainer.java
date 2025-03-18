@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Preset;
@@ -31,214 +30,239 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.supersystems.ElevatorSupersystem;
 
 public class RobotContainer {
-    // initialize subsystems
-    Elevator elevator = Elevator.getInstance();
-    ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
-    CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
-    CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
-    // Climber climber = Climber.getInstance();
+        // initialize subsystems
+        Elevator elevator = Elevator.getInstance();
+        ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
+        CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
+        CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
+        // Climber climber = Climber.getInstance();
 
-    Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
+        Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
 
-    private double max_speed = TunerConstants.kSpeedAt12Volts.magnitude(); // kSpeedAt12Volts desired top speed
-                                                                           // desired top speed
-    private double max_angular_rate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
+        private double max_speed = TunerConstants.kSpeedAt12Volts.magnitude(); // kSpeedAt12Volts desired top speed
+                                                                               // desired top speed
+        private double max_angular_rate = 1.5 * Math.PI; // 3/4 of a rotation per second max angular velocity
 
-    /* Setting up bindings for necessary control of the swerve drive platform */
-    private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(max_speed * 0.1)
-            .withRotationalDeadband(max_angular_rate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(DriveRequestType.Velocity); // Use closed-loop control for drive motors
+        /* Setting up bindings for necessary control of the swerve drive platform */
+        private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+                        .withDeadband(max_speed * 0.1)
+                        .withRotationalDeadband(max_angular_rate * 0.1) // Add a 10% deadband
+                        .withDriveRequestType(DriveRequestType.Velocity); // Use closed-loop control for drive motors
 
-    private final SwerveRequest.RobotCentric robot_centric = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.Velocity);
+        private final SwerveRequest.RobotCentric robot_centric = new SwerveRequest.RobotCentric()
+                        .withDriveRequestType(DriveRequestType.Velocity);
 
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+        private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+        private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-    private final Telemetry logger = new Telemetry(max_speed);
-    private final CommandXboxController controller = new CommandXboxController(0);
+        private final Telemetry logger = new Telemetry(max_speed);
+        private final CommandXboxController controller = new CommandXboxController(0);
 
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+        public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    // Choreo stuff
-    private final AutoFactory auto_factory;
-    private final AutoRoutines auto_routines;
-    private final AutoChooser auto_chooser = new AutoChooser();
+        // Choreo stuff
+        private final AutoFactory auto_factory;
+        private final AutoRoutines auto_routines;
+        private final AutoChooser auto_chooser = new AutoChooser();
 
-    public RobotContainer() {
-        // Add Autos
-        auto_factory = drivetrain.createAutoFactory();
+        public RobotContainer() {
+                // Add Autos
+                auto_factory = drivetrain.createAutoFactory();
                 // .bind("storage_position", supersystem.storagePosition().withTimeout(0.3))
-        // auto_factory
-        //         .bind("storage_position", Commands.print("sotrage_position"))
-        //         .bind("intake_prepare", supersystem.intakePrepare())
-        //         .bind("intake_load", supersystem.intakeLoad())
-        //         .bind("intake_post", supersystem.intakePost())
-        //         .bind("coral_prepare_l4", supersystem.coralPrepareL4())
-        //         .bind("coral_score_l4", supersystem.coralScoreL4());
+                // auto_factory
+                // .bind("storage_position", Commands.print("sotrage_position"))
+                // .bind("intake_prepare", supersystem.intakePrepare())
+                // .bind("intake_load", supersystem.intakeLoad())
+                // .bind("intake_post", supersystem.intakePost())
+                // .bind("coral_prepare_l4", supersystem.coralPrepareL4())
+                // .bind("coral_score_l4", supersystem.coralScoreL4());
 
-        auto_routines = new AutoRoutines(auto_factory);
-        // auto_chooser.addRoutine("Center Cage 3L4", auto_routines::CenterCage3l4);
-        // auto_chooser.addRoutine("Bottom Center Cage 3L4", auto_routines::BottomCenterCage3l4);
-        auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
-        auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
+                auto_routines = new AutoRoutines(auto_factory);
+                // auto_chooser.addRoutine("Center Cage 3L4", auto_routines::CenterCage3l4);
+                // auto_chooser.addRoutine("Bottom Center Cage 3L4",
+                // auto_routines::BottomCenterCage3l4);
+                auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
+                auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
 
-        SmartDashboard.putData("Auto Chooser", auto_chooser);
+                SmartDashboard.putData("Auto Chooser", auto_chooser);
 
-        configureBindings();
-    }
+                configureBindings();
+        }
 
-    private boolean manual_turtle_mode = false;
+        private final double turtle_mode = 0.15;
+        private Trigger turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL2.getHeight())));
 
-    private final double turtle_mode = 0.15;
-    private Trigger turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.IntakeCatch.getHeight())
-            && (elevator.getHeight() <= Preset.ScoreL3.getHeight())));
+        private final double slower_turtle_mode = 0.035;
 
-    private final double slower_turtle_mode = 0.035;
-    private Trigger slower_turtle_trigger = new Trigger(
-            () -> ((elevator.getHeight() >= Preset.ScoreL3.getHeight()) || manual_turtle_mode));
+        // Auto align bindings
 
-    // Auto align bindings
-    private Supplier<Pose2d> nearestLeftCoral() {
-        return () -> {
-            Pose2d curr_pose = drivetrain.getState().Pose;
-            return curr_pose.nearest(FieldConstants.Reef.lefts);
+        public Supplier<Pose2d> nearestRightCoral = () -> {
+                Pose2d curr_pose = drivetrain.getState().Pose;
+                return curr_pose.nearest(FieldConstants.Reef.rights);
         };
-    }
 
-    private Supplier<Pose2d> nearestRightCoral() {
-        return () -> {
-            Pose2d curr_pose = drivetrain.getState().Pose;
-            return curr_pose.nearest(FieldConstants.Reef.rights);
+        public Supplier<Pose2d> nearestLeftCoral = () -> {
+                Pose2d curr_pose = drivetrain.getState().Pose;
+                return curr_pose.nearest(FieldConstants.Reef.lefts);
         };
-    }
 
-    public void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
-        // and Y is defined as to the left according to WPILib convention.
+        DriveToPose pose;
 
-        // Drivetrain will execute this command periodically
-        drivetrain.setDefaultCommand(
-                drivetrain.applyRequest(
-                        () -> drive.withVelocityX(-controller.getLeftY() * max_speed) // Drive forward with negative Y
-                                                                                      // (forward)
-                                .withVelocityY(-controller.getLeftX() * max_speed) // Drive left with negative X (left)
-                                                                                   // Drive counterclockwise with
-                                                                                   // negative X (left)
-                                .withRotationalRate(-controller.getRightX() * max_angular_rate) // Drive
-                                                                                                // counterclockwise with
-                                                                                                // negative X (left)
+        public Pose2d goalPose = new Pose2d();
+        public DriveToPose leftSide = new DriveToPose(drivetrain, nearestLeftCoral.get());
 
+        public void configureBindings() {
+                // Note that X is defined as forward according to WPILib convention,
+                // and Y is defined as to the left according to WPILib convention.
+
+                // Drivetrain will execute this command periodically
+                drivetrain.setDefaultCommand(
+                                drivetrain.applyRequest(
+                                                () -> drive.withVelocityX(-controller.getLeftY() * max_speed) // Drive
+                                                                                                              // forward
+                                                                                                              // with
+                                                                                                              // negative
+                                                                                                              // Y
+                                                                                                              // (forward)
+                                                                .withVelocityY(-controller.getLeftX() * max_speed) // Drive
+                                                                                                                   // left
+                                                                                                                   // with
+                                                                                                                   // negative
+                                                                                                                   // X
+                                                                                                                   // (left)
+                                                                                                                   // Drive
+                                                                                                                   // counterclockwise
+                                                                                                                   // with
+                                                                                                                   // negative
+                                                                                                                   // X
+                                                                                                                   // (left)
+                                                                .withRotationalRate(-controller.getRightX()
+                                                                                * max_angular_rate) // Drive
+                                                                                                    // counterclockwise
+                                                                                                    // with
+                                                                                                    // negative X (left)
+
+                                ));
+
+                turtle_trigger.whileTrue(drivetrain.applyRequest(
+                                () -> drive.withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive
+                                                                                                            // forward
+                                                                                                            // with
+                                                                                                            // negative
+                                                                                                            // Y
+                                                                                                            // (forward)
+                                                .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive
+                                                                                                                 // left
+                                                                                                                 // with
+                                                                                                                 // negative
+                                                                                                                 // X
+                                                                                                                 // (left)
+                                                .withRotationalRate(-controller.getRightX() * max_angular_rate
+                                                                * turtle_mode) // Drive
+                                                                               // counterclockwise
+                                                                               // with negative X
+                                                                               // (left)
                 ));
 
-        turtle_trigger.whileTrue(drivetrain.applyRequest(
-                () -> drive.withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive forward with
-                                                                                            // negative Y (forward)
-                        .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive left with negative X
-                                                                                         // (left)
-                        .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive
-                                                                                                      // counterclockwise
-                                                                                                      // with negative X
-                                                                                                      // (left)
-        ));
+                controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
+                controller.b().whileTrue(drivetrain.applyRequest(
+                                () -> point.withModuleDirection(
+                                                new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))));
 
-        slower_turtle_trigger.whileTrue(drivetrain.applyRequest(
-                () -> drive.withVelocityX(-controller.getLeftY() * max_speed * slower_turtle_mode) // Drive forward with
-                                                                                                   // negative Y
-                                                                                                   // (forward)
-                        .withVelocityY(-controller.getLeftX() * max_speed * slower_turtle_mode) // Drive left with
-                                                                                                // negative X (left)
-                        .withRotationalRate(-controller.getRightX() * max_angular_rate * slower_turtle_mode) // Drive
-                                                                                                             // counterclockwise
-                                                                                                             // with
-                                                                                                             // negative
-                                                                                                             // X (left)
-        ));
+                // Run SysId routines when holding back/start and X/Y.
+                // Note that each routine should be run exactly once in a single log.
+                // controller.back().and(controller.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+                // controller.back().and(controller.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+                // controller.start().and(controller.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+                // controller.start().and(controller.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        controller.b().whileTrue(drivetrain.applyRequest(
-                () -> point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))));
+                // reset the field-centric heading on left bumper press
+                controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // Run SysId routines when holding back/start and X/Y.
-        // Note that each routine should be run exactly once in a single log.
-        // controller.back().and(controller.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        // controller.back().and(controller.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        // controller.start().and(controller.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        // controller.start().and(controller.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                controller.povLeft().whileTrue(
+                                drivetrain.applyRequest(
+                                                () -> robot_centric.withVelocityX(0)
+                                                                .withVelocityY(max_speed * slower_turtle_mode)));
+                controller.povRight().whileTrue(
 
-        // reset the field-centric heading on left bumper press
-        controller.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+                                drivetrain.applyRequest(
+                                                () -> robot_centric.withVelocityX(0)
+                                                                .withVelocityY(-max_speed * slower_turtle_mode)));
+                controller.povUp().whileTrue(
+                                drivetrain.applyRequest(
+                                                () -> robot_centric.withVelocityX(max_speed * slower_turtle_mode)
+                                                                .withVelocityY(0)));
+                controller.povDown().whileTrue(
+                                drivetrain.applyRequest(
+                                                () -> robot_centric.withVelocityX(-max_speed * slower_turtle_mode)
+                                                                .withVelocityY(0)));
 
-        controller.povLeft().whileTrue(
-                drivetrain.applyRequest(
-                        () -> robot_centric.withVelocityX(0).withVelocityY(max_speed * slower_turtle_mode)));
-        controller.povRight().whileTrue(
+                // left/right reef align
+                // launchpad.getButton(3, 0).whileTrue(Commands.runOnce(() -> {
+                //         goalPose = nearestLeftCoral.get();
+                //         pose = new DriveToPose(drivetrain, goalPose);
+                // }).andThen(Commands.run(() -> pose.execute()))); // .whileTrue(getDriveToPose(nearestLeftCoral));
+                // launchpad.getButton(4, 0).whileTrue(new DriveToPose(drivetrain,
+                // nearestRightCoral));
+                launchpad.getButton(3, 0).whileTrue(leftSide.beforeStarting(() -> {leftSide = new DriveToPose(drivetrain, nearestLeftCoral.get()); System.out.println(nearestLeftCoral.get().toString());}));
 
-                drivetrain.applyRequest(
-                        () -> robot_centric.withVelocityX(0).withVelocityY(-max_speed * slower_turtle_mode)));
-        controller.povUp().whileTrue(
-                drivetrain.applyRequest(
-                        () -> robot_centric.withVelocityX(max_speed * slower_turtle_mode).withVelocityY(0)));
-        controller.povDown().whileTrue(
-                drivetrain.applyRequest(
-                        () -> robot_centric.withVelocityX(-max_speed * slower_turtle_mode).withVelocityY(0)));
+                // Elevator/coral arm controls
+                launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
+                launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareL2());
+                launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareL3());
+                launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareL4());
 
-        // left/right reef align
-        launchpad.getButton(2, 0).onTrue(new DriveToPose(drivetrain, nearestLeftCoral()));
-        launchpad.getButton(3, 0).onTrue(new DriveToPose(drivetrain, nearestRightCoral()));
+                // coral scoring
+                launchpad.getButton(7, 1).onTrue(supersystem.coralScoreL1());
+                launchpad.getButton(7, 2).onTrue(supersystem.coralScoreL2());
+                launchpad.getButton(7, 3).onTrue(supersystem.coralScoreL3());
+                launchpad.getButton(7, 4).onTrue(supersystem.coralScoreL4());
 
-        // Elevator/coral arm controls
-        launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
-        launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareL2());
-        launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareL3());
-        launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareL4());
+                // intake
+                launchpad.getButton(8, 5).onTrue(supersystem.intakePrepare());
+                launchpad.getButton(7, 5).onTrue(supersystem.intakeLoad());
+                launchpad.getButton(6, 5).onTrue(supersystem.intakePost());
 
-        // coral scoring
-        launchpad.getButton(7, 1).onTrue(supersystem.coralScoreL1());
-        launchpad.getButton(7, 2).onTrue(supersystem.coralScoreL2());
-        launchpad.getButton(7, 3).onTrue(supersystem.coralScoreL3());
-        launchpad.getButton(7, 4).onTrue(supersystem.coralScoreL4());
+                // high extract / low extract
+                launchpad.getButton(8, 6).onTrue(supersystem.extractionPrepareHigh());
+                launchpad.getButton(7, 6).onTrue(supersystem.extractionExtractHigh());
 
-        // intake
-        launchpad.getButton(8, 5).onTrue(supersystem.intakePrepare());
-        launchpad.getButton(7, 5).onTrue(supersystem.intakeLoad());
-        launchpad.getButton(6, 5).onTrue(supersystem.intakePost());
+                // low extract
+                launchpad.getButton(8, 7).onTrue(supersystem.extractionPrepareLow());
+                launchpad.getButton(7, 7).onTrue(supersystem.extractionExtractLow());
 
-        // high extract / low extract
-        launchpad.getButton(8, 6).onTrue(supersystem.extractionPrepareHigh());
-        launchpad.getButton(7, 6).onTrue(supersystem.extractionExtractHigh());
+                // TODO: barge scoring
 
-        // low extract
-        launchpad.getButton(8, 7).onTrue(supersystem.extractionPrepareLow());
-        launchpad.getButton(7, 7).onTrue(supersystem.extractionExtractLow());
+                // processor scoring
+                launchpad.getButton(6, 7).onTrue(supersystem.algaePrepareProcessor());
+                launchpad.getButton(5, 7).onTrue(supersystem.algaeScoreProcessor());
 
-        // TODO: barge scoring
+                // storage positions
 
-        // processor scoring
-        launchpad.getButton(6, 7).onTrue(supersystem.algaePrepareProcessor());
-        launchpad.getButton(5, 7).onTrue(supersystem.algaeScoreProcessor());
+                launchpad.getButton(0, 7).onTrue(supersystem.storagePositionAlgae());
+                launchpad.getButton(0, 8).onTrue(supersystem.storagePosition());
 
-        // storage positions
+                // launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
 
-        launchpad.getButton(0, 7).onTrue(supersystem.storagePositionAlgae());
-        launchpad.getButton(0, 8).onTrue(supersystem.storagePosition());
+                launchpad.getButton(8, 8).onTrue(supersystem.extractionStop());
+                launchpad.getButton(7, 0).onTrue(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = true))
+                                .onFalse(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = false));
 
-        // launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
+                /// manual testing voltage sets
+                // controller.rightTrigger().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
+                // controller.leftTrigger().onTrue(climber.setVoltage(-6)).onFalse(climber.setVoltage(0));
 
-        launchpad.getButton(8, 8).onTrue(supersystem.extractionStop());
-        launchpad.getButton(7, 0).onTrue(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = true))
-                .onFalse(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = false));
+                // Telemetrize our drive train
+                drivetrain.registerTelemetry(logger::telemeterize);
+        }
 
-        /// manual testing voltage sets
-        // controller.rightTrigger().onTrue(climber.setVoltage(6)).onFalse(climber.setVoltage(0));
-        // controller.leftTrigger().onTrue(climber.setVoltage(-6)).onFalse(climber.setVoltage(0));
+        // public Command getDriveToPose(Supplier<Pose2d> supplySide) {
+        //         DriveToPose leftSide = new DriveToPose(drivetrain, supplySide.get());
 
-        // Telemetrize our drive train
-        drivetrain.registerTelemetry(logger::telemeterize);
-    }
+        //         return leftSide;
+        // }
 
-    public Command getAutonomousCommand() {
-        return auto_chooser.selectedCommand();
-    }
+        public Command getAutonomousCommand() {
+                return auto_chooser.selectedCommand();
+        }
 }
