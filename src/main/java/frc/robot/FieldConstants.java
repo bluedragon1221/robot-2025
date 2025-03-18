@@ -87,11 +87,8 @@ public class FieldConstants {
                              .transformBy(new Transform2d(adjustX, adjustY, new Rotation2d()))
                             .getY()
                     ),
-                    new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180)));
-                
-
-                lefts.add(left);
-                lefts.add(AllianceFlipUtil.apply(left));
+                    new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
+                ));
 
                 Pose2d right = new Pose2d(
                     new Translation2d(
@@ -103,10 +100,7 @@ public class FieldConstants {
                             .getY()
                     ),
                     new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
-                );
-
-                rights.add(right);
-                rights.add(AllianceFlipUtil.apply(right));
+                ));
             }
             lefts.addAll(lefts.stream().map(AllianceFlipUtil::apply).toList());
             rights.addAll(rights.stream().map(AllianceFlipUtil::apply).toList());

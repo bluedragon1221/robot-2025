@@ -124,7 +124,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command setHeight(double goalHeight) {
-        return run(() -> {
+        return runOnce(() -> {
             // leader_motor.setPosition(translateHeightToRotations(getHeight()));
 
             leader_motor.setControl(mm_voltage.withPosition(translateHeightToRotations(goalHeight)));

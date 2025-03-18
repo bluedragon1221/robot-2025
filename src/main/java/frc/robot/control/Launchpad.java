@@ -43,7 +43,7 @@ public class Launchpad {
         defaultLEDs();
         vjoys = new CommandGenericHID[]{new CommandGenericHID(vjoy1), new CommandGenericHID(vjoy2), new CommandGenericHID(vjoy3)};
         for (int i = 0; i < 9*9; i++) {
-            int vjoy_num = Math.floorDiv(i,32);
+            int vjoy_num = Math.floorDiv(i+1,32);
             int row = Math.floorDiv(i,9);
             int col = i%9;
             int button_num = getButtonNum(col,row);
@@ -54,13 +54,13 @@ public class Launchpad {
             changeLED(col, row, rgbTable[row][col]);
 
             int button = button_num - (32 * Math.floorDiv(i,32));
-            if(button != 0)
-            {
-            buttons[row][col] = vjoys[vjoy_num].button(button);
+            // if(button != 0)
+            // {
+            buttons[row][col] = vjoys[vjoy_num].button(button+1);
             buttons[row][col].onTrue(Commands.print("("+row+","+(col)+") pressed"));
             buttons[row][col].onFalse(Commands.runOnce((()->this.restoreSavedLED(col,row))));
             buttons[row][col].onTrue(Commands.runOnce((()->this.feedback(col,row, pressedColor))));
-            }
+            // }
         }
     }
 
@@ -106,9 +106,9 @@ public class Launchpad {
     private int getButtonNum(int x, int y)
     {
         int button_num = y*9+x;
-        if(y > 0) {
-            button_num += 1;
-        }
+        // if(y > 0) {
+        //     button_num += 1;
+        // }
         return button_num;
     }
     /**

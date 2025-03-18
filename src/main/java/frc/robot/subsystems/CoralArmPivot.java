@@ -117,7 +117,7 @@ public class CoralArmPivot extends SubsystemBase {
     }
 
     public Command setAngle(double goalAngle) {
-        return run(() -> {
+        return runOnce(() -> {
             pivot_motor.setControl(
                 pivot_mm_voltage.withPosition(goalAngle)
             );
