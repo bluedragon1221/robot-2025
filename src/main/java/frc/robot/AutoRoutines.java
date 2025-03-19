@@ -33,6 +33,7 @@ public class AutoRoutines {
         routine.active().onTrue(
             path.resetOdometry().andThen(path.spawnCmd())
         );
+        
 
         return routine;
     }
@@ -40,7 +41,7 @@ public class AutoRoutines {
     public AutoRoutine Center1l4() {
         final AutoRoutine routine = factory.newRoutine("Center 1L4");
         final AutoTrajectory path = routine.trajectory("center_1l4", 0);
-        final AutoTrajectory path1 = routine.trajectory("center_1l4", 1);
+        // final AutoTrajectory path1 = routine.trajectory("center_1l4", 1);
 
         routine.active().onTrue(Commands.sequence(
             path.resetOdometry(),
@@ -52,7 +53,7 @@ public class AutoRoutines {
 
         path.recentlyDone().and(supersystem.canScoreL4).onTrue(supersystem.coralScoreL4());
 
-        supersystem.hasScoredL4.onTrue(path1.cmd());
+        // supersystem.hasScoredL4.onTrue(path1.cmd());
         
         return routine;
     }
