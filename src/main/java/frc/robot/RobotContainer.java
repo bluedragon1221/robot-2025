@@ -160,6 +160,7 @@ public class RobotContainer {
 
                                 ));
 
+                // TODO: turtle trigger was a problem in auto so we commented it out, will fix it later
                 // turtle_trigger.whileTrue(drivetrain.applyRequest(
                 //                 () -> drive.withVelocityX(getControlY() * max_speed * turtle_mode) // Drive
                 //                                                                                             // forward

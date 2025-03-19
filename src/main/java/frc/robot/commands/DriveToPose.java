@@ -54,7 +54,7 @@ public class DriveToPose extends Command {
         this.chassis = chassis;
         this.target = target;
 
-        SmartDashboard.putString("cons", target.get().toString()); // Diagnostic
+        // SmartDashboard.putString("cons", target.get().toString()); // Diagnostic
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         addRequirements(chassis);
@@ -62,7 +62,7 @@ public class DriveToPose extends Command {
 
     @Override
     public void initialize() {
-        SmartDashboard.putString("init", target.get().toString()); // Diagnostic
+        // SmartDashboard.putString("init", target.get().toString()); // Diagnostic
         Pose2d currentPose = robot.get();
         ChassisSpeeds fieldVelocity = chassis.getState().Speeds;
         Translation2d linearFieldVelocity =
