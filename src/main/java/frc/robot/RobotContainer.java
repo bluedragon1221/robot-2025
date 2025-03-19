@@ -103,16 +103,16 @@ public class RobotContainer {
         private final double slower_turtle_mode = 0.035;
 
     // Auto align bindings
-    private Supplier<Pose2d> nearestLeftCoral() {
-        return () -> {
-            return drivetrain.getState().Pose.nearest(FieldConstants.Reef.lefts.stream().map(AllianceFlipUtil::apply).toList());
-        };
+        private Supplier<Pose2d> nearestLeftCoral() {
+                return () -> {
+                        return drivetrain.getState().Pose.nearest(FieldConstants.Reef.lefts.stream().map(AllianceFlipUtil::apply).toList());
+                };
         };
 
-    private Supplier<Pose2d> nearestRightCoral() {
-        return () -> {
-            return drivetrain.getState().Pose.nearest(FieldConstants.Reef.rights.stream().map(AllianceFlipUtil::apply).toList());
-        };
+        private Supplier<Pose2d> nearestRightCoral() {
+                return () -> {
+                        return drivetrain.getState().Pose.nearest(FieldConstants.Reef.rights.stream().map(AllianceFlipUtil::apply).toList());
+                };
         };
 
         public void configureBindings() {

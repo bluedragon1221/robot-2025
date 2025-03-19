@@ -43,7 +43,7 @@ public class Launchpad {
         defaultLEDs();
         vjoys = new CommandGenericHID[]{new CommandGenericHID(vjoy1), new CommandGenericHID(vjoy2), new CommandGenericHID(vjoy3)};
         for (int i = 0; i < 9*9; i++) {
-            int vjoy_num = Math.floorDiv(i+1,32);
+            int vjoy_num = Math.floorDiv(i,32);
             int row = Math.floorDiv(i,9);
             int col = i%9;
             int button_num = getButtonNum(col,row);

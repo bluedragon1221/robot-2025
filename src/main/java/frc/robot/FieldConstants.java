@@ -89,6 +89,7 @@ public class FieldConstants {
                     ),
                     new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
                 );
+                lefts.add(left);
 
                 Pose2d right = new Pose2d(
                     new Translation2d(
@@ -101,6 +102,7 @@ public class FieldConstants {
                     ),
                     new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
                 );
+                rights.add(right);
             }
             // lefts.addAll(lefts.stream().map(AllianceFlipUtil::apply).toList());
             // rights.addAll(rights.stream().map(AllianceFlipUtil::apply).toList());
