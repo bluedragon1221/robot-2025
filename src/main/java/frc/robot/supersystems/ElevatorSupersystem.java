@@ -174,10 +174,10 @@ public class ElevatorSupersystem {
                 .until(coral_arm_pivot.isAtAngle(0))
                 .andThen(setStateGripper(-0.5))
                 .withTimeout(1)
-                .andThen(setStateGripper(0))
-                .onlyIf(elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
-                        .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
-                        .and(hasCoral));
+                .andThen(setStateGripper(0));
+                // .onlyIf(elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
+                //         .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
+                //         .and(hasCoral));
     }
 
     public Command coralScoreL3() {

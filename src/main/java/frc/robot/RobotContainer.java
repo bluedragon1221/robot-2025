@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -12,6 +11,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,8 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.DeferredCommand;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Preset;
@@ -69,13 +67,24 @@ public class RobotContainer {
         private final AutoFactory auto_factory;
         private final AutoRoutines auto_routines;
         private final AutoChooser auto_chooser = new AutoChooser();
+        
+        private final SlewRateLimiter slew_rate_limiter_x = new SlewRateLimiter(1);
+        private final SlewRateLimiter slew_rate_limiter_y = new SlewRateLimiter(1);
 
-    public RobotContainer() {
-        if (Robot.isSimulation()) {
-                DriverStation.silenceJoystickConnectionWarning(true);
+        private double getControlX() {
+                return slew_rate_limiter_x.calculate(-controller.getLeftX());
         }
-        // Add Autos
-        auto_factory = drivetrain.createAutoFactory();
+
+        private double getControlY() {
+                return slew_rate_limiter_y.calculate(-controller.getLeftY());
+        }
+
+        public RobotContainer() {
+                if (Robot.isSimulation()) {
+                        DriverStation.silenceJoystickConnectionWarning(true);
+                }
+                // Add Autos
+                auto_factory = drivetrain.createAutoFactory();
                 // .bind("storage_position", supersystem.storagePosition().withTimeout(0.3))
                 // auto_factory
                 // .bind("storage_position", Commands.print("sotrage_position"))
@@ -102,21 +111,21 @@ public class RobotContainer {
 
         private final double slower_turtle_mode = 0.035;
 
-    // Auto align bindings
-    private Supplier<Pose2d> nearestLeftCoral() {
-        return () -> {
-            return drivetrain.getState().Pose.nearest(FieldConstants.Reef.lefts.stream().map(AllianceFlipUtil::apply).toList());
-        };
+        // Auto align bindings
+        private Supplier<Pose2d> nearestLeftCoral() {
+                return () -> {
+                        return drivetrain.getState().Pose.nearest(
+                                        FieldConstants.Reef.lefts.stream().map(AllianceFlipUtil::apply).toList());
+                };
+        }
 
-    private Supplier<Pose2d> nearestRightCoral() {
-        return () -> {
-            return drivetrain.getState().Pose.nearest(FieldConstants.Reef.rights.stream().map(AllianceFlipUtil::apply).toList());
-        };
+        private Supplier<Pose2d> nearestRightCoral() {
+                return () -> {
+                        return drivetrain.getState().Pose.nearest(
+                                        FieldConstants.Reef.rights.stream().map(AllianceFlipUtil::apply).toList());
+                };
 
-        DriveToPose pose;
-
-        public Pose2d goalPose = new Pose2d();
-        public DriveToPose leftSide = new DriveToPose(drivetrain, nearestLeftCoral.get());
+        }
 
         public void configureBindings() {
                 // Note that X is defined as forward according to WPILib convention,
@@ -125,13 +134,13 @@ public class RobotContainer {
                 // Drivetrain will execute this command periodically
                 drivetrain.setDefaultCommand(
                                 drivetrain.applyRequest(
-                                                () -> drive.withVelocityX(-controller.getLeftY() * max_speed) // Drive
+                                                () -> drive.withVelocityX(getControlY() * max_speed) // Drive
                                                                                                               // forward
                                                                                                               // with
                                                                                                               // negative
                                                                                                               // Y
                                                                                                               // (forward)
-                                                                .withVelocityY(-controller.getLeftX() * max_speed) // Drive
+                                                                .withVelocityY(getControlX() * max_speed) // Drive
                                                                                                                    // left
                                                                                                                    // with
                                                                                                                    // negative
@@ -151,25 +160,25 @@ public class RobotContainer {
 
                                 ));
 
-                turtle_trigger.whileTrue(drivetrain.applyRequest(
-                                () -> drive.withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive
-                                                                                                            // forward
-                                                                                                            // with
-                                                                                                            // negative
-                                                                                                            // Y
-                                                                                                            // (forward)
-                                                .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive
-                                                                                                                 // left
-                                                                                                                 // with
-                                                                                                                 // negative
-                                                                                                                 // X
-                                                                                                                 // (left)
-                                                .withRotationalRate(-controller.getRightX() * max_angular_rate
-                                                                * turtle_mode) // Drive
-                                                                               // counterclockwise
-                                                                               // with negative X
-                                                                               // (left)
-                ));
+                // turtle_trigger.whileTrue(drivetrain.applyRequest(
+                //                 () -> drive.withVelocityX(getControlY() * max_speed * turtle_mode) // Drive
+                //                                                                                             // forward
+                //                                                                                             // with
+                //                                                                                             // negative
+                //                                                                                             // Y
+                //                                                                                             // (forward)
+                //                                 .withVelocityY(getControlY() * max_speed * turtle_mode) // Drive
+                //                                                                                                  // left
+                //                                                                                                  // with
+                //                                                                                                  // negative
+                //                                                                                                  // X
+                //                                                                                                  // (left)
+                //                                 .withRotationalRate(-controller.getRightX() * max_angular_rate
+                //                                                 * turtle_mode) // Drive
+                //                                                                // counterclockwise
+                //                                                                // with negative X
+                //                                                                // (left)
+                // ));
 
                 controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
                 controller.b().whileTrue(drivetrain.applyRequest(
@@ -204,9 +213,9 @@ public class RobotContainer {
                                                 () -> robot_centric.withVelocityX(-max_speed * slower_turtle_mode)
                                                                 .withVelocityY(0)));
 
-        // left/right reef align
-        launchpad.getButton(2, 0).whileTrue(new DriveToPose(drivetrain, nearestLeftCoral()));
-        launchpad.getButton(3, 0).whileTrue(new DriveToPose(drivetrain, nearestRightCoral()));
+                // left/right reef align
+                launchpad.getButton(2, 0).whileTrue(new DriveToPose(drivetrain, nearestLeftCoral()));
+                launchpad.getButton(3, 0).whileTrue(new DriveToPose(drivetrain, nearestRightCoral()));
 
                 // Elevator/coral arm controls
                 launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
@@ -259,9 +268,9 @@ public class RobotContainer {
         }
 
         // public Command getDriveToPose(Supplier<Pose2d> supplySide) {
-        //         DriveToPose leftSide = new DriveToPose(drivetrain, supplySide.get());
+        // DriveToPose leftSide = new DriveToPose(drivetrain, supplySide.get());
 
-        //         return leftSide;
+        // return leftSide;
         // }
 
         public Command getAutonomousCommand() {
