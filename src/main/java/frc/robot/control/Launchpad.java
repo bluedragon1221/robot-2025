@@ -48,7 +48,7 @@ public class Launchpad {
             int col = i%9;
             int button_num = getButtonNum(col,row);
             // if(row == 3)
-            //     System.out.println("("+row+","+col+","+vjoy_num+") "+button_num);
+                // System.out.println("("+row+","+col+","+vjoy_num+") "+button_num);
 
             // Change me!
             changeLED(col, row, rgbTable[row][col]);

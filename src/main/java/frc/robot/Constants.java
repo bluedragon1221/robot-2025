@@ -7,7 +7,7 @@ public class Constants {
         Initial         (0,      0.25),
         Storage         (0,   0.15),
         ScoreL1         (0.1524, 0),
-        ScoreL2         (0.1524, 0.09),
+        ScoreL2         (0.15, 0.099),
         ScoreL3         (0.3556, 0.09),
         ScoreL4         (0.6604, 0.14),
         ExtractAlgaeLow (0.3400, 0),
@@ -15,7 +15,8 @@ public class Constants {
         IntakeCatch     (0.5148, -0.255),
         PostIntakeCatch (0.517, -0.255),
         IntakeGrip      (0.4387, -0.255),
-        ScoreProcessor  (0.1224,0);
+        ScoreProcessor  (0.1224,0),
+        ScoreBarge(0.6850, 0.21);
 
         private double height_meters;
         private double angle;
@@ -62,7 +63,7 @@ public class Constants {
 
     public static final class CoralArmGripperConstants {
         public static final int gripperMotorID = 32;
-        public static final double gripperMotorCurrentLimit = 40;
+        public static final double gripperMotorCurrentLimit = 60;
     }
 
     public static final class AlgaeArmPivotConstants {
@@ -92,5 +93,10 @@ public class Constants {
     public static final class ElevatorSupersystemConstants {
         public static final int beamBreakSensorDIO = 6;
         public static final double algaeHoldVoltage = 1;
+    }
+
+    public static final class StatusLEDConstants {
+        public static final int statusLEDPort = 9;
+        public static final int statusLEDCount = 23;
     }
 }

@@ -29,6 +29,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.StatusLED;
 import frc.robot.supersystems.ElevatorSupersystem;
 import frc.robot.util.AllianceFlipUtil;
 
@@ -38,6 +39,7 @@ public class RobotContainer {
         ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
         CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
         CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
+        StatusLED status_led = StatusLED.getInstance();
         // Climber climber = Climber.getInstance();
 
         Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
@@ -50,7 +52,7 @@ public class RobotContainer {
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
                         .withDeadband(max_speed * 0.1)
                         .withRotationalDeadband(max_angular_rate * 0.1) // Add a 10% deadband
-                        .withDriveRequestType(DriveRequestType.Velocity); // Use closed-loop control for drive motors
+                        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use closed-loop control for drive motors
 
         private final SwerveRequest.RobotCentric robot_centric = new SwerveRequest.RobotCentric()
                         .withDriveRequestType(DriveRequestType.Velocity);
@@ -85,19 +87,8 @@ public class RobotContainer {
                 }
                 // Add Autos
                 auto_factory = drivetrain.createAutoFactory();
-                // .bind("storage_position", supersystem.storagePosition().withTimeout(0.3))
-                // auto_factory
-                // .bind("storage_position", Commands.print("sotrage_position"))
-                // .bind("intake_prepare", supersystem.intakePrepare())
-                // .bind("intake_load", supersystem.intakeLoad())
-                // .bind("intake_post", supersystem.intakePost())
-                // .bind("coral_prepare_l4", supersystem.coralPrepareL4())
-                // .bind("coral_score_l4", supersystem.coralScoreL4());
 
                 auto_routines = new AutoRoutines(auto_factory);
-                // auto_chooser.addRoutine("Center Cage 3L4", auto_routines::CenterCage3l4);
-                // auto_chooser.addRoutine("Bottom Center Cage 3L4",
-                // auto_routines::BottomCenterCage3l4);
                 auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
                 auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
 
@@ -161,25 +152,27 @@ public class RobotContainer {
                                 ));
 
                 // TODO: turtle trigger was a problem in auto so we commented it out, will fix it later
-                // turtle_trigger.whileTrue(drivetrain.applyRequest(
-                //                 () -> drive.withVelocityX(getControlY() * max_speed * turtle_mode) // Drive
-                //                                                                                             // forward
-                //                                                                                             // with
-                //                                                                                             // negative
-                //                                                                                             // Y
-                //                                                                                             // (forward)
-                //                                 .withVelocityY(getControlY() * max_speed * turtle_mode) // Drive
-                //                                                                                                  // left
-                //                                                                                                  // with
-                //                                                                                                  // negative
-                //                                                                                                  // X
-                //                                                                                                  // (left)
-                //                                 .withRotationalRate(-controller.getRightX() * max_angular_rate
-                //                                                 * turtle_mode) // Drive
-                //                                                                // counterclockwise
-                //                                                                // with negative X
-                //                                                                // (left)
-                // ));
+                turtle_trigger
+                        .and(DriverStation::isTeleopEnabled)
+                        .whileTrue(drivetrain.applyRequest(
+                                () -> drive.withVelocityX(getControlY() * max_speed * turtle_mode) // Drive
+                                                                                                            // forward
+                                                                                                            // with
+                                                                                                            // negative
+                                                                                                            // Y
+                                                                                                            // (forward)
+                                                .withVelocityY(getControlY() * max_speed * turtle_mode) // Drive
+                                                                                                                 // left
+                                                                                                                 // with
+                                                                                                                 // negative
+                                                                                                                 // X
+                                                                                                                 // (left)
+                                                .withRotationalRate(-controller.getRightX() * max_angular_rate
+                                                                * turtle_mode) // Drive
+                                                                               // counterclockwise
+                                                                               // with negative X
+                                                                               // (left)
+                ));
 
                 controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
                 controller.b().whileTrue(drivetrain.applyRequest(
@@ -248,6 +241,11 @@ public class RobotContainer {
                 // processor scoring
                 launchpad.getButton(6, 7).onTrue(supersystem.algaePrepareProcessor());
                 launchpad.getButton(5, 7).onTrue(supersystem.algaeScoreProcessor());
+
+                // barge scoring
+
+                launchpad.getButton(6, 6).onTrue(supersystem.algaePrepareBarge());
+                launchpad.getButton(5, 6).onTrue(supersystem.algaeScoreBarge());
 
                 // storage positions
 

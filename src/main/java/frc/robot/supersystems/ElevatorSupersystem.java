@@ -247,4 +247,18 @@ public class ElevatorSupersystem {
         return setStateGripper(-6)
             .withTimeout(1.5);
     }
+
+    public Command algaePrepareBarge() {
+        return setStatePivotGrip(Preset.ScoreL4.getAngle(), algaeHoldVoltage)
+            .until(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
+            .andThen(setState(Preset.ScoreBarge.getHeight(), Preset.ScoreL4.getAngle()))
+            .until(elevator.isAtHeight(Preset.ScoreBarge.getHeight()))
+            .andThen(setState(Preset.ScoreBarge.getHeight(), Preset.ScoreBarge.getAngle(), algaeHoldVoltage));
+    }
+
+    public Command algaeScoreBarge() {
+        return setStateGripper(-12)
+            .withTimeout(1)
+            .andThen(setStateGripper(0));
+    }
 }
