@@ -4,8 +4,6 @@ import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.Constants.Preset;
-import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.supersystems.ElevatorSupersystem;
 
 public class AutoRoutines {
@@ -30,10 +28,33 @@ public class AutoRoutines {
         path.atTime("Storage Position").onTrue(supersystem.storagePosition());
         path.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
 
-        path.atTime("Score L4").and(supersystem.canScoreL4).onTrue(supersystem.coralScoreL4());
+        path.atTime("Score L4").onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
 
         path.recentlyDone().and(supersystem.hasScoredL4).onTrue(driveback.cmd());
         driveback.recentlyDone().onTrue(supersystem.storagePosition());
+
+        return routine;
+    }
+
+    public AutoRoutine BlueCenterCage2l4() {
+        final AutoRoutine routine = factory.newRoutine("Blue Center Cage 2L4");
+        final AutoTrajectory drive_to_1l4 = routine.trajectory("blue_centercage_2l4", 0);
+        final AutoTrajectory drive_to_1hps = routine.trajectory("blue_centercage_2l4", 1);
+        
+        
+        routine.active().onTrue(Commands.sequence(
+            drive_to_1l4.resetOdometry(),
+            drive_to_1l4.cmd()
+        ));
+
+        drive_to_1l4.atTime("Storage Position").onTrue(supersystem.storagePosition());
+        drive_to_1l4.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
+        drive_to_1l4.atTime("Score L4").onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
+
+        drive_to_1l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(drive_to_1hps.cmd());
+
+        drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
+        drive_to_1hps.recentlyDone().onTrue(Commands.waitSeconds(1).andThen(supersystem.intakeLoad()));
 
         return routine;
     }
