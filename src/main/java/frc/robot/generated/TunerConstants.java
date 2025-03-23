@@ -24,35 +24,35 @@ public class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerFLGains = new Slot0Configs()
-        .withKP(100).withKI(0).withKD(0.5)
-        .withKS(0.1).withKV(1.59).withKA(0)
+        .withKP(0.27709).withKI(0).withKD(0)
+        .withKS(0.37136).withKV(1.5536).withKA(0.031841)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     private static final Slot0Configs steerFRGains = new Slot0Configs()
-        .withKP(100).withKI(0).withKD(0.5)
-        .withKS(0.1).withKV(1.59).withKA(0)
+        .withKP(0.19891).withKI(0).withKD(0)
+        .withKS(0.28955).withKV(1.534).withKA(0.027024)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     private static final Slot0Configs steerBLGains = new Slot0Configs()
-        .withKP(100).withKI(0).withKD(0.5)
-        .withKS(0.1).withKV(1.59).withKA(0)
+        .withKP(0.31788).withKI(0).withKD(0)
+        .withKS(0.28955).withKV(1.5611).withKA(0.03013)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     private static final Slot0Configs steerBRGains = new Slot0Configs()
-        .withKP(100).withKI(0).withKD(0.5)
-        .withKS(0.1).withKV(1.59).withKA(0)
+        .withKP(0.31275).withKI(0).withKD(0)
+        .withKS(0.39276).withKV(1.5881).withKA(0.034434)
         .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
     private static final Slot0Configs driveFLGains = new Slot0Configs()
-        .withKP(0.1).withKI(0).withKD(0)
-        .withKS(0).withKV(0.124);
+        .withKP(0.12022).withKI(0).withKD(0)
+        .withKS(0.20711).withKV(0.12069).withKA(0.0097521);
     private static final Slot0Configs driveFRGains = new Slot0Configs()
-        .withKP(0.1).withKI(0).withKD(0)
-        .withKS(0).withKV(0.124);
+        .withKP(0.116).withKI(0).withKD(0)
+        .withKS(0.22118).withKV(0.12139).withKA(0.0096046);
     private static final Slot0Configs driveBLGains = new Slot0Configs()
-        .withKP(0.1).withKI(0).withKD(0)
-        .withKS(0).withKV(0.124);
+        .withKP(0.11783).withKI(0).withKD(0)
+        .withKS(0.21884).withKV(0.12148).withKA(0.0078177);
     private static final Slot0Configs driveBRGains = new Slot0Configs()
-        .withKP(0.1).withKI(0).withKD(0)
-        .withKS(0).withKV(0.124);
+        .withKP(0.1222).withKI(0).withKD(0)
+        .withKS(0.23234).withKV(0.1224).withKA(0.0087941);
 
 
     // The closed-loop output type to use for the steer motors;
@@ -168,7 +168,7 @@ public class TunerConstants {
     private static final Distance kFrontRightYPos = Inches.of(-10.75);
 
     // Back Left
-    private static final int kBackLeftDriveMotorId = 41;
+    private static final int kBackLeftDriveMotorId = 11;
     private static final int kBackLeftSteerMotorId = 13;
     private static final int kBackLeftEncoderId = 12;
     private static final Angle kBackLeftEncoderOffset = Rotations.of(-0.492431640625);
