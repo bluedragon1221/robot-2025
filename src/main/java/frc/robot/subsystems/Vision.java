@@ -39,7 +39,7 @@ public class Vision {
                 POSE_STRATEGY,
                 new PhotonCamera("front_cam"),
                 new Transform3d(
-                    new Translation3d(0.15, 0.30, 0.285),
+                    new Translation3d(0.116, 0.200025, 0.352425),
                     new Rotation3d(0.0, 0.0, -0.17453292)),
                 "front_cam"
             );
@@ -50,7 +50,7 @@ public class Vision {
                     POSE_STRATEGY,
                     new PhotonCamera("back_cam"),
                     new Transform3d(
-                        new Translation3d(0.145, 0.59, 0.28),
+                        new Translation3d(-0.0762, 0.19685, 0.55245),
                         new Rotation3d(0.0, 0.0, Math.PI)),
                     "back_cam"
                 );

@@ -48,7 +48,7 @@ public class FieldConstants {
             for (int face = 0; face < 6; face++) {
                 Pose2d centerWithAngle = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
                 double adjustX = Units.inchesToMeters(30.738+19); // set 19in back for aligning
-                double adjustY = Units.inchesToMeters(6.469);
+                double adjustY = Units.inchesToMeters(6.469 * 1.2);
 
                 Pose2d left = new Pose2d(
                     new Translation2d(

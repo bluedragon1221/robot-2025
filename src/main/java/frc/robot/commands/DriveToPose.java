@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import java.lang.annotation.Target;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -14,32 +15,33 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.util.GeomUtil;
 
 public class DriveToPose extends Command {
-    private static final double drivekP = 0.8;
-    private static final double drivekD = 0.0;
+    private static final double drivekP = 6;
+    private static final double drivekD = 0.32;
     private static final double thetakP = 4.0;
-    private static final double thetakD = 0.0;
+    private static final double thetakD = 0.3;
     private static final double driveMaxVelocity = 0.55;
     private static final double driveMaxAcceleration = 1;
     private static final double thetaMaxVelocity = Units.degreesToRadians(360.0);
     private static final double thetaMaxAcceleration = 8.0;
-    public static final double driveTolerance = 0.01;
+    public static final double driveTolerance = 0.0005;
     public static final double thetaTolerance = Units.degreesToRadians(1.0);
-    private static final double ffMinRadius = 0.01;
-    private static final double ffMaxRadius = 0.05;
+    private static final double ffMinRadius = 0.005;
+    private static final double ffMaxRadius = 0.07;
 
     private CommandSwerveDrivetrain chassis;
     private Supplier<Pose2d> target;
     private final SwerveRequest.ApplyRobotSpeeds drive = new SwerveRequest.ApplyRobotSpeeds().withDriveRequestType(DriveRequestType.Velocity);
 
-    private static final ProfiledPIDController driveController = new ProfiledPIDController(drivekP, 0, drivekD,
+    private static final ProfiledPIDController driveController = new ProfiledPIDController(drivekP, 0.1, drivekD,
         new TrapezoidProfile.Constraints(driveMaxVelocity, driveMaxAcceleration));
-    private static final ProfiledPIDController thetaController = new ProfiledPIDController(thetakP, 0, thetakD,
+    private static final ProfiledPIDController thetaController = new ProfiledPIDController(thetakP, 0.1, thetakD,
         new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration));
     private Translation2d lastSetpointTranslation = Translation2d.kZero;
     private double driveErrorAbs = 0.0;
@@ -50,11 +52,12 @@ public class DriveToPose extends Command {
     private Supplier<Translation2d> linearFF = () -> Translation2d.kZero;
     private DoubleSupplier omegaFF = () -> 0.0;
 
+    private Field2d targetField2d = new Field2d();
+
     public DriveToPose(CommandSwerveDrivetrain chassis, Supplier<Pose2d> target) {
         this.chassis = chassis;
         this.target = target;
 
-        // SmartDashboard.putString("cons", target.get().toString()); // Diagnostic
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         addRequirements(chassis);
@@ -63,6 +66,8 @@ public class DriveToPose extends Command {
     @Override
     public void initialize() {
         // SmartDashboard.putString("init", target.get().toString()); // Diagnostic
+        SmartDashboard.putData("targetPose", targetField2d); // Diagnostic
+        targetField2d.setRobotPose(target.get());
         Pose2d currentPose = robot.get();
         ChassisSpeeds fieldVelocity = chassis.getState().Speeds;
         Translation2d linearFieldVelocity =

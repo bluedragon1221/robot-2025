@@ -1,16 +1,21 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.StatusLEDConstants.statusLEDCount;
+
+import java.time.Instant;
+
+import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.StatusLEDConstants.*;
 
 public class StatusLED extends SubsystemBase {
     private static StatusLED instance;
 
     private final AddressableLED status_strip = new AddressableLED(9);
     AddressableLEDBuffer buf = new AddressableLEDBuffer(statusLEDCount);
-    double tick = 0;
 
     private StatusLED() {
         status_strip.setLength(statusLEDCount);
@@ -18,16 +23,40 @@ public class StatusLED extends SubsystemBase {
         status_strip.setData(buf);
 
         status_strip.start();
+
+        setDefaultCommand(rgbStream());
     }
 
-    @Override
-    public void periodic() {
-        for (int i=0;i<statusLEDCount;i++)
-            buf.setHSV(i, (i * 2 + (int) tick) % 180, 255, 255);
+    public Command rgbStream() {
+        return run(() -> {
+            long time = System.currentTimeMillis() / 100;
+            for (int i = 0; i < statusLEDCount; i++)
+                buf.setHSV(i, (int) ((i * 2 + time) % 180), 255, 255);
 
-        tick += 1;
-        
-        status_strip.setData(buf);
+            status_strip.setData(buf);
+        }).ignoringDisable(true);
+    }
+
+    public Command flashColor(Color color, double rate) {
+        return run(() -> {
+            double time = ((double) System.currentTimeMillis()) / 1000;
+            for (int i = 0; i < statusLEDCount; i++) {
+                if ((time / rate) % 2 < 1)
+                    // odds
+                    if ((i & 1) == 1)
+                        buf.setLED(i, color);
+                    else
+                        buf.setLED(i, Color.kWhite);
+                else
+                    // evens
+                    if ((i & 1) == 1)
+                        buf.setLED(i, Color.kWhite);
+                    else
+                        buf.setLED(i, color);
+            }
+
+            status_strip.setData(buf);
+        }).ignoringDisable(true);
     }
 
     public static StatusLED getInstance() {

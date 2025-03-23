@@ -215,7 +215,7 @@ public class ElevatorSupersystem {
     }
 
     public Command extractionExtractLow() {
-        return setStateGripper(10)
+        return setStateGripper(11)
                 .until(hasCoral) // TODO: does the coral trigger the beam break?
                 .withTimeout(3)
                 .andThen(setStateGripper(algaeHoldVoltage))

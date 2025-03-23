@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -208,9 +209,14 @@ public class RobotContainer {
                                                 () -> robot_centric.withVelocityX(-max_speed * slower_turtle_mode)
                                                                 .withVelocityY(0)));
 
+                DriveToPose left_go_to_pose = new DriveToPose(drivetrain, nearestLeftCoral());
+                DriveToPose right_go_to_pose = new DriveToPose(drivetrain, nearestRightCoral());
+
+                (new Trigger(left_go_to_pose::atGoal)).or(right_go_to_pose::atGoal).whileTrue(status_led.flashColor(Color.kGreen, 1));
+
                 // left/right reef align
-                launchpad.getButton(2, 0).whileTrue(new DriveToPose(drivetrain, nearestLeftCoral()));
-                launchpad.getButton(3, 0).whileTrue(new DriveToPose(drivetrain, nearestRightCoral()));
+                launchpad.getButton(2, 0).whileTrue(left_go_to_pose);
+                launchpad.getButton(3, 0).whileTrue(right_go_to_pose);
 
                 // Elevator/coral arm controls
                 launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
