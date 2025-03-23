@@ -207,5 +207,6 @@
    {"name":"Prepare Intake", "from":{"target":3, "targetTimestamp":1.50713, "offset":{"exp":"0.7 s", "val":0.7}}, "event":null},
    {"name":"Prepare L4", "from":{"target":5, "targetTimestamp":3.59078, "offset":{"exp":"0.3 s", "val":0.3}}, "event":null},
    {"name":"Score L4", "from":{"target":2, "targetTimestamp":1.21256, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
-   {"name":"Score L4", "from":{"target":2, "targetTimestamp":1.21256, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
+   {"name":"Score L4", "from":{"target":2, "targetTimestamp":1.21256, "offset":{"exp":"0 s", "val":0.0}}, "event":null},
+   {"name":"Score L4", "from":{"target":6, "targetTimestamp":4.76387, "offset":{"exp":"0 s", "val":0.0}}, "event":null}]
 }
