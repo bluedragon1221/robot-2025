@@ -22,18 +22,18 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.util.GeomUtil;
 
 public class DriveToPose extends Command {
-    private static final double drivekP = 6;
-    private static final double drivekD = 0.32;
+    private static final double drivekP = 0.8; // in m/s, so 6 is unreasonable
+    private static final double drivekD = 0.0;
     private static final double thetakP = 4.0;
-    private static final double thetakD = 0.3;
+    private static final double thetakD = 0.0;
     private static final double driveMaxVelocity = 0.55;
     private static final double driveMaxAcceleration = 1;
     private static final double thetaMaxVelocity = Units.degreesToRadians(360.0);
     private static final double thetaMaxAcceleration = 8.0;
-    public static final double driveTolerance = 0.0005;
+    public static final double driveTolerance = 0.01;
     public static final double thetaTolerance = Units.degreesToRadians(1.0);
-    private static final double ffMinRadius = 0.005;
-    private static final double ffMaxRadius = 0.07;
+    private static final double ffMinRadius = 0.01;
+    private static final double ffMaxRadius = 0.05;
 
     private CommandSwerveDrivetrain chassis;
     private Supplier<Pose2d> target;
