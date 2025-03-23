@@ -40,7 +40,7 @@ public class Constants {
         public static final double gripperMotorCurrentLimit = 60;
     }
 
-    public static final class AlgaeArmPivotConstants {
+    public static final class L1PivotConstants {
         public static final int pivotMotorID = 35;
         
         public static final int pivotMotorAcceleration = 0;
@@ -49,7 +49,7 @@ public class Constants {
         public static final double pivotMotorGearRatio = 10.0;
     }
     
-    public static final class AlgaeArmGripperConstants {
+    public static final class L1GripperConstants {
         public static final int gripperMotorID = 36;
         
         public static final int gripperMotorCurrentLimit = 15;

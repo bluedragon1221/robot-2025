@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.AlgaeArmPivotConstants.*;
+import static frc.robot.Constants.L1PivotConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -11,19 +11,19 @@ import com.ctre.phoenix6.signals.GravityTypeValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class AlgaeArmPivot extends SubsystemBase {
-    private static AlgaeArmPivot instance;
+public class L1Pivot extends SubsystemBase {
+    private static L1Pivot instance;
 
     private static final TalonFX pivotMotor = new TalonFX(pivotMotorID, "canivore");
     private static final MotionMagicVoltage pivot_position_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
 
-    AlgaeArmPivot() {
+    L1Pivot() {
         configureMotors();
     }
 
-    public static synchronized AlgaeArmPivot getInstance() {
+    public static synchronized L1Pivot getInstance() {
         if (instance == null) {
-            instance = new AlgaeArmPivot();
+            instance = new L1Pivot();
         }
 
         return instance;
