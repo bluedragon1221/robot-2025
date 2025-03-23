@@ -51,12 +51,8 @@ public class Elevator extends SubsystemBase {
     //     )
     // );
 
-    // private static CANrange canrange = new CANrange(heightSensorID, "canivore");
-
     private Elevator() {
         configureMotors();
-
-        // this.setDefaultCommand(run(() -> leader_motor.setControl(new VoltageOut(0))));
     }
 
     public static synchronized Elevator getInstance() {
@@ -67,6 +63,22 @@ public class Elevator extends SubsystemBase {
         return instance;
     }
     
+    public static class ElevatorHeight {
+        public static final double initial = 0;
+        public static final double storage = 0;
+        public static final double scoreL1 = 0.1524;
+        public static final double scoreL2 = 0.15;
+        public static final double scoreL3 = 0.3556;
+        public static final double scoreL4 = 0.6604;
+        public static final double extractAlgaeLow = 0.34;
+        public static final double extractAlgaeHigh = 0.5;
+        public static final double intakeCatch = 0.5148;
+        public static final double postIntakeCatch = 0.517;
+        public static final double intakeGrip = 0.4387;
+        public static final double scoreProcessor = 0.1224;
+        public static final double scoreBarge = 0.6850;
+    }
+
     private void configureMotors() {
         BaseStatusSignal.setUpdateFrequencyForAll(250, leader_motor.getPosition(), leader_motor.getVelocity(), leader_motor.getMotorVoltage());
 
@@ -125,21 +137,10 @@ public class Elevator extends SubsystemBase {
 
     public Command setHeight(double goalHeight) {
         return run(() -> {
-            // leader_motor.setPosition(translateHeightToRotations(getHeight()));
-
             leader_motor.setControl(mm_voltage.withPosition(translateHeightToRotations(goalHeight)));
             follower_motor.setControl(follow);
         });
     }
-
-    // public Command setHeightFromDashboard() {
-    //     return run(() -> {
-    //         leader_motor.setControl(
-    //             mm_voltage.withPosition(translateHeightToRotations(SmartDashboard.getNumber("Set Elevator Height", 0)))
-    //         );
-    //         follower_motor.setControl(follow);
-    //     });
-    // }
 
     public Command stopElevator() {
         return runOnce(() -> {
