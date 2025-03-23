@@ -1,22 +1,18 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.Constants.L1GripperConstants.*;
 
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
 
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class L1Gripper extends SubsystemBase {
     private static L1Gripper instance;
 
-    private static final SparkMax gripperMotor = new SparkMax(gripperMotorID, MotorType.kBrushless);
+    private static final TalonFX gripperMotor = new TalonFX(gripperMotorID, "canivore");
 
     private L1Gripper() {
         configureMotors();
@@ -31,13 +27,12 @@ public class L1Gripper extends SubsystemBase {
     }
 
     private void configureMotors() {
-        var gripper_cfg = new SparkMaxConfig();
-        gripper_cfg.smartCurrentLimit(gripperMotorCurrentLimit);
-        gripper_cfg.openLoopRampRate(gripperMotorRampRate);
-        gripperMotor.configure(gripper_cfg, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        var gripper_cfg = new TalonFXConfiguration();
+        gripper_cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
+        gripper_cfg.CurrentLimits.SupplyCurrentLimit = gripperMotorCurrentLimit;
     }
 
-    public Command setGripperVoltage(Voltage voltage) {
-        return run(() -> gripperMotor.setVoltage(voltage.in(Volts)));
+    public Command setGripperVoltage(double voltage) {
+        return run(() -> gripperMotor.setControl(new VoltageOut(voltage)));
     }
 }
