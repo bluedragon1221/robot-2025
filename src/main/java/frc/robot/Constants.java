@@ -1,32 +1,6 @@
 package frc.robot;
 
 public class Constants {
-    public static enum Preset {
-        // Height: Don't worry about canrangeOffset in these heights; the subsystem takes care of it
-        // Angle: 0rot is horizontal, 0.25rot up, and -0.25rot down because cosine arm mechanics
-        Initial         (0,      0.25),
-        Storage         (0,   0.15),
-        ScoreL1         (0.1524, 0),
-        ScoreL2         (0.15, 0.099),
-        ScoreL3         (0.3556, 0.09),
-        ScoreL4         (0.6604, 0.14),
-        ExtractAlgaeLow (0.3400, 0),
-        ExtractAlgaeHigh(0.5, 0),
-        IntakeCatch     (0.5148, -0.255),
-        PostIntakeCatch (0.517, -0.255),
-        IntakeGrip      (0.4387, -0.255),
-        ScoreProcessor  (0.1224,0),
-        ScoreBarge(0.6850, 0.21);
-
-        private double height_meters;
-        private double angle;
-
-        private Preset(double h, double a) { height_meters = h; angle = a; }
-
-        public double getHeight() { return height_meters; }
-        public double getAngle() { return angle; }
-    }
-
     public static final class ElevatorConstants {
         public static final int leftMotorID = 20;
         public static final int rightMotorID = 21;
@@ -92,7 +66,6 @@ public class Constants {
 
     public static final class ElevatorSupersystemConstants {
         public static final int beamBreakSensorDIO = 6;
-        public static final double algaeHoldVoltage = 1;
     }
 
     public static final class StatusLEDConstants {

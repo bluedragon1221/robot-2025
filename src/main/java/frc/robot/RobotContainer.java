@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants.Preset;
 import frc.robot.commands.DriveToPose;
 import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
@@ -99,7 +98,7 @@ public class RobotContainer {
         }
 
         private final double turtle_mode = 0.15;
-        private Trigger turtle_trigger = new Trigger(() -> ((elevator.getHeight() >= Preset.ScoreL2.getHeight())));
+        private Trigger turtle_trigger = new Trigger(() -> (elevator.getHeight() >= Elevator.ElevatorHeight.scoreL2));
 
         private final double slower_turtle_mode = 0.035;
 

@@ -15,7 +15,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -32,8 +31,22 @@ public class CoralArmPivot extends SubsystemBase {
 
     private CoralArmPivot() {
         configureMotors();
-    
-        // SmartDashboard.putNumber("Set Coral Arm Pivot", 0);
+    }
+
+    public static class PivotAngle {
+        public static final double initial = 0.25;
+        public static final double storage = 0.15;
+        public static final double scoreL1 = 0;
+        public static final double scoreL2 = 0.099;
+        public static final double scoreL3 = 0.09;
+        public static final double scoreL4 = 0.14;
+        public static final double extractAlgaeLow = 0;
+        public static final double extractAlgaeHigh = 0;
+        public static final double intakeCatch = -0.255;
+        public static final double postIntakeCatch = -0.255;
+        public static final double intakeGrip = -0.255;
+        public static final double scoreProcessor = 0;
+        public static final double scoreBarge = 0.21;
     }
 
     // private final SysIdRoutine sysIdRoutine = new SysIdRoutine(
@@ -123,14 +136,6 @@ public class CoralArmPivot extends SubsystemBase {
             );
         });
     }
-
-    // public Command setAngleFromDashboard() {
-    //     return run(() -> {
-    //         pivot_motor.setControl(
-    //             pivot_mm_voltage.withPosition(SmartDashboard.getNumber("Set Coral Arm Pivot", 0))
-    //         );
-    //     });
-    // }
 
     // public Command runSysICommand() {
     //     return (sysIdRoutine.dynamic(SysIdRoutine.Direction.kForward).until(atMax))

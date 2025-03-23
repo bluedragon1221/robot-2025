@@ -6,10 +6,12 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.Preset;
+import frc.robot.subsystems.CoralArmGripper.GripperVoltage;
 import frc.robot.subsystems.CoralArmGripper;
 import frc.robot.subsystems.CoralArmPivot;
+import frc.robot.subsystems.CoralArmPivot.PivotAngle;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.ElevatorHeight;
 
 public class ElevatorSupersystem {
     private static ElevatorSupersystem instance;
@@ -51,19 +53,6 @@ public class ElevatorSupersystem {
                 coral_arm_pivot.setAngle(arm_angle));
     }
 
-    public Command setStatePreset(Preset preset) {
-        return Commands.parallel(
-                elevator.setHeight(preset.getHeight()),
-                coral_arm_pivot.setAngle(preset.getAngle()));
-    }
-
-    public Command setStatePreset(Preset preset, double gripper_voltage) {
-        return Commands.parallel(
-                elevator.setHeight(preset.getHeight()),
-                coral_arm_pivot.setAngle(preset.getAngle()),
-                coral_arm_gripper.setGripperVoltage(gripper_voltage));
-    }
-
     public Command setStatePivotGrip(double arm_angle, double gripper_voltage) {
         return Commands.parallel(
                 coral_arm_pivot.setAngle(arm_angle),
@@ -76,13 +65,6 @@ public class ElevatorSupersystem {
                 coral_arm_gripper.setGripperVoltage(gripper_voltage));
     }
 
-    // public Command setStateFromDashboard() {
-    //     return Commands.parallel(
-    //             elevator.setHeightFromDashboard(),
-    //             coral_arm_pivot.setAngleFromDashboard(),
-    //             coral_arm_gripper.setVoltageFromDashboard());
-    // }
-
     public static synchronized ElevatorSupersystem getInstance() {
         if (instance == null) {
             instance = new ElevatorSupersystem();
@@ -92,125 +74,125 @@ public class ElevatorSupersystem {
     }
 
     public Command storagePosition() {
-        return setStatePivotGrip(Preset.Storage.getAngle(), 0)
+        return setStatePivotGrip(PivotAngle.storage, GripperVoltage.zero)
                 .until(coral_arm_pivot.isGreaterThanAngle(0.01))
-                .andThen(setStatePreset(Preset.Storage));
+                .andThen(setState(ElevatorHeight.storage, PivotAngle.storage));
     }
 
     public Command storagePositionAlgae() {
-        return setStatePivotGrip(Preset.Storage.getAngle(), 1)
+        return setStatePivotGrip(PivotAngle.storage, GripperVoltage.holdAlgae)
                 .until(coral_arm_pivot.isGreaterThanAngle(0.01))
-                .andThen(setStatePreset(Preset.Storage));
+                .andThen(setState(ElevatorHeight.storage, PivotAngle.storage));
     }
 
     // INTAKE
     public Command intakePrepare() {
         return setStatePivot(0)
                 .until(coral_arm_pivot.isAtAngle(0))
-                .andThen(setStateElevator(Preset.IntakeCatch.getHeight()))
-                .until(elevator.isAtHeight(Preset.IntakeCatch.getHeight()))
-                .andThen(setStatePreset(Preset.IntakeCatch, 0))
+                .andThen(setStateElevator(ElevatorHeight.intakeCatch))
+                .until(elevator.isAtHeight(ElevatorHeight.intakeCatch))
+                .andThen(setState(ElevatorHeight.intakeCatch, PivotAngle.intakeCatch, GripperVoltage.zero))
                 .onlyIf(hasCoral.negate()); // only run of we don't already have a coral
     }
 
     public Command intakeLoad() {
-        return setStatePreset(Preset.IntakeGrip, 2)
+        return setState(ElevatorHeight.intakeGrip, PivotAngle.intakeGrip, GripperVoltage.intakeCoral)
                 .until(hasCoral)
                 .withTimeout(3)
-                .andThen(setStatePreset(Preset.PostIntakeCatch, 0))
-                .onlyIf(elevator.isAtHeight(Preset.IntakeCatch.getHeight())
-                        .and(coral_arm_pivot.isAtAngle(Preset.IntakeCatch.getAngle()))
+                .andThen(setState(ElevatorHeight.postIntakeCatch, PivotAngle.postIntakeCatch, GripperVoltage.zero))
+                .onlyIf(elevator.isAtHeight(ElevatorHeight.intakeCatch)
+                        .and(coral_arm_pivot.isAtAngle(PivotAngle.intakeCatch))
                         .and(hasCoral.negate())); // don't try to intake with a low elevator
     }
 
     public Command intakePost() {
-        return setStateElevator(Preset.PostIntakeCatch.getHeight())
-                .until(elevator.isAtHeight(Preset.PostIntakeCatch.getHeight()))
-                .andThen(setStatePivot(Preset.Storage.getAngle()))
-                .until(coral_arm_pivot.isAtAngle(Preset.Storage.getAngle()))
-                .andThen(setStatePreset(Preset.Storage));
+        return setStateElevator(ElevatorHeight.postIntakeCatch)
+                .until(elevator.isAtHeight(ElevatorHeight.postIntakeCatch))
+                .andThen(setStatePivot(PivotAngle.storage))
+                .until(coral_arm_pivot.isAtAngle(PivotAngle.storage))
+                .andThen(setState(ElevatorHeight.storage, PivotAngle.storage));
     }
 
     // SCORE CORAL
     public Command coralPrepareL4() {
-        return setStatePivot(Preset.ScoreL4.getAngle())
+        return setStatePivot(PivotAngle.scoreL4)
                 .until(coral_arm_pivot.isGreaterThanAngle(0.01))
-                .andThen(setStatePreset(Preset.ScoreL4))
+                .andThen(setState(ElevatorHeight.scoreL4, PivotAngle.scoreL4))
                 .onlyIf(hasCoral);
     }
 
     public Command coralPrepareL3() {
-        return setStatePivot(Preset.ScoreL3.getAngle())
+        return setStatePivot(PivotAngle.scoreL3)
                 .until(coral_arm_pivot.isGreaterThanAngle(0.01))
-                .andThen(setStatePreset(Preset.ScoreL3))
+                .andThen(setState(ElevatorHeight.scoreL3, PivotAngle.scoreL3))
                 .onlyIf(hasCoral);
     }
 
     public Command coralPrepareL2() {
-        return setStatePivot(Preset.ScoreL2.getAngle())
+        return setStatePivot(PivotAngle.scoreL2)
                 .until(coral_arm_pivot.isGreaterThanAngle(0.01))
-                .andThen(setStatePreset(Preset.ScoreL2))
+                .andThen(setState(ElevatorHeight.scoreL2, PivotAngle.scoreL2))
                 .onlyIf(hasCoral);
     }
 
     public Command coralPrepareL1() {
         return setStatePivot(0)
                 .until(coral_arm_pivot.isAtAngle(0))
-                .andThen(setStateElevator(Preset.ScoreL1.getHeight()))
+                .andThen(setStateElevator(PivotAngle.scoreL1))
                 .onlyIf(hasCoral);
     }
 
-    public Trigger canScoreL4 = elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
-        .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
+    public Trigger canScoreL4 = elevator.isAtHeight(ElevatorHeight.scoreL4, 0.02)
+        .and(coral_arm_pivot.isAtAngle(PivotAngle.scoreL4))
         .and(hasCoral);
 
-    public Trigger hasScoredL4 = elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
-    .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()));
+    public Trigger hasScoredL4 = elevator.isAtHeight(ElevatorHeight.scoreL4, 0.02)
+        .and(coral_arm_pivot.isAtAngle(PivotAngle.scoreL4));
 
     public Command coralScoreL4() {
         return setStatePivot(0)
                 .until(coral_arm_pivot.isAtAngle(0))
                 .andThen(setStateGripper(-0.5))
                 .withTimeout(1)
-                .andThen(setStateGripper(0));
+                .andThen(setStateGripper(GripperVoltage.zero));
                 // .onlyIf(elevator.isAtHeight(Preset.ScoreL4.getHeight(), 0.02)
                 //         .and(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
                 //         .and(hasCoral));
     }
 
     public Command coralScoreL3() {
-        return setStatePivotGrip(0, -1.5)
-                .onlyIf(elevator.isAtHeight(Preset.ScoreL3.getHeight(), 0.02)
-                        .and(coral_arm_pivot.isAtAngle(Preset.ScoreL3.getAngle()))
+        return setStatePivotGrip(0, GripperVoltage.releaseCoralL3)
+                .onlyIf(elevator.isAtHeight(ElevatorHeight.scoreL3, 0.02)
+                        .and(coral_arm_pivot.isAtAngle(PivotAngle.scoreL3))
                         .and(hasCoral));
     }
 
     public Command coralScoreL2() {
-        return setStatePivotGrip(0, -1.5)
-                .onlyIf(elevator.isAtHeight(Preset.ScoreL2.getHeight(), 0.02)
-                        .and(coral_arm_pivot.isAtAngle(Preset.ScoreL2.getAngle()))
+        return setStatePivotGrip(0, GripperVoltage.releaseCoralL2)
+                .onlyIf(elevator.isAtHeight(ElevatorHeight.scoreL2, 0.02)
+                        .and(coral_arm_pivot.isAtAngle(PivotAngle.scoreL2))
                         .and(hasCoral));
     }
 
     public Command coralScoreL1() {
-        return setStatePivotGrip(0, -0.5)
-                .onlyIf(elevator.isAtHeight(Preset.ScoreL1.getHeight(), 0.02)
+        return setStatePivotGrip(0, GripperVoltage.releaseCoralL1)
+                .onlyIf(elevator.isAtHeight(ElevatorHeight.scoreL1, 0.02)
                         .and(coral_arm_pivot.isAtAngle(0))
                         .and(hasCoral));
     }
 
     // EXTRACT ALGAE
     public Command extractionPrepareLow() {
-        return setStatePivotGrip(Preset.ExtractAlgaeLow.getAngle(), 0)
-                .until(coral_arm_pivot.isAtAngle(0))
-                .andThen(setStatePreset(Preset.ExtractAlgaeLow))
+        return setStatePivotGrip(PivotAngle.extractAlgaeLow, 0)
+                .until(coral_arm_pivot.isAtAngle(PivotAngle.extractAlgaeLow))
+                .andThen(setState(ElevatorHeight.extractAlgaeLow, PivotAngle.extractAlgaeLow))
                 .onlyIf(hasCoral.negate()); // can't run if we already have a algae
     }
 
     public Command extractionPrepareHigh() {
         return setStatePivot(0)
                 .until(coral_arm_pivot.isAtAngle(0))
-                .andThen(setStatePreset(Preset.ExtractAlgaeHigh))
+                .andThen(setState(ElevatorHeight.extractAlgaeHigh, PivotAngle.extractAlgaeHigh))
                 .onlyIf(hasCoral.negate());
     }
 
@@ -218,18 +200,18 @@ public class ElevatorSupersystem {
         return setStateGripper(10)
                 .until(hasCoral) // TODO: does the coral trigger the beam break?
                 .withTimeout(3)
-                .andThen(setStateGripper(algaeHoldVoltage))
-                .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeLow.getHeight())
-                        .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeLow.getAngle())));
+                .andThen(setStateGripper(GripperVoltage.holdAlgae))
+                .onlyIf(elevator.isAtHeight(ElevatorHeight.extractAlgaeLow)
+                        .and(coral_arm_pivot.isAtAngle(PivotAngle.extractAlgaeLow)));
     }
 
     public Command extractionExtractHigh() {
         return setStateGripper(10)
                 .until(hasCoral)
                 .withTimeout(3)
-                .andThen(setStateGripper(algaeHoldVoltage))
-                .onlyIf(elevator.isAtHeight(Preset.ExtractAlgaeHigh.getHeight())
-                        .and(coral_arm_pivot.isAtAngle(Preset.ExtractAlgaeHigh.getAngle())));
+                .andThen(setStateGripper(GripperVoltage.holdAlgae))
+                .onlyIf(elevator.isAtHeight(ElevatorHeight.extractAlgaeHigh)
+                        .and(coral_arm_pivot.isAtAngle(PivotAngle.extractAlgaeHigh)));
     }
 
     public Command extractionStop() {
@@ -238,9 +220,9 @@ public class ElevatorSupersystem {
 
     // SCORE ALGAE
     public Command algaePrepareProcessor() {
-        return setStatePivotGrip(Preset.ScoreProcessor.getAngle(), algaeHoldVoltage)
-            .until(coral_arm_pivot.isAtAngle(Preset.ScoreProcessor.getAngle()))
-            .andThen(setStatePreset(Preset.ScoreProcessor));
+        return setStatePivotGrip(PivotAngle.scoreProcessor, GripperVoltage.holdAlgae)
+            .until(coral_arm_pivot.isAtAngle(PivotAngle.scoreProcessor))
+            .andThen(setState(ElevatorHeight.scoreProcessor, PivotAngle.scoreProcessor));
     }
 
     public Command algaeScoreProcessor() {
@@ -249,11 +231,11 @@ public class ElevatorSupersystem {
     }
 
     public Command algaePrepareBarge() {
-        return setStatePivotGrip(Preset.ScoreL4.getAngle(), algaeHoldVoltage)
-            .until(coral_arm_pivot.isAtAngle(Preset.ScoreL4.getAngle()))
-            .andThen(setState(Preset.ScoreBarge.getHeight(), Preset.ScoreL4.getAngle()))
-            .until(elevator.isAtHeight(Preset.ScoreBarge.getHeight()))
-            .andThen(setState(Preset.ScoreBarge.getHeight(), Preset.ScoreBarge.getAngle(), algaeHoldVoltage));
+        return setStatePivotGrip(PivotAngle.scoreL4, GripperVoltage.holdAlgae)
+            .until(coral_arm_pivot.isAtAngle(PivotAngle.scoreL4))
+            .andThen(setState(ElevatorHeight.scoreBarge, PivotAngle.scoreL4))
+            .until(elevator.isAtHeight(ElevatorHeight.scoreBarge))
+            .andThen(setState(ElevatorHeight.scoreBarge, PivotAngle.scoreBarge, GripperVoltage.holdAlgae));
     }
 
     public Command algaeScoreBarge() {
