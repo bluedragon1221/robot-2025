@@ -74,8 +74,8 @@ public class FieldConstants {
                     new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
                 );
 
-                lefts.add(AllianceFlipUtil.apply(left));
-                rights.add(AllianceFlipUtil.apply(right));
+                lefts.add(left);
+                rights.add(right);
             }
         }
     }

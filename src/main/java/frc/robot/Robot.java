@@ -4,9 +4,7 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Vision;
-import frc.robot.supersystems.ElevatorSupersystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

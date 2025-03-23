@@ -26,7 +26,10 @@ public class Elevator extends SubsystemBase {
     private static final MotionMagicVoltage mm_voltage = new MotionMagicVoltage(0).withEnableFOC(true).withSlot(0);
     private static final Follower follow = new Follower(leftMotorID, false);
     
+    @SuppressWarnings("unused")
     private final Trigger atMax = new Trigger(() -> MathUtil.isNear(getHeight(), 0.58, 0.0254));
+
+    @SuppressWarnings("unused")
     private final Trigger atMin = new Trigger(() -> MathUtil.isNear(getHeight(), 0, 0.0254));
 
     // SysID Routine

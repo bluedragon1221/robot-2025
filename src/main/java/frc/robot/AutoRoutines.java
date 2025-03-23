@@ -40,7 +40,7 @@ public class AutoRoutines {
         final AutoRoutine routine = factory.newRoutine("Blue Center Cage 2L4");
         final AutoTrajectory drive_to_1l4 = routine.trajectory("blue_centercage_2l4", 0);
         final AutoTrajectory drive_to_1hps = routine.trajectory("blue_centercage_2l4", 1);
-        
+        final AutoTrajectory drive_to_2l4 = routine.trajectory("blue_centercage_2l4", 2);
         
         routine.active().onTrue(Commands.sequence(
             drive_to_1l4.resetOdometry(),
@@ -55,6 +55,9 @@ public class AutoRoutines {
 
         drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
         drive_to_1hps.recentlyDone().onTrue(Commands.waitSeconds(1).andThen(supersystem.intakeLoad()));
+
+        drive_to_2l4.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
+        drive_to_2l4.atTime("Score L4").onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
 
         return routine;
     }
