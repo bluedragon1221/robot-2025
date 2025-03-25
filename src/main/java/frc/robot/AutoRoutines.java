@@ -41,7 +41,8 @@ public class AutoRoutines {
         final AutoTrajectory drive_to_1l4 = routine.trajectory("blue_centercage_2l4", 0);
         final AutoTrajectory drive_to_1hps = routine.trajectory("blue_centercage_2l4", 1);
         final AutoTrajectory drive_to_2l4 = routine.trajectory("blue_centercage_2l4", 2);
-        
+        final AutoTrajectory driveback = routine.trajectory("blue_centercage_2l4", 3);
+
         routine.active().onTrue(Commands.sequence(
             drive_to_1l4.resetOdometry(),
             drive_to_1l4.cmd()
@@ -54,10 +55,15 @@ public class AutoRoutines {
         drive_to_1l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(drive_to_1hps.cmd());
 
         drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
-        drive_to_1hps.recentlyDone().onTrue(Commands.waitSeconds(1).andThen(supersystem.intakeLoad()));
+        drive_to_1hps.recentlyDone().onTrue(Commands.waitSeconds(1.5).andThen(supersystem.intakeLoad()).andThen(drive_to_2l4.cmd()));
 
+        drive_to_2l4.atTime("Storage Position").onTrue(supersystem.storagePosition());
         drive_to_2l4.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
         drive_to_2l4.atTime("Score L4").onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
+
+        drive_to_2l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(driveback.cmd());
+
+        driveback.recentlyDone().onTrue(supersystem.storagePosition());
 
         return routine;
     }
