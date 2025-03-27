@@ -22,7 +22,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 
 public class Vision {
-    private static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    private static final AprilTagFieldLayout FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private static final PoseStrategy POSE_STRATEGY = PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR;
     private final CommandSwerveDrivetrain chassis;
     public static final Matrix<N3, N1> SINGLE_TAG_STD_DEVS = VecBuilder.fill(4, 4, 8);
@@ -39,7 +39,7 @@ public class Vision {
                 POSE_STRATEGY,
                 new PhotonCamera("front_cam"),
                 new Transform3d(
-                    new Translation3d(0.0508, 0.1953, 0.3937),
+                    new Translation3d(0.051, 0.195, 0.394),
                     new Rotation3d(0.0, 0.0, -0.174532925)),
                 "front_cam"
             );
@@ -50,7 +50,7 @@ public class Vision {
                     POSE_STRATEGY,
                     new PhotonCamera("back_cam"),
                     new Transform3d(
-                        new Translation3d(-0.0732, -0.2134, 24.45),
+                        new Translation3d(-0.0732, -0.2134, 0.621),
                         new Rotation3d(0.0, 0.0, Math.PI)),
                     "back_cam"
                 );

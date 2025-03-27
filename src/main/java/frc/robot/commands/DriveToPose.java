@@ -30,7 +30,7 @@ public class DriveToPose extends Command {
     private static final double driveMaxAcceleration = 1;
     private static final double thetaMaxVelocity = Units.degreesToRadians(360.0);
     private static final double thetaMaxAcceleration = 8.0;
-    public static final double driveTolerance = 0.01;
+    public static final double driveTolerance = 0.125;
     public static final double thetaTolerance = Units.degreesToRadians(1.0);
     private static final double ffMinRadius = 0.01;
     private static final double ffMaxRadius = 0.05;
@@ -39,9 +39,9 @@ public class DriveToPose extends Command {
     private Supplier<Pose2d> target;
     private final SwerveRequest.ApplyRobotSpeeds drive = new SwerveRequest.ApplyRobotSpeeds().withDriveRequestType(DriveRequestType.Velocity);
 
-    private static final ProfiledPIDController driveController = new ProfiledPIDController(drivekP, 0.1, drivekD,
+    private static final ProfiledPIDController driveController = new ProfiledPIDController(drivekP, 0.0, drivekD,
         new TrapezoidProfile.Constraints(driveMaxVelocity, driveMaxAcceleration));
-    private static final ProfiledPIDController thetaController = new ProfiledPIDController(thetakP, 0.1, thetakD,
+    private static final ProfiledPIDController thetaController = new ProfiledPIDController(thetakP, 0.0, thetakD,
         new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration));
     private Translation2d lastSetpointTranslation = Translation2d.kZero;
     private double driveErrorAbs = 0.0;
@@ -57,6 +57,9 @@ public class DriveToPose extends Command {
     public DriveToPose(CommandSwerveDrivetrain chassis, Supplier<Pose2d> target) {
         this.chassis = chassis;
         this.target = target;
+
+        driveController.setTolerance(driveTolerance);
+        thetaController.setTolerance(thetaTolerance);
 
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -163,7 +166,7 @@ public class DriveToPose extends Command {
     }
 
     public boolean atGoal() {
-        return running && driveController.atGoal() && thetaController.atGoal();
+        return running && ((driveController.atGoal() && thetaController.atGoal()) || withinTolerance(driveTolerance, Rotation2d.fromRadians(thetaTolerance)));
     }
 
     public boolean withinTolerance(double driveTolerance, Rotation2d thetaTolerance) {

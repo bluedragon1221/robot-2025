@@ -31,7 +31,7 @@ public class Constants {
 
         public static final double pivotMotorCurrentLimit = 40;
 
-        public static final double pivotMotorGearRatio = 37.5;
+        public static final double pivotMotorGearRatio = 42.85714286;
         public static final double pivotMotorTolerance = 0.01;
     }
 
