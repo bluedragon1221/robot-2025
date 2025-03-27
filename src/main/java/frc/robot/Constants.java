@@ -42,6 +42,7 @@ public class Constants {
 
     public static final class L1PivotConstants {
         public static final int pivotMotorID = 35;
+        public static final int limSwitchDIO = 0;
         
         public static final int pivotMotorAcceleration = 0;
         public static final int pivotMotorCruiseVelocity = 0;
