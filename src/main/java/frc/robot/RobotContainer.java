@@ -33,6 +33,7 @@ import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StatusLED;
 import frc.robot.supersystems.ElevatorSupersystem;
+import frc.robot.util.AllianceFlipUtil;
 
 public class RobotContainer {
     // initialize subsystems
@@ -104,12 +105,12 @@ public class RobotContainer {
     // Auto align bindings
     private Supplier<Pose2d> nearestLeftCoral() {
         return () ->
-            drivetrain.getState().Pose.nearest(FieldConstants.Reef.lefts);
+            drivetrain.getState().Pose.nearest(AllianceFlipUtil.applyAll(FieldConstants.Reef.lefts));
     }
 
     private Supplier<Pose2d> nearestRightCoral() {
         return () ->
-            drivetrain.getState().Pose.nearest(FieldConstants.Reef.rights);
+        drivetrain.getState().Pose.nearest(AllianceFlipUtil.applyAll(FieldConstants.Reef.rights));
     }
 
     public void configureBindings() {
