@@ -5,6 +5,7 @@
 // @formatter:off
 package frc.robot;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -33,6 +34,7 @@ import frc.robot.subsystems.CoralArmPivot;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StatusLED;
 import frc.robot.supersystems.ElevatorSupersystem;
+import frc.robot.util.AllianceFlipUtil;
 
 public class RobotContainer {
     // initialize subsystems
@@ -80,18 +82,24 @@ public class RobotContainer {
         return slew_rate_limiter_y.calculate(-controller.getLeftY());
     }
 
+    private List<Pose2d> autoalign_lefts;
+    private List<Pose2d> autoalign_rights;
+
     public RobotContainer() {
         if (Robot.isSimulation()) DriverStation.silenceJoystickConnectionWarning(true);
 
         // Add Autos
         auto_factory = drivetrain.createAutoFactory();
-
         auto_routines = new AutoRoutines(auto_factory);
         auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
         auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
         auto_chooser.addRoutine("Blue Center Cage 2L4", auto_routines::BlueCenterCage2l4);
 
         SmartDashboard.putData("Auto Chooser", auto_chooser);
+
+        // Targets for autoalign
+        autoalign_lefts = AllianceFlipUtil.applyAll(FieldConstants.Reef.lefts);
+        autoalign_rights = AllianceFlipUtil.applyAll(FieldConstants.Reef.rights);
 
         configureBindings();
     }
@@ -104,12 +112,12 @@ public class RobotContainer {
     // Auto align bindings
     private Supplier<Pose2d> nearestLeftCoral() {
         return () ->
-            drivetrain.getState().Pose.nearest(FieldConstants.Reef.lefts);
+            drivetrain.getState().Pose.nearest(autoalign_lefts);
     }
 
     private Supplier<Pose2d> nearestRightCoral() {
         return () ->
-            drivetrain.getState().Pose.nearest(FieldConstants.Reef.rights);
+            drivetrain.getState().Pose.nearest(autoalign_rights);
     }
 
     public void configureBindings() {

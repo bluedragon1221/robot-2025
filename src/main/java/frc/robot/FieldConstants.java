@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
-import frc.robot.util.AllianceFlipUtil;
 
 /**
  * Contains various field dimensions and useful reference points. All units are
@@ -75,8 +74,8 @@ public class FieldConstants {
                     new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
                 );
 
-                lefts.add(AllianceFlipUtil.apply(left));
-                rights.add(AllianceFlipUtil.apply(right));
+                lefts.add(left);
+                rights.add(right);
             }
         }
     }

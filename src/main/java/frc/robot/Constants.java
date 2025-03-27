@@ -42,18 +42,18 @@ public class Constants {
 
     public static final class L1PivotConstants {
         public static final int pivotMotorID = 35;
+        public static final int limSwitchDIO = 0;
         
-        public static final int pivotMotorAcceleration = 0;
-        public static final int pivotMotorCruiseVelocity = 0;
+        public static final double pivotMotorAcceleration = 6;
+        public static final double pivotMotorCruiseVelocity = 1.25;
 
-        public static final double pivotMotorGearRatio = 10.0;
+        public static final double pivotMotorGearRatio = 15.0;
     }
     
     public static final class L1GripperConstants {
         public static final int gripperMotorID = 36;
         
         public static final int gripperMotorCurrentLimit = 15;
-        public static final double gripperMotorRampRate = 3; // seconds to max voltage
     }
 
     public static final class ClimberConstants {
