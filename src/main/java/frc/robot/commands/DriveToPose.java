@@ -39,9 +39,9 @@ public class DriveToPose extends Command {
     private Supplier<Pose2d> target;
     private final SwerveRequest.ApplyRobotSpeeds drive = new SwerveRequest.ApplyRobotSpeeds().withDriveRequestType(DriveRequestType.Velocity);
 
-    private static final ProfiledPIDController driveController = new ProfiledPIDController(drivekP, 0.1, drivekD,
+    private static final ProfiledPIDController driveController = new ProfiledPIDController(drivekP, 0.0, drivekD,
         new TrapezoidProfile.Constraints(driveMaxVelocity, driveMaxAcceleration));
-    private static final ProfiledPIDController thetaController = new ProfiledPIDController(thetakP, 0.1, thetakD,
+    private static final ProfiledPIDController thetaController = new ProfiledPIDController(thetakP, 0.0, thetakD,
         new TrapezoidProfile.Constraints(thetaMaxVelocity, thetaMaxAcceleration));
     private Translation2d lastSetpointTranslation = Translation2d.kZero;
     private double driveErrorAbs = 0.0;
