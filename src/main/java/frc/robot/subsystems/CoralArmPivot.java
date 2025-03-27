@@ -26,10 +26,7 @@ public class CoralArmPivot extends SubsystemBase {
     private static final CANcoder pivot_encoder = new CANcoder(pivotEncoderID, "canivore");
     private static final MotionMagicVoltage pivot_mm_voltage = new MotionMagicVoltage(0).withEnableFOC(true);
 
-    @SuppressWarnings("unused")
     private final Trigger atMax = new Trigger(() -> MathUtil.isNear(pivot_motor.getPosition().getValueAsDouble(), 0.23, 0.01));
-    
-    @SuppressWarnings("unused")
     private final Trigger atMin = new Trigger(() -> MathUtil.isNear(pivot_motor.getPosition().getValueAsDouble(), -0.23, 0.01));
 
     private CoralArmPivot() {
@@ -50,6 +47,7 @@ public class CoralArmPivot extends SubsystemBase {
         public static final double intakeGrip = -0.255;
         public static final double scoreProcessor = 0;
         public static final double scoreBarge = 0.21;
+        public static final double lollipop = -0.03;
     }
 
     // private final SysIdRoutine sysIdRoutine = new SysIdRoutine(

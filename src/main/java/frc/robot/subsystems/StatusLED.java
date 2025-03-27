@@ -37,7 +37,7 @@ public class StatusLED extends SubsystemBase {
         }).ignoringDisable(true);
     }
 
-    public Command flashColor(Color color, double rate) {
+    public Command flashColor(Color color, Color second_color, double rate) {
         return run(() -> {
             double time = ((double) System.currentTimeMillis()) / 1000;
             for (int i = 0; i < statusLEDCount; i++) {
@@ -46,17 +46,21 @@ public class StatusLED extends SubsystemBase {
                     if ((i & 1) == 1)
                         buf.setLED(i, color);
                     else
-                        buf.setLED(i, Color.kWhite);
+                        buf.setLED(i, second_color);
                 else
                     // evens
                     if ((i & 1) == 1)
-                        buf.setLED(i, Color.kWhite);
+                        buf.setLED(i, second_color);
                     else
                         buf.setLED(i, color);
             }
 
             status_strip.setData(buf);
         }).ignoringDisable(true);
+    }
+
+    public Command flashColor(Color color, double rate) {
+        return flashColor(color, Color.kWhite, rate);
     }
 
     public static StatusLED getInstance() {

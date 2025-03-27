@@ -15,6 +15,7 @@ import frc.robot.util.AllianceFlipUtil;
  * origin.
  */
 public class FieldConstants {
+    public static final double offsetLength = 21;
     public static final double fieldLength = Units.inchesToMeters(690.876);
     public static final double fieldWidth = Units.inchesToMeters(317);
     public static final double startingLineX = Units.inchesToMeters(299.438); // Measured from the inside of starting line
@@ -47,8 +48,8 @@ public class FieldConstants {
         static {
             for (int face = 0; face < 6; face++) {
                 Pose2d centerWithAngle = new Pose2d(center, Rotation2d.fromDegrees(180 - (60 * face)));
-                double adjustX = Units.inchesToMeters(30.738+19); // set 19in back for aligning
-                double adjustY = Units.inchesToMeters(6.469 * 1.2);
+                double adjustX = Units.inchesToMeters(30.738+offsetLength); // set pose back for aligning
+                double adjustY = Units.inchesToMeters(6.469);
 
                 Pose2d left = new Pose2d(
                     new Translation2d(
@@ -74,9 +75,16 @@ public class FieldConstants {
                     new Rotation2d(centerWithAngle.getRotation().getRadians()).minus(Rotation2d.fromDegrees(180))
                 );
 
-                lefts.add(left);
-                rights.add(right);
+                lefts.add(AllianceFlipUtil.apply(left));
+                rights.add(AllianceFlipUtil.apply(right));
             }
         }
+    }
+
+    public static class Lollipops {
+        public static Pose2d leftLollipop = new Pose2d(
+            new Translation2d(48.25, 84),
+            new Rotation2d()
+        );
     }
 }
