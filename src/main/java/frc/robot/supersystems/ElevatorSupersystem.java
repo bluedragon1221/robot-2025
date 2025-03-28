@@ -111,6 +111,9 @@ public class ElevatorSupersystem {
             .onlyIf(hasCoral.negate()); // only run of we don't already have a coral
     }
 
+    public Trigger hasIntaked = elevator.isAtHeight(ElevatorHeight.postIntakeCatch)
+        .and(hasCoral);
+
     public Command intakeLoad() {
         return setState(ElevatorHeight.intakeGrip, PivotAngle.intakeGrip, GripperVoltage.intakeCoral)
             .until(hasCoral)
@@ -123,10 +126,11 @@ public class ElevatorSupersystem {
 
     public Command intakePost() {
         return setStateElevator(ElevatorHeight.postIntakeCatch)
+            .andThen(setStateGripper(0.0))
             .until(elevator.isAtHeight(ElevatorHeight.postIntakeCatch))
             .andThen(setStatePivot(PivotAngle.storage))
             .until(coral_arm_pivot.isAtAngle(PivotAngle.storage))
-            .andThen(setState(ElevatorHeight.storage, PivotAngle.storage));
+            .andThen(setState(ElevatorHeight.storage, PivotAngle.storage, 0));
     }
 
     // SCORE CORAL

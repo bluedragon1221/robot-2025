@@ -27,7 +27,7 @@ public class Constants {
         public static final double pivotMotorAcceleration = 1;
         public static final double pivotMotorCruiseVelocity = 0.5;
 
-        public static final double pivotEncoderOffset = -0.242919921875;
+        public static final double pivotEncoderOffset = 0.4169921875;
 
         public static final double pivotMotorCurrentLimit = 40;
 
