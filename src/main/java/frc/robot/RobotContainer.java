@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
@@ -16,7 +17,9 @@ import choreo.auto.AutoFactory;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -72,18 +75,20 @@ public class RobotContainer {
     private final AutoRoutines auto_routines;
     private final AutoChooser auto_chooser = new AutoChooser();
 
-    private final SlewRateLimiter slew_rate_limiter_x = new SlewRateLimiter(1);
+    // private final SlewRateLimiter slew_rate_limiter_x = new SlewRateLimiter(1);
     private double getControlX() {
-        return slew_rate_limiter_x.calculate(-controller.getLeftX());
+        return -controller.getLeftX(); //slew_rate_limiter_x.calculate(-controller.getLeftX());
     }
     
-    private final SlewRateLimiter slew_rate_limiter_y = new SlewRateLimiter(1);
+    // private final SlewRateLimiter slew_rate_limiter_y = new SlewRateLimiter(1);
     private double getControlY() {
-        return slew_rate_limiter_y.calculate(-controller.getLeftY());
+        return -controller.getLeftY(); //slew_rate_limiter_y.calculate(-controller.getLeftY());
     }
 
     private List<Pose2d> autoalign_lefts;
     private List<Pose2d> autoalign_rights;
+
+    private final Pose2d hps;
 
     public RobotContainer() {
         if (Robot.isSimulation()) DriverStation.silenceJoystickConnectionWarning(true);
@@ -101,6 +106,8 @@ public class RobotContainer {
         autoalign_lefts = AllianceFlipUtil.applyAll(FieldConstants.Reef.lefts);
         autoalign_rights = AllianceFlipUtil.applyAll(FieldConstants.Reef.rights);
 
+        hps = AllianceFlipUtil.apply(new Pose2d(new Translation2d(1.1446170806884766, 0.9114338755607605), Rotation2d.fromRadians(-2.203650142759433)));
+        
         configureBindings();
     }
 
@@ -137,9 +144,18 @@ public class RobotContainer {
             drivetrain.applyRequest(() ->
                 drive
                     .withVelocityX(getControlY() * max_speed * turtle_mode) // Drive forward with negative Y (forward)
-                    .withVelocityY(getControlY() * max_speed * turtle_mode) // Drive left with negative X (left)
+                    .withVelocityY(getControlX() * max_speed * turtle_mode) // Drive left with negative X (left)
                     .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive counterclockwise with negative X (left)
         ));
+
+        // Orchestra orchestra = new Orchestra("output.chrp");
+
+        // for (var module : drivetrain.getModules()) {
+        //     orchestra.addInstrument(module.getDriveMotor());
+        //     orchestra.addInstrument(module.getSteerMotor());
+        // }
+
+        // orchestra.play();
 
         controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
         controller.b().whileTrue(drivetrain.applyRequest(() ->
@@ -152,6 +168,8 @@ public class RobotContainer {
         controller.back().and(controller.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         controller.start().and(controller.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         controller.start().and(controller.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        // controller.back().and(controller.a()).whileTrue(ElevatorSupersystem.coral_arm_pivot.runSysICommand());
 
         // reset the field-centric heading on left bumper press
         controller.leftBumper().and(controller.start()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -186,6 +204,7 @@ public class RobotContainer {
 
         DriveToPose left_go_to_pose = new DriveToPose(drivetrain, nearestLeftCoral());
         DriveToPose right_go_to_pose = new DriveToPose(drivetrain, nearestRightCoral());
+        DriveToPose hps_go_to_pose = new DriveToPose(drivetrain, () -> hps);
 
         (new Trigger(() -> left_go_to_pose.atGoal() && right_go_to_pose.atGoal())).whileTrue(
             status_led.flashColor(
@@ -197,6 +216,8 @@ public class RobotContainer {
         // left/right reef align
         launchpad.getButton(2, 0).or(controller.leftBumper()).whileTrue(left_go_to_pose);
         launchpad.getButton(3, 0).or(controller.rightBumper()).whileTrue(right_go_to_pose);
+
+        launchpad.getButton(1, 0).or(controller.a()).whileTrue(hps_go_to_pose);
 
         // Elevator/coral arm controls
         launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
@@ -236,6 +257,8 @@ public class RobotContainer {
         launchpad.getButton(0, 8).onTrue(supersystem.storagePosition());
 
         // launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
+
+        launchpad.getButton(0, 6).onTrue(supersystem.setStatePivot(0));
 
         launchpad.getButton(8, 8).onTrue(supersystem.extractionStop());
         launchpad.getButton(7, 0).onTrue(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = true))

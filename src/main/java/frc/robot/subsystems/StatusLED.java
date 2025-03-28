@@ -3,10 +3,13 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.StatusLEDConstants.statusLEDCount;
 
 import java.time.Instant;
+import java.util.function.Supplier;
 
 import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,7 +27,9 @@ public class StatusLED extends SubsystemBase {
 
         status_strip.start();
 
-        setDefaultCommand(rgbStream());
+        setDefaultCommand(solidColorSupplier(
+                () -> (DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red ? Color.kFirstRed
+                        : Color.kFirstBlue)));
     }
 
     public Command rgbStream() {
@@ -48,11 +53,22 @@ public class StatusLED extends SubsystemBase {
                     else
                         buf.setLED(i, second_color);
                 else
-                    // evens
-                    if ((i & 1) == 1)
-                        buf.setLED(i, second_color);
-                    else
-                        buf.setLED(i, color);
+                // evens
+                if ((i & 1) == 1)
+                    buf.setLED(i, second_color);
+                else
+                    buf.setLED(i, color);
+            }
+
+            status_strip.setData(buf);
+        }).ignoringDisable(true);
+    }
+
+    public Command solidColorSupplier(Supplier<Color> colorSupplier) {
+        return run(() -> {
+            Color color = colorSupplier.get();
+            for (int i = 0; i < statusLEDCount; i++) {
+                buf.setLED(i, color);
             }
 
             status_strip.setData(buf);

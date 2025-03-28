@@ -117,7 +117,7 @@ public class ElevatorSupersystem {
     public Command intakeLoad() {
         return setState(ElevatorHeight.intakeGrip, PivotAngle.intakeGrip, GripperVoltage.intakeCoral)
             .until(hasCoral)
-            .withTimeout(3)
+            .withTimeout(5)
             .andThen(setState(ElevatorHeight.postIntakeCatch, PivotAngle.postIntakeCatch, GripperVoltage.zero))
             .onlyIf(elevator.isAtHeight(ElevatorHeight.intakeCatch)
                 .and(coral_arm_pivot.isAtAngle(PivotAngle.intakeCatch))

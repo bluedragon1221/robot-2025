@@ -72,10 +72,10 @@ public class Elevator extends SubsystemBase {
         public static final double scoreL4 = 0.6604;
         public static final double extractAlgaeLow = 0.34;
         public static final double extractAlgaeHigh = 0.5;
-        public static final double intakeCatch = 0.5148;
-        public static final double postIntakeCatch = 0.517;
+        public static final double intakeCatch = 0.525;
+        public static final double postIntakeCatch = 0.525;
         public static final double intakeGrip = 0.4387;
-        public static final double scoreProcessor = 0.1224;
+        public static final double scoreProcessor = 0.10;
         public static final double scoreBarge = 0.6850;
     }
 

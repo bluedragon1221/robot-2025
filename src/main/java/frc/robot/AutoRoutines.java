@@ -3,7 +3,9 @@ package frc.robot;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.ElevatorHeight;
 import frc.robot.supersystems.ElevatorSupersystem;
@@ -42,8 +44,9 @@ public class AutoRoutines {
                 final AutoRoutine routine = factory.newRoutine("Blue Center Cage 2L4");
                 final AutoTrajectory drive_to_1l4 = routine.trajectory("blue_centercage_2l4", 0);
                 final AutoTrajectory drive_to_1hps = routine.trajectory("blue_centercage_2l4", 1);
-                final AutoTrajectory drive_to_2l4 = routine.trajectory("blue_centercage_2l4", 2);
-                final AutoTrajectory driveback = routine.trajectory("blue_centercage_2l4", 3);
+                final AutoTrajectory hps_backup = routine.trajectory("blue_centercage_2l4", 2);
+                final AutoTrajectory drive_to_2l4 = routine.trajectory("blue_centercage_2l4", 3);
+                final AutoTrajectory driveback = routine.trajectory("blue_centercage_2l4", 4);
 
                 routine.active().onTrue(Commands.sequence(
                                 drive_to_1l4.resetOdometry(),
@@ -59,10 +62,14 @@ public class AutoRoutines {
                 drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
                 drive_to_1hps.recentlyDone().onTrue(
                                 Commands.waitSeconds(1.5) // Time for HP to place coral
-                                                .andThen(supersystem.intakeLoad())
-                                                .until(supersystem.hasIntaked)
-                                                .withTimeout(3)
-                                                .andThen(drive_to_2l4.spawnCmd()));
+                                                .andThen(supersystem.intakeLoad()
+                                                                .until(supersystem.hasIntaked)
+                                                                .withTimeout(3))
+                                                .andThen(hps_backup.spawnCmd()));
+
+                hps_backup.recentlyDone().onTrue(new ConditionalCommand(
+                                supersystem.intakePost(),
+                                drive_to_2l4.spawnCmd(), supersystem.hasCoral));
                 // drive_to_1hps.recentlyDone()
                 // .onTrue(Commands.waitSeconds(1.5)
                 // .andThen(supersystem.intakeLoad()
@@ -72,13 +79,14 @@ public class AutoRoutines {
                 // .withTimeout(3))
                 // .andThen(drive_to_2l4.cmd()));
 
-                // drive_to_2l4.atTime("Intake Post").onTrue(supersystem.intakePost());
-                drive_to_2l4.atTime("Prepare L4 2").onTrue(supersystem.coralPrepareL4());
-                drive_to_2l4.atTime("Score L4 2")
+                drive_to_2l4.atTime("Intake Post").onTrue(supersystem.intakePost());
+                drive_to_2l4.atTime("Prepare L4 2").and(supersystem.hasCoral).onTrue(supersystem.coralPrepareL4());
+                drive_to_2l4.atTime("Score L4 2").and(supersystem.hasCoral)
                                 .onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
 
                 drive_to_2l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(driveback.cmd());
 
+                driveback.atTime("Storage Position 2").onTrue(supersystem.storagePosition());
                 driveback.recentlyDone().onTrue(supersystem.storagePosition());
 
                 return routine;
