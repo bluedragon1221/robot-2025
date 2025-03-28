@@ -58,22 +58,21 @@ public class AutoRoutines {
 
                 drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
                 drive_to_1hps.recentlyDone().onTrue(
-                        Commands.waitSeconds(1.5) // Time for HP to place coral
-                        .andThen(supersystem.intakeLoad())
-                                .until(supersystem.hasIntaked)
-                                .withTimeout(3)
-                        .andThen(drive_to_2l4.cmd())
-                );
+                                Commands.waitSeconds(1.5) // Time for HP to place coral
+                                                .andThen(supersystem.intakeLoad())
+                                                .until(supersystem.hasIntaked)
+                                                .withTimeout(3)
+                                                .andThen(drive_to_2l4.spawnCmd()));
                 // drive_to_1hps.recentlyDone()
-                //                 .onTrue(Commands.waitSeconds(1.5)
-                //                                 .andThen(supersystem.intakeLoad()
-                //                                                 .until(ElevatorSupersystem.elevator.isAtHeight(
-                //                                                                 ElevatorHeight.postIntakeCatch)
-                //                                                                 .and(supersystem.hasCoral))
-                //                                                 .withTimeout(3))
-                //                                 .andThen(drive_to_2l4.cmd()));
+                // .onTrue(Commands.waitSeconds(1.5)
+                // .andThen(supersystem.intakeLoad()
+                // .until(ElevatorSupersystem.elevator.isAtHeight(
+                // ElevatorHeight.postIntakeCatch)
+                // .and(supersystem.hasCoral))
+                // .withTimeout(3))
+                // .andThen(drive_to_2l4.cmd()));
 
-                drive_to_2l4.atTime("Intake Post").onTrue(supersystem.intakePost());
+                // drive_to_2l4.atTime("Intake Post").onTrue(supersystem.intakePost());
                 drive_to_2l4.atTime("Prepare L4 2").onTrue(supersystem.coralPrepareL4());
                 drive_to_2l4.atTime("Score L4 2")
                                 .onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
