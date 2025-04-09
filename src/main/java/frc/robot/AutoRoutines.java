@@ -14,8 +14,6 @@ import frc.robot.supersystems.ElevatorSupersystem;
 import frc.robot.util.AllianceFlipUtil;
 
 public class AutoRoutines {
-        private final ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
-
         private final AutoFactory factory;
         private final CommandSwerveDrivetrain drivetrain;
 
@@ -33,14 +31,14 @@ public class AutoRoutines {
                                 path.resetOdometry(),
                                 path.cmd()));
 
-                path.atTime("Storage Position").onTrue(supersystem.storagePosition());
-                path.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
+                path.atTime("Storage Position").onTrue(ElevatorSupersystem.storage.coral());
+                path.atTime("Prepare L4").onTrue(ElevatorSupersystem.coral.prepareL4());
 
                 path.atTime("Score L4")
-                                .onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
+                                .onTrue(Commands.waitUntil(ElevatorSupersystem.coral.canScoreL4).andThen(ElevatorSupersystem.coral.scoreL4()));
 
-                path.recentlyDone().and(supersystem.hasScoredL4).onTrue(driveback.cmd());
-                driveback.recentlyDone().onTrue(supersystem.storagePosition());
+                path.recentlyDone().and(ElevatorSupersystem.coral.hasScoredL4).onTrue(driveback.cmd());
+                driveback.recentlyDone().onTrue(ElevatorSupersystem.storage.empty());
 
                 return routine;
         }
@@ -56,64 +54,29 @@ public class AutoRoutines {
                                 drive_to_1l4.resetOdometry(),
                                 drive_to_1l4.cmd()));
 
-                drive_to_1l4.atTime("Storage Position").onTrue(supersystem.storagePosition());
-                drive_to_1l4.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
+                drive_to_1l4.atTime("Storage Position").onTrue(ElevatorSupersystem.storage.empty());
+                drive_to_1l4.atTime("Prepare L4").onTrue(ElevatorSupersystem.coral.prepareL4());
                 drive_to_1l4.atTime("Score L4")
-                                .onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
+                                .onTrue(Commands.waitUntil(ElevatorSupersystem.coral.canScoreL4).andThen(ElevatorSupersystem.coral.scoreL4()));
 
-                drive_to_1l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(drive_to_1hps.cmd());
+                drive_to_1l4.recentlyDone().and(ElevatorSupersystem.coral.hasScoredL4).onTrue(drive_to_1hps.cmd());
 
-                drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
+                drive_to_1hps.atTime("Prepare Intake").onTrue(ElevatorSupersystem.intake.prepare());
                 drive_to_1hps.recentlyDone().onTrue(
                                 Commands.waitSeconds(1.5) // Time for HP to place coral
-                                                .andThen(supersystem.intakeLoad()
-                                                                .until(supersystem.hasIntaked)
+                                                .andThen(ElevatorSupersystem.intake.load()
+                                                                .until(ElevatorSupersystem.intake.hasIntaked)
                                                                 .withTimeout(5))
                                                 .andThen(drive_to_2l4.spawnCmd()));
 
-                drive_to_2l4.atTime("Prepare L4 2").and(supersystem.hasCoral).onTrue(supersystem.coralPrepareL4());
-                drive_to_2l4.atTime("Score L4 2").and(supersystem.hasCoral)
-                                .onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
+                drive_to_2l4.atTime("Prepare L4 2").and(ElevatorSupersystem.hasCoral).onTrue(ElevatorSupersystem.coral.prepareL4());
+                drive_to_2l4.atTime("Score L4 2").and(ElevatorSupersystem.hasCoral)
+                                .onTrue(Commands.waitUntil(ElevatorSupersystem.coral.canScoreL4).andThen(ElevatorSupersystem.coral.scoreL4()));
 
-                drive_to_2l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(driveback.cmd());
+                drive_to_2l4.recentlyDone().and(ElevatorSupersystem.coral.hasScoredL4).onTrue(driveback.cmd());
 
-                driveback.atTime("Storage Position 2").onTrue(supersystem.storagePosition());
-                driveback.recentlyDone().onTrue(supersystem.storagePosition());
-
-                return routine;
-        }
-
-        public AutoRoutine BlueCenterCage2l4AUTOALIGN() {
-                final AutoRoutine routine = factory.newRoutine("Blue Center Cage 2L4 AUTOALIGN");
-                final AutoTrajectory drive_to_1l4 = routine.trajectory("blue_centercage_2l4_AUTOALIGN", 0);
-                final AutoTrajectory drive_to_1hps = routine.trajectory("blue_centercage_2l4_AUTOALIGN", 1);
-                final AutoTrajectory drive_to_2l4 = routine.trajectory("blue_centercage_2l4_AUTOALIGN", 2);
-
-                routine.active().onTrue(Commands.sequence(
-                                drive_to_1l4.resetOdometry(),
-                                drive_to_1l4.cmd()));
-
-                drive_to_1l4.atTime("Storage Position").onTrue(supersystem.storagePosition());
-                drive_to_1l4.atTime("Prepare L4").onTrue(supersystem.coralPrepareL4());
-                drive_to_1l4.atTime("Score L4")
-                                .onTrue(Commands.waitUntil(supersystem.canScoreL4).andThen(supersystem.coralScoreL4()));
-
-                drive_to_1l4.recentlyDone().and(supersystem.hasScoredL4).onTrue(drive_to_1hps.cmd());
-
-                // Supplier<Pose2d> goal_pose = () -> AllianceFlipUtil.apply(new Pose2d(3.982771873474121, 2.8459954261779785, new Rotation2d(1.034896238468816)));
-                Supplier<Pose2d> goal_pose = () -> AllianceFlipUtil.apply(new Pose2d(4.08438777923584, 2.9911606311798096, new Rotation2d(1.034896238468816)));
-
-                drive_to_1hps.atTime("Prepare Intake").onTrue(supersystem.intakePrepare());
-                drive_to_1hps.recentlyDone().onTrue(
-                                Commands.waitSeconds(1.5) // Time for HP to place coral
-                                                .andThen(supersystem.intakeLoad()
-                                                                .until(supersystem.hasIntaked)
-                                                                .withTimeout(5))
-                                                .andThen(drive_to_2l4.spawnCmd()));
-
-                drive_to_2l4.recentlyDone().onTrue(
-                        new DriveToPose(drivetrain, goal_pose)
-                                .andThen(supersystem.coralScoreL4()));
+                driveback.atTime("Storage Position 2").onTrue(ElevatorSupersystem.storage.coral());
+                driveback.recentlyDone().onTrue(ElevatorSupersystem.storage.coral());
 
                 return routine;
         }
@@ -126,7 +89,7 @@ public class AutoRoutines {
                                 path.resetOdometry(),
                                 path.cmd()));
 
-                path.atTime("Storage Position").onTrue(supersystem.storagePosition());
+                path.atTime("Storage Position").onTrue(ElevatorSupersystem.storage.empty());
 
                 return routine;
         }

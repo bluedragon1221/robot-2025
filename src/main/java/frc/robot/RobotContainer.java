@@ -9,17 +9,14 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.ctre.phoenix6.Orchestra;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import choreo.auto.AutoChooser;
 import choreo.auto.AutoFactory;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
@@ -32,19 +29,15 @@ import frc.robot.commands.DriveToPose;
 import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.CoralArmGripper;
-import frc.robot.subsystems.CoralArmPivot;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.StatusLED;
+import frc.robot.subsystems.elevator.ElevatorPreset;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.supersystems.ElevatorSupersystem;
 import frc.robot.util.AllianceFlipUtil;
 
 public class RobotContainer {
     // initialize subsystems
-    Elevator elevator = Elevator.getInstance();
-    ElevatorSupersystem supersystem = ElevatorSupersystem.getInstance();
-    CoralArmPivot coral_arm_pivot = CoralArmPivot.getInstance();
-    CoralArmGripper coral_arm_gripper = CoralArmGripper.getInstance();
+    ElevatorSubsystem elevator = ElevatorSubsystem.getInstance();
     StatusLED status_led = StatusLED.getInstance();
 
     Launchpad launchpad = new Launchpad(1, 2, 3, new Color8Bit(255, 255, 255));
@@ -75,16 +68,6 @@ public class RobotContainer {
     private final AutoRoutines auto_routines;
     private final AutoChooser auto_chooser = new AutoChooser();
 
-    // private final SlewRateLimiter slew_rate_limiter_x = new SlewRateLimiter(1);
-    private double getControlX() {
-        return -controller.getLeftX(); //slew_rate_limiter_x.calculate(-controller.getLeftX());
-    }
-    
-    // private final SlewRateLimiter slew_rate_limiter_y = new SlewRateLimiter(1);
-    private double getControlY() {
-        return -controller.getLeftY(); //slew_rate_limiter_y.calculate(-controller.getLeftY());
-    }
-
     private List<Pose2d> autoalign_lefts;
     private List<Pose2d> autoalign_rights;
 
@@ -103,7 +86,6 @@ public class RobotContainer {
         auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
         auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
         auto_chooser.addRoutine("Blue Center Cage 2L4", auto_routines::BlueCenterCage2l4);
-        auto_chooser.addRoutine("Blue Center Cage 2L4 AUTOALIGN", auto_routines::BlueCenterCage2l4AUTOALIGN);
 
         SmartDashboard.putData("Auto Chooser", auto_chooser);
 
@@ -116,7 +98,7 @@ public class RobotContainer {
     private final double turtle_mode = 0.15;
     private final double slower_turtle_mode = 0.035;
 
-    private Trigger turtle_trigger = new Trigger(() -> (elevator.getHeight() >= Elevator.ElevatorHeight.scoreL2)).and(DriverStation::isTeleopEnabled);
+    private Trigger turtle_trigger = elevator.isAboveHeight(ElevatorPreset.l2).and(DriverStation::isTeleopEnabled);
 
     // Auto align bindings
     private Supplier<Pose2d> nearestLeftCoral() {
@@ -137,16 +119,16 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             drivetrain.applyRequest(() ->
                 drive
-                    .withVelocityX(getControlY() * max_speed) // Drive forward with negative Y (forward)
-                    .withVelocityY(getControlX() * max_speed) // Drive left with negative X (left) Drive counterclockwise with negative X (left)
+                    .withVelocityX(-controller.getLeftY() * max_speed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-controller.getLeftX() * max_speed) // Drive left with negative X (left) Drive counterclockwise with negative X (left)
                     .withRotationalRate(-controller.getRightX() * max_angular_rate) // Drive counterclockwise with negative X (left)
         ));
 
         turtle_trigger.whileTrue(
             drivetrain.applyRequest(() ->
                 drive
-                    .withVelocityX(getControlY() * max_speed * turtle_mode) // Drive forward with negative Y (forward)
-                    .withVelocityY(getControlX() * max_speed * turtle_mode) // Drive left with negative X (left)
+                    .withVelocityX(-controller.getLeftY() * max_speed * turtle_mode) // Drive forward with negative Y (forward)
+                    .withVelocityY(-controller.getLeftX() * max_speed * turtle_mode) // Drive left with negative X (left)
                     .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive counterclockwise with negative X (left)
         ));
 
@@ -222,47 +204,44 @@ public class RobotContainer {
         launchpad.getButton(1, 0).or(controller.a()).whileTrue(hps_go_to_pose);
 
         // Elevator/coral arm controls
-        launchpad.getButton(8, 1).onTrue(supersystem.coralPrepareL1());
-        launchpad.getButton(8, 2).onTrue(supersystem.coralPrepareL2());
-        launchpad.getButton(8, 3).onTrue(supersystem.coralPrepareL3());
-        launchpad.getButton(8, 4).onTrue(supersystem.coralPrepareL4());
+        launchpad.getButton(8, 1).onTrue(ElevatorSupersystem.coral.prepareL1());
+        launchpad.getButton(8, 2).onTrue(ElevatorSupersystem.coral.prepareL2());
+        launchpad.getButton(8, 3).onTrue(ElevatorSupersystem.coral.prepareL3());
+        launchpad.getButton(8, 4).onTrue(ElevatorSupersystem.coral.prepareL4());
 
         // coral scoring
-        launchpad.getButton(7, 1).onTrue(supersystem.coralScoreL1());
-        launchpad.getButton(7, 2).onTrue(supersystem.coralScoreL2());
-        launchpad.getButton(7, 3).onTrue(supersystem.coralScoreL3());
-        launchpad.getButton(7, 4).onTrue(supersystem.coralScoreL4());
+        launchpad.getButton(7, 1).onTrue(ElevatorSupersystem.coral.scoreL1());
+        launchpad.getButton(7, 2).onTrue(ElevatorSupersystem.coral.scoreL2());
+        launchpad.getButton(7, 3).onTrue(ElevatorSupersystem.coral.scoreL3());
+        launchpad.getButton(7, 4).onTrue(ElevatorSupersystem.coral.scoreL4());
 
         // intake
-        launchpad.getButton(8, 5).onTrue(supersystem.intakePrepare());
-        launchpad.getButton(7, 5).onTrue(supersystem.intakeLoad());
-        launchpad.getButton(6, 5).onTrue(supersystem.intakePost());
+        launchpad.getButton(8, 5).onTrue(ElevatorSupersystem.intake.prepare());
+        launchpad.getButton(7, 5).onTrue(ElevatorSupersystem.intake.load());
+        launchpad.getButton(6, 5).onTrue(ElevatorSupersystem.storage.coral());
 
         // high extract / low extract
-        launchpad.getButton(8, 6).onTrue(supersystem.extractionPrepareHigh());
-        launchpad.getButton(7, 6).onTrue(supersystem.extractionExtractHigh());
+        launchpad.getButton(8, 6).onTrue(ElevatorSupersystem.extraction.prepareHigh());
+        launchpad.getButton(7, 6).onTrue(ElevatorSupersystem.extraction.extract());
 
         // low extract
-        launchpad.getButton(8, 7).onTrue(supersystem.extractionPrepareLow());
-        launchpad.getButton(7, 7).onTrue(supersystem.extractionExtractLow());
+        launchpad.getButton(8, 7).onTrue(ElevatorSupersystem.extraction.prepareLow());
+        launchpad.getButton(7, 7).onTrue(ElevatorSupersystem.extraction.extract());
 
         // processor scoring
-        launchpad.getButton(6, 7).onTrue(supersystem.algaePrepareProcessor());
-        launchpad.getButton(5, 7).onTrue(supersystem.algaeScoreProcessor());
+        launchpad.getButton(6, 7).onTrue(ElevatorSupersystem.processor.prepare());
+        launchpad.getButton(5, 7).onTrue(ElevatorSupersystem.processor.score());
 
         // barge scoring
-        launchpad.getButton(6, 6).onTrue(supersystem.algaePrepareBarge());
-        launchpad.getButton(5, 6).onTrue(supersystem.algaeScoreBarge());
+        launchpad.getButton(6, 6).onTrue(ElevatorSupersystem.barge.prepare());
+        launchpad.getButton(5, 6).onTrue(ElevatorSupersystem.barge.score());
 
         // storage positions
-        launchpad.getButton(0, 7).onTrue(supersystem.storagePositionAlgae());
-        launchpad.getButton(0, 8).onTrue(supersystem.storagePosition());
+        launchpad.getButton(0, 7).onTrue(ElevatorSupersystem.storage.algae());
+        launchpad.getButton(0, 8).onTrue(ElevatorSupersystem.storage.coral());
 
         // launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
 
-        launchpad.getButton(0, 6).onTrue(supersystem.setStatePivot(0));
-
-        launchpad.getButton(8, 8).onTrue(supersystem.extractionStop());
         launchpad.getButton(7, 0).onTrue(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = true))
                         .onFalse(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = false));
 
