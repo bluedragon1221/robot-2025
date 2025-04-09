@@ -1,13 +1,6 @@
 package frc.robot.subsystems.coralarmpivot;
 
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotEncoderID;
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotEncoderOffset;
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotMotorAcceleration;
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotMotorCruiseVelocity;
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotMotorCurrentLimit;
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotMotorGearRatio;
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotMotorID;
-import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.pivotMotorTolerance;
+import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.*;
 
 import java.util.function.Supplier;
 
