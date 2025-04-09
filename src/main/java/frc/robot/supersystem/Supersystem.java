@@ -1,10 +1,7 @@
 //@formatter:off
 
-package frc.robot.supersystems;
+package frc.robot.supersystem;
 
-import static frc.robot.Constants.ElevatorSupersystemConstants.beamBreakSensorDIO;
-
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -15,17 +12,14 @@ import frc.robot.subsystems.coralarmpivot.CoralArmPivotSubsystem;
 import frc.robot.subsystems.elevator.ElevatorPreset;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
-public class ElevatorSupersystem {
+public class Supersystem {
     private static final ElevatorSubsystem elevator = ElevatorSubsystem.getInstance();
     private static final CoralArmGripperSubsystem coral_gripper = CoralArmGripperSubsystem.getInstance();
     private static final CoralArmPivotSubsystem coral_pivot = CoralArmPivotSubsystem.getInstance();
 
-    public static boolean beam_break_override = false;
-    public static final DigitalInput beam_break_sensor = new DigitalInput(beamBreakSensorDIO);
-    public static final Trigger hasCoral = new Trigger(() -> beam_break_sensor.get() || beam_break_override).negate();
-
     public static final Trigger pivotSafe = coral_pivot.isBetweenAngles(CoralArmPivotPreset.minSafe, CoralArmPivotPreset.maxSafe);
-    
+    public static final Trigger hasCoral = coral_gripper.hasCoral;
+
     public static class storage {
         public static final Command empty() {
             return coral();
@@ -207,7 +201,7 @@ public class ElevatorSupersystem {
         
         public static final Command extract() {
             return coral_gripper.setVoltage(CoralArmGripperPreset.extractAlgae)
-                .until(hasCoral)
+                .until(coral_gripper.hasCoral)
                 .withTimeout(3);
         }
     }
