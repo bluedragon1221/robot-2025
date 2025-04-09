@@ -2,10 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.StatusLEDConstants.statusLEDCount;
 
-import java.time.Instant;
 import java.util.function.Supplier;
 
-import edu.wpi.first.hal.HALUtil;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
