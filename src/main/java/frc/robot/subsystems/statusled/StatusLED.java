@@ -1,6 +1,6 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.statusled;
 
-import static frc.robot.Constants.StatusLEDConstants.statusLEDCount;
+import static frc.robot.subsystems.statusled.StatusLEDConstants.*;
 
 import java.util.function.Supplier;
 

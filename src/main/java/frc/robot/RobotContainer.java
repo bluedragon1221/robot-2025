@@ -29,10 +29,11 @@ import frc.robot.commands.DriveToPose;
 import frc.robot.control.Launchpad;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.StatusLED;
+import frc.robot.subsystems.coralarmgripper.CoralArmGripperSubsystem;
 import frc.robot.subsystems.elevator.ElevatorPreset;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.supersystems.ElevatorSupersystem;
+import frc.robot.subsystems.statusled.StatusLED;
+import frc.robot.supersystem.Supersystem;
 import frc.robot.util.AllianceFlipUtil;
 
 public class RobotContainer {
@@ -82,7 +83,7 @@ public class RobotContainer {
 
         // Add Autos
         auto_factory = drivetrain.createAutoFactory();
-        auto_routines = new AutoRoutines(auto_factory, drivetrain);
+        auto_routines = new AutoRoutines(auto_factory);
         auto_chooser.addRoutine("Center 1L4", auto_routines::Center1l4);
         auto_chooser.addRoutine("Drive Forward", auto_routines::DriveForward);
         auto_chooser.addRoutine("Blue Center Cage 2L4", auto_routines::BlueCenterCage2l4);
@@ -132,15 +133,6 @@ public class RobotContainer {
                     .withRotationalRate(-controller.getRightX() * max_angular_rate * turtle_mode) // Drive counterclockwise with negative X (left)
         ));
 
-        // Orchestra orchestra = new Orchestra("output.chrp");
-
-        // for (var module : drivetrain.getModules()) {
-        //     orchestra.addInstrument(module.getDriveMotor());
-        //     orchestra.addInstrument(module.getSteerMotor());
-        // }
-
-        // orchestra.play();
-
         controller.a().whileTrue(drivetrain.applyRequest(() -> brake));
         controller.b().whileTrue(drivetrain.applyRequest(() ->
             point.withModuleDirection(new Rotation2d(-controller.getLeftY(), -controller.getLeftX()))
@@ -153,7 +145,6 @@ public class RobotContainer {
         controller.start().and(controller.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         controller.start().and(controller.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // controller.back().and(controller.a()).whileTrue(ElevatorSupersystem.coral_arm_pivot.runSysICommand());
 
         // reset the field-centric heading on left bumper press
         controller.leftBumper().and(controller.start()).onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -204,46 +195,46 @@ public class RobotContainer {
         launchpad.getButton(1, 0).or(controller.a()).whileTrue(hps_go_to_pose);
 
         // Elevator/coral arm controls
-        launchpad.getButton(8, 1).onTrue(ElevatorSupersystem.coral.prepareL1());
-        launchpad.getButton(8, 2).onTrue(ElevatorSupersystem.coral.prepareL2());
-        launchpad.getButton(8, 3).onTrue(ElevatorSupersystem.coral.prepareL3());
-        launchpad.getButton(8, 4).onTrue(ElevatorSupersystem.coral.prepareL4());
+        launchpad.getButton(8, 1).onTrue(Supersystem.coral.prepareL1());
+        launchpad.getButton(8, 2).onTrue(Supersystem.coral.prepareL2());
+        launchpad.getButton(8, 3).onTrue(Supersystem.coral.prepareL3());
+        launchpad.getButton(8, 4).onTrue(Supersystem.coral.prepareL4());
 
         // coral scoring
-        launchpad.getButton(7, 1).onTrue(ElevatorSupersystem.coral.scoreL1());
-        launchpad.getButton(7, 2).onTrue(ElevatorSupersystem.coral.scoreL2());
-        launchpad.getButton(7, 3).onTrue(ElevatorSupersystem.coral.scoreL3());
-        launchpad.getButton(7, 4).onTrue(ElevatorSupersystem.coral.scoreL4());
+        launchpad.getButton(7, 1).onTrue(Supersystem.coral.scoreL1());
+        launchpad.getButton(7, 2).onTrue(Supersystem.coral.scoreL2());
+        launchpad.getButton(7, 3).onTrue(Supersystem.coral.scoreL3());
+        launchpad.getButton(7, 4).onTrue(Supersystem.coral.scoreL4());
 
         // intake
-        launchpad.getButton(8, 5).onTrue(ElevatorSupersystem.intake.prepare());
-        launchpad.getButton(7, 5).onTrue(ElevatorSupersystem.intake.load());
-        launchpad.getButton(6, 5).onTrue(ElevatorSupersystem.storage.coral());
+        launchpad.getButton(8, 5).onTrue(Supersystem.intake.prepare());
+        launchpad.getButton(7, 5).onTrue(Supersystem.intake.load());
+        launchpad.getButton(6, 5).onTrue(Supersystem.storage.coral());
 
         // high extract / low extract
-        launchpad.getButton(8, 6).onTrue(ElevatorSupersystem.extraction.prepareHigh());
-        launchpad.getButton(7, 6).onTrue(ElevatorSupersystem.extraction.extract());
+        launchpad.getButton(8, 6).onTrue(Supersystem.extraction.prepareHigh());
+        launchpad.getButton(7, 6).onTrue(Supersystem.extraction.extract());
 
         // low extract
-        launchpad.getButton(8, 7).onTrue(ElevatorSupersystem.extraction.prepareLow());
-        launchpad.getButton(7, 7).onTrue(ElevatorSupersystem.extraction.extract());
+        launchpad.getButton(8, 7).onTrue(Supersystem.extraction.prepareLow());
+        launchpad.getButton(7, 7).onTrue(Supersystem.extraction.extract());
 
         // processor scoring
-        launchpad.getButton(6, 7).onTrue(ElevatorSupersystem.processor.prepare());
-        launchpad.getButton(5, 7).onTrue(ElevatorSupersystem.processor.score());
+        launchpad.getButton(6, 7).onTrue(Supersystem.processor.prepare());
+        launchpad.getButton(5, 7).onTrue(Supersystem.processor.score());
 
         // barge scoring
-        launchpad.getButton(6, 6).onTrue(ElevatorSupersystem.barge.prepare());
-        launchpad.getButton(5, 6).onTrue(ElevatorSupersystem.barge.score());
+        launchpad.getButton(6, 6).onTrue(Supersystem.barge.prepare());
+        launchpad.getButton(5, 6).onTrue(Supersystem.barge.score());
 
         // storage positions
-        launchpad.getButton(0, 7).onTrue(ElevatorSupersystem.storage.algae());
-        launchpad.getButton(0, 8).onTrue(ElevatorSupersystem.storage.coral());
+        launchpad.getButton(0, 7).onTrue(Supersystem.storage.algae());
+        launchpad.getButton(0, 8).onTrue(Supersystem.storage.coral());
 
         // launchpad.getButton(2, 2).onTrue(supersystem.setStateFromDashboard());
 
-        launchpad.getButton(7, 0).onTrue(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = true))
-                        .onFalse(Commands.runOnce(() -> ElevatorSupersystem.beam_break_override = false));
+        launchpad.getButton(7, 0).onTrue(Commands.runOnce(() -> CoralArmGripperSubsystem.beam_break_override = true))
+                        .onFalse(Commands.runOnce(() -> CoralArmGripperSubsystem.beam_break_override = false));
 
         // Telemetrize our drive train
         drivetrain.registerTelemetry(logger::telemeterize);
