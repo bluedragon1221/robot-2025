@@ -5,7 +5,6 @@ import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -28,22 +27,20 @@ public class ElevatorSubsystem extends SubsystemBase {
     protected static final Follower follow = new Follower(leftMotorID, false);
 
     protected static final Supplier<Double> elevator_height = () -> translateRotationsToHeight(leader_motor.getPosition().getValueAsDouble());
+    
+    public static synchronized ElevatorSubsystem getInstance() {
+        if (instance == null) {
+            instance = new ElevatorSubsystem();
+        }
+        
+        return instance;
+    }
 
     protected ElevatorSubsystem() {
         configureMotors();
     }
 
-    public static synchronized ElevatorSubsystem getInstance() {
-        if (instance == null) {
-            instance = new ElevatorSubsystem();
-        }
-
-        return instance;
-    }
-
     private void configureMotors() {
-        BaseStatusSignal.setUpdateFrequencyForAll(250, leader_motor.getPosition(), leader_motor.getVelocity(), leader_motor.getMotorVoltage());
-
         var cfg = new TalonFXConfiguration();
         cfg.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -69,28 +66,23 @@ public class ElevatorSubsystem extends SubsystemBase {
         leader_motor.getConfigurator().apply(cfg);
         follower_motor.getConfigurator().apply(cfg);
         
-        leader_motor.optimizeBusUtilization();
-        
         leader_motor.setPosition(0);
         follower_motor.setPosition(0);
     }
 
-    private static double translateHeightToRotations(double goalHeight) {
-        return goalHeight / (22 * 0.25 * 0.0254);
+    private static double translateHeightToRotations(double height) {
+        return height / sprocketRadius;
     }
-    private static double translateRotationsToHeight(double goalAngle) {
-        return (22 * 0.25 * 0.0254) * goalAngle;
+    private static double translateRotationsToHeight(double rotations) {
+        return sprocketRadius * rotations;
     }
 
     public Trigger isAtHeight(double goalHeight) {
         return new Trigger(() -> MathUtil.isNear(goalHeight, elevator_height.get(), heightTolerance));
     }
-    public Trigger isAtHeight(double goalHeight, double tolerance) {
-        return new Trigger(() -> MathUtil.isNear(goalHeight, elevator_height.get(), tolerance));
-    }
 
     public Trigger isAboveHeight(double height) {
-        return new Trigger(() -> elevator_height.get() > (height + heightTolerance));
+        return new Trigger(() -> elevator_height.get() > height);
     }
 
     public Command setHeight(double goalHeight) {

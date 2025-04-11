@@ -30,7 +30,6 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     field.setRobotPose(robot_container.drivetrain.getPose());
-    // field.setRobotPose(robot_container.drivetrain.getPose());
   }
   
   @Override

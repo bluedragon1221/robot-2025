@@ -20,12 +20,12 @@ public class Supersystem {
     public static final Trigger pivotSafe = coral_pivot.isBetweenAngles(CoralArmPivotPreset.minSafe, CoralArmPivotPreset.maxSafe);
     public static final Trigger hasCoral = coral_gripper.hasCoral;
 
-    public static class storage {
-        public static final Command empty() {
+    public static final class storage {
+        public static Command empty() {
             return coral();
         }
     
-        public static final Command coral() {
+        public static Command coral() {
             // case 1: coming from robot start
                 // set elevator (should already be initial)
                 // parallel set arm
@@ -37,7 +37,7 @@ public class Supersystem {
                 // wait until above lowest safe pivot (0.01), then move elevator
             // or generally:
                 // set arm to storage
-                // wait until between hightest safe pivot and lowest safe pivot, then move elevator
+                // wait until between highest and lowest safe pivot, then move elevator
 
             return Commands.parallel(
                 coral_pivot.setAngle(CoralArmPivotPreset.storage),
@@ -46,14 +46,14 @@ public class Supersystem {
             );
         }
 
-        public static final Command algae() {
+        public static Command algae() {
             return empty()
                 .alongWith(coral_gripper.setVoltage(CoralArmGripperPreset.holdAlgae));
         }
     }
     
     public static final class intake {
-        public static final Command prepare() {
+        public static Command prepare() {
             // case 1: coming from storage
                 // set angle to minSafe
                 // parallel set height to intake catch
@@ -85,7 +85,7 @@ public class Supersystem {
         public static final Trigger isPrepared = elevator.isAtHeight(ElevatorPreset.intakeCatch)
             .and(coral_pivot.isAtAngle(CoralArmPivotPreset.intake));
 
-        public static final Command load() {
+        public static Command load() {
             // only run if already prepared
             // set gripper voltage and set intakeGrip height until has coral
             // set gripper voltage to holdCoral and intakePost height
@@ -112,7 +112,7 @@ public class Supersystem {
             // go to the correct angle
             // wait until above min safe angle, then set angle to correct height
 
-        private static final Command prepare(double angle, double height) {
+        private static Command prepare(double angle, double height) {
             return Commands.parallel(
                 coral_pivot.setAngle(angle),
                 Commands.waitUntil(pivotSafe)
@@ -120,19 +120,19 @@ public class Supersystem {
             );
         }
 
-        public static final Command prepareL4() {
+        public static Command prepareL4() {
             return prepare(CoralArmPivotPreset.prepareL4, ElevatorPreset.l4);
         }
 
-        public static final Command prepareL3() {
+        public static Command prepareL3() {
             return prepare(CoralArmPivotPreset.prepareL3, ElevatorPreset.l3);
         }
 
-        public static final Command prepareL2() {
+        public static Command prepareL2() {
             return prepare(CoralArmPivotPreset.prepareL2, ElevatorPreset.l2);
         }
 
-        public static final Command prepareL1() {
+        public static Command prepareL1() {
             return prepare(CoralArmPivotPreset.prepareL1, ElevatorPreset.l1);
         }
 
@@ -144,7 +144,7 @@ public class Supersystem {
             .and(coral_pivot.isAtAngle(CoralArmPivotPreset.prepareL4));
         public static final Trigger hasScoredL4 = elevator.isAtHeight(ElevatorPreset.l4)
             .and(coral_pivot.isAtAngle(CoralArmPivotPreset.scoreL4));
-        public static final Command scoreL4() {
+        public static Command scoreL4() {
             return Commands.parallel(
                 coral_pivot.setAngle(CoralArmPivotPreset.scoreL4),
                 Commands.waitUntil(coral_pivot.isAtAngle(CoralArmPivotPreset.scoreL4))
@@ -152,9 +152,9 @@ public class Supersystem {
             ).onlyIf(canScoreL4);
         }
 
-        public static final Trigger canScoreL3 = elevator.isAtHeight(ElevatorPreset.l3, 0.02)
+        public static final Trigger canScoreL3 = elevator.isAtHeight(ElevatorPreset.l3)
             .and(coral_pivot.isAtAngle(CoralArmPivotPreset.scoreL3));
-        public static final Command scoreL3() {
+        public static Command scoreL3() {
             return Commands.parallel(
                 coral_pivot.setAngle(CoralArmPivotPreset.scoreL3),
                 coral_gripper.setVoltage(CoralArmGripperPreset.releaseCoralL3)
@@ -163,7 +163,7 @@ public class Supersystem {
 
         public static final Trigger canScoreL2 = elevator.isAtHeight(ElevatorPreset.l2)
             .and(coral_pivot.isAtAngle(CoralArmPivotPreset.scoreL2));
-        public static final Command scoreL2() {
+        public static Command scoreL2() {
             return Commands.parallel(
                 coral_pivot.setAngle(CoralArmPivotPreset.scoreL2),
                 coral_gripper.setVoltage(CoralArmGripperPreset.releaseCoralL2)
@@ -173,33 +173,33 @@ public class Supersystem {
         public static final Trigger canScoreL1 = elevator.isAtHeight(ElevatorPreset.l1)
             .and(coral_pivot.isAtAngle(0));
 
-        public static final Command scoreL1() {
+        public static Command scoreL1() {
             return coral_gripper.setVoltage(CoralArmGripperPreset.releaseCoralL1).onlyIf(canScoreL1);
         }
     }
 
     public static final class extraction {
-        public static final Command prepareLow() {
+        public static Command prepareLow() {
             return Commands.parallel(
-                coral_pivot.setAngle(CoralArmPivotPreset.extractAlgaeLow),
+                coral_pivot.setAngle(CoralArmPivotPreset.extractAlgae),
                 Commands.waitUntil(pivotSafe).andThen(elevator.setHeight(ElevatorPreset.extractAlgaeLow))
             );
         }
 
-        public static final Command prepareHigh() {
+        public static Command prepareHigh() {
             return Commands.parallel(
-                coral_pivot.setAngle(CoralArmPivotPreset.extractAlgaeHigh),
+                coral_pivot.setAngle(CoralArmPivotPreset.extractAlgae),
                 Commands.waitUntil(pivotSafe).andThen(elevator.setHeight(ElevatorPreset.extractAlgaeHigh))
             );
         }
 
         public static final Trigger canExtractLow = elevator.isAtHeight(ElevatorPreset.extractAlgaeLow)
-            .and(coral_pivot.isAtAngle(CoralArmPivotPreset.extractAlgaeLow));
+            .and(coral_pivot.isAtAngle(CoralArmPivotPreset.extractAlgae));
         
         public static final Trigger canExtractHigh = elevator.isAtHeight(ElevatorPreset.extractAlgaeHigh)
-            .and(coral_pivot.isAtAngle(CoralArmPivotPreset.extractAlgaeHigh));
+            .and(coral_pivot.isAtAngle(CoralArmPivotPreset.extractAlgae));
         
-        public static final Command extract() {
+        public static Command extract() {
             return coral_gripper.setVoltage(CoralArmGripperPreset.extractAlgae)
                 .until(coral_gripper.hasCoral)
                 .withTimeout(3);
@@ -207,7 +207,7 @@ public class Supersystem {
     }
 
     public static final class processor {
-        public static final Command prepare() {
+        public static Command prepare() {
             return Commands.parallel(
                 // This should continue over gripper voltage from previous state
                     // case 1: coming from storage.algae
@@ -218,7 +218,7 @@ public class Supersystem {
             );
         }
 
-        public static final Command score() {
+        public static Command score() {
             return coral_gripper
                 .setVoltage(CoralArmGripperPreset.scoreAlgaeProcessor)
                 .withTimeout(1)
@@ -227,7 +227,7 @@ public class Supersystem {
     }
 
     public static final class barge {
-        public static final Command prepare() {
+        public static Command prepare() {
             return Commands.parallel(
                 coral_pivot.setAngle(CoralArmPivotPreset.maxSafe)
                     .until(elevator.isAtHeight(ElevatorPreset.scoreBarge))
@@ -237,7 +237,7 @@ public class Supersystem {
             );
         }
 
-        public static final Command score() {
+        public static Command score() {
             return coral_gripper.setVoltage(CoralArmGripperPreset.scoreAlgaeBarge)
                 .withTimeout(1)
                 .andThen(coral_gripper.setVoltage(CoralArmGripperPreset.zero));

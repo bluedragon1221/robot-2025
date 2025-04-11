@@ -4,7 +4,6 @@ import static frc.robot.subsystems.coralarmpivot.CoralArmPivotConstants.*;
 
 import java.util.function.Supplier;
 
-import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -44,18 +43,13 @@ public class CoralArmPivotSubsystem extends SubsystemBase {
 
     private void configureMotors() {
         // Encoder
-        BaseStatusSignal.setUpdateFrequencyForAll(50, pivot_encoder.getPosition(), pivot_encoder.getVelocity());
-        pivot_encoder.optimizeBusUtilization();
-
         var encoder_cfg = new MagnetSensorConfigs();
         encoder_cfg.SensorDirection = SensorDirectionValue.Clockwise_Positive;
         encoder_cfg.MagnetOffset = pivotEncoderOffset;
+
         pivot_encoder.getConfigurator().apply(encoder_cfg);
 
         // Motor
-        BaseStatusSignal.setUpdateFrequencyForAll(50, pivot_motor.getPosition(), pivot_motor.getVelocity(), pivot_motor.getMotorVoltage(), pivot_motor.getRotorVelocity(), pivot_motor.getRotorPosition());
-        pivot_motor.optimizeBusUtilization();
-
         var pivot_cfg = new TalonFXConfiguration();
         pivot_cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
         pivot_cfg.Feedback.FeedbackRemoteSensorID = pivotEncoderID;
@@ -83,8 +77,8 @@ public class CoralArmPivotSubsystem extends SubsystemBase {
     }
 
 
-    public Trigger isAtAngle(double goalAngle) {
-        return new Trigger(() -> MathUtil.isNear(goalAngle, pivot_angle.get(), pivotMotorTolerance));
+    public Trigger isAtAngle(double angle) {
+        return new Trigger(() -> MathUtil.isNear(angle, pivot_angle.get(), pivotMotorTolerance));
     }
 
     public Trigger isBeyondAngle(double angle) {

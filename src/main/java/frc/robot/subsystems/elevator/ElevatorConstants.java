@@ -11,8 +11,7 @@ public final class ElevatorConstants {
 
     public static final double heightTolerance = 0.0015;
 
-    public static final double sprocketRadius = 0.0254 * 0.905;
+    public static final double sprocketRadius = 22 * 0.25 * 0.0254;
 
     public static final int heightSensorID = 22;
-    public static final int bottomSensorDIO = 0;
 }
